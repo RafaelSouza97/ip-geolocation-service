@@ -1,0 +1,39 @@
+# Configurações base
+spring:
+  application:
+    name: ip-geolocation-service
+
+server:
+  port: 8080
+
+# Configurações de geolocalização
+geolocation:
+  api:
+    url: ${GEOLOCATION_API_URL:http://ip-api.com/json}
+    timeout: ${GEOLOCATION_API_TIMEOUT:5s}
+  cache:
+    ttl: ${GEOLOCATION_CACHE_TTL:24h}
+    max-size: ${GEOLOCATION_CACHE_MAX_SIZE:10000}
+  fallback:
+    country-code: ${GEOLOCATION_FALLBACK_COUNTRY_CODE:BR}
+    country-name: ${GEOLOCATION_FALLBACK_COUNTRY_NAME:Brazil}
+
+# Actuator
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics
+  endpoint:
+    health:
+      show-details: when_authorized
+      probes:
+        enabled: true
+
+# OpenAPI
+springdoc:
+  api-docs:
+    path: /api-docs
+  swagger-ui:
+    path: /swagger-ui.html
+    operationsSorter: method

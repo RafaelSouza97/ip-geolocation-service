@@ -1,0 +1,14 @@
+# Configurações para desenvolvimento local
+spring:
+  profiles:
+    active: local
+
+logging:
+  level:
+    com.example.geolocation: DEBUG
+    org.springframework.web: DEBUG
+
+# Swagger habilitado em dev
+springdoc:
+  swagger-ui:
+    enabled: true
