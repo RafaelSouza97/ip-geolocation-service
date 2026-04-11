@@ -1,0 +1,213 @@
+{
+  "_type": "export",
+  "__export_format": 4,
+  "__export_date": "2026-04-11T00:00:00.000Z",
+  "__export_source": "insomnia.desktop.app:v2023.5.8",
+  "resources": [
+    {
+      "_id": "wrk_ip_geolocation",
+      "parentId": null,
+      "modified": 1712800000000,
+      "created": 1712800000000,
+      "name": "IP Geolocation Service",
+      "description": "Collection para testar o serviço de geolocalização por IP",
+      "scope": "collection",
+      "_type": "workspace"
+    },
+    {
+      "_id": "env_base",
+      "parentId": "wrk_ip_geolocation",
+      "modified": 1712800000000,
+      "created": 1712800000000,
+      "name": "Local",
+      "data": {
+        "base_url": "http://localhost:8080",
+        "api_version": "v1"
+      },
+      "dataPropertyOrder": {
+        "&": ["base_url", "api_version"]
+      },
+      "color": "#7ED321",
+      "isPrivate": false,
+      "metaSortKey": 1,
+      "_type": "environment"
+    },
+    {
+      "_id": "fld_geolocation",
+      "parentId": "wrk_ip_geolocation",
+      "modified": 1712800000000,
+      "created": 1712800000000,
+      "name": "Geolocation",
+      "description": "Endpoints de geolocalização",
+      "environment": {},
+      "environmentPropertyOrder": null,
+      "metaSortKey": -1,
+      "_type": "request_group"
+    },
+    {
+      "_id": "req_locate_valid_ip",
+      "parentId": "fld_geolocation",
+      "modified": 1712800000000,
+      "created": 1712800000000,
+      "url": "{{ _.base_url }}/api/geolocation/{{ _.api_version }}/locate?ip=8.8.8.8",
+      "name": "Locate Valid IP (Google DNS)",
+      "description": "Consulta geolocalização de um IP público válido",
+      "method": "GET",
+      "body": {},
+      "parameters": [],
+      "headers": [
+        {
+          "name": "x-device-platform",
+          "value": "Web",
+          "description": "Plataforma do dispositivo (iOS, Android, Web)"
+        }
+      ],
+      "authentication": {},
+      "metaSortKey": -1,
+      "isPrivate": false,
+      "settingStoreCookies": true,
+      "settingSendCookies": true,
+      "settingDisableRenderRequestBody": false,
+      "settingEncodeUrl": true,
+      "settingRebuildPath": true,
+      "settingFollowRedirects": "global",
+      "_type": "request"
+    },
+    {
+      "_id": "req_locate_brazil_ip",
+      "parentId": "fld_geolocation",
+      "modified": 1712800000000,
+      "created": 1712800000000,
+      "url": "{{ _.base_url }}/api/geolocation/{{ _.api_version }}/locate?ip=177.45.123.45",
+      "name": "Locate Brazil IP",
+      "description": "Consulta geolocalização de um IP brasileiro",
+      "method": "GET",
+      "body": {},
+      "parameters": [],
+      "headers": [
+        {
+          "name": "x-device-platform",
+          "value": "Android"
+        }
+      ],
+      "authentication": {},
+      "metaSortKey": 0,
+      "_type": "request"
+    },
+    {
+      "_id": "req_locate_private_ip",
+      "parentId": "fld_geolocation",
+      "modified": 1712800000000,
+      "created": 1712800000000,
+      "url": "{{ _.base_url }}/api/geolocation/{{ _.api_version }}/locate?ip=192.168.1.1",
+      "name": "Locate Private IP (Fallback)",
+      "description": "IP privado deve retornar fallback (Brasil)",
+      "method": "GET",
+      "body": {},
+      "parameters": [],
+      "headers": [
+        {
+          "name": "x-device-platform",
+          "value": "iOS"
+        }
+      ],
+      "authentication": {},
+      "metaSortKey": 1,
+      "_type": "request"
+    },
+    {
+      "_id": "req_locate_invalid_ip",
+      "parentId": "fld_geolocation",
+      "modified": 1712800000000,
+      "created": 1712800000000,
+      "url": "{{ _.base_url }}/api/geolocation/{{ _.api_version }}/locate?ip=invalid",
+      "name": "Locate Invalid IP (Error 400)",
+      "description": "IP inválido deve retornar erro 400",
+      "method": "GET",
+      "body": {},
+      "parameters": [],
+      "headers": [
+        {
+          "name": "x-device-platform",
+          "value": "Web"
+        }
+      ],
+      "authentication": {},
+      "metaSortKey": 2,
+      "_type": "request"
+    },
+    {
+      "_id": "req_missing_platform",
+      "parentId": "fld_geolocation",
+      "modified": 1712800000000,
+      "created": 1712800000000,
+      "url": "{{ _.base_url }}/api/geolocation/{{ _.api_version }}/locate?ip=8.8.8.8",
+      "name": "Missing Platform Header (Error 400)",
+      "description": "Requisição sem header x-device-platform",
+      "method": "GET",
+      "body": {},
+      "parameters": [],
+      "headers": [],
+      "authentication": {},
+      "metaSortKey": 3,
+      "_type": "request"
+    },
+    {
+      "_id": "fld_health",
+      "parentId": "wrk_ip_geolocation",
+      "modified": 1712800000000,
+      "created": 1712800000000,
+      "name": "Health & Metrics",
+      "description": "Endpoints de monitoramento",
+      "environment": {},
+      "metaSortKey": 0,
+      "_type": "request_group"
+    },
+    {
+      "_id": "req_health",
+      "parentId": "fld_health",
+      "modified": 1712800000000,
+      "created": 1712800000000,
+      "url": "{{ _.base_url }}/actuator/health",
+      "name": "Health Check",
+      "method": "GET",
+      "body": {},
+      "parameters": [],
+      "headers": [],
+      "authentication": {},
+      "metaSortKey": -1,
+      "_type": "request"
+    },
+    {
+      "_id": "req_info",
+      "parentId": "fld_health",
+      "modified": 1712800000000,
+      "created": 1712800000000,
+      "url": "{{ _.base_url }}/actuator/info",
+      "name": "Application Info",
+      "method": "GET",
+      "body": {},
+      "parameters": [],
+      "headers": [],
+      "authentication": {},
+      "metaSortKey": 0,
+      "_type": "request"
+    },
+    {
+      "_id": "req_swagger",
+      "parentId": "fld_health",
+      "modified": 1712800000000,
+      "created": 1712800000000,
+      "url": "{{ _.base_url }}/swagger-ui.html",
+      "name": "Swagger UI",
+      "description": "Abrir no navegador para documentação interativa",
+      "method": "GET",
+      "body": {},
+      "parameters": [],
+      "headers": [],
+      "authentication": {},
+      "metaSortKey": 1,
+      "_type": "request"
+    }
+  ]
+}
