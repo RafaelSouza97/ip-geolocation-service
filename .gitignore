@@ -30,7 +30,7 @@ buildNumber.properties
 *.iws
 *.iml
 *.ipr
-out/
+/out/
 
 # IDE - Eclipse
 .apt_generated
