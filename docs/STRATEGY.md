@@ -433,3 +433,87 @@ Antes de cada PR, verificar:
 - [ ] **DIP:** Dependências são injetadas via interfaces?
 - [ ] **KISS:** Existe uma solução mais simples?
 - [ ] **DRY:** Há código duplicado que pode ser extraído?
+
+---
+
+## 10. Estratégia de Autenticação (JWT)
+
+### Escolha: JWT Stateless
+
+**Justificativa:**
+- ✅ Sem necessidade de sessão no servidor
+- ✅ Escalabilidade horizontal (qualquer instância valida o token)
+- ✅ Padrão amplamente adotado em APIs REST
+- ⚠️ Token não pode ser invalidado antes da expiração
+
+### Configuração
+
+```yaml
+security:
+  jwt:
+    secret-key: ${JWT_SECRET_KEY:404E635266...}  # 256-bit key
+    expiration: ${JWT_EXPIRATION:86400000}       # 24 horas em ms
+  user:
+    username: ${SECURITY_USER:admin}
+    password: ${SECURITY_PASSWORD:admin123}
+```
+
+### Componentes de Segurança
+
+| Componente | Responsabilidade |
+|------------|------------------|
+| `SecurityConfig` | Configura filtros, endpoints públicos/protegidos |
+| `JwtService` | Gera e valida tokens JWT |
+| `JwtAuthenticationFilter` | Intercepta requests, extrai e valida Bearer token |
+| `AuthController` | Endpoint POST /auth/login |
+
+### Fluxo de Autenticação
+
+```java
+// 1. Login
+POST /auth/login
+{"username": "admin", "password": "admin123"}
+
+// 2. Resposta
+{"token": "eyJhbGciOiJIUzI1NiIs..."}
+
+// 3. Requisições autenticadas
+GET /api/geolocation/v1/locate?ip=8.8.8.8
+Authorization: Bearer eyJhbGciOiJIUzI1NiIs...
+```
+
+### Estrutura do Token
+
+```json
+// Header
+{"alg": "HS256", "typ": "JWT"}
+
+// Payload
+{
+  "sub": "admin",           // Subject (username)
+  "iat": 1712947200,        // Issued At
+  "exp": 1713033600         // Expiration (24h)
+}
+
+// Signature
+HMACSHA256(base64(header) + "." + base64(payload), secret)
+```
+
+### Endpoints por Acesso
+
+| Endpoint | Acesso | Justificativa |
+|----------|--------|---------------|
+| `POST /auth/login` | Público | Necessário para obter token |
+| `GET /actuator/health` | Público | Health checks (k8s, load balancer) |
+| `GET /swagger-ui/**` | Público | Documentação da API |
+| `GET /api/**` | Autenticado | Rotas de negócio protegidas |
+
+### Tratamento de Erros
+
+| Cenário | HTTP Status | Resposta |
+|---------|-------------|----------|
+| Sem Authorization header | 403 | Forbidden |
+| Token expirado | 403 | Forbidden |
+| Token inválido/mal formado | 403 | Forbidden |
+| Credenciais inválidas | 401 | Unauthorized |
+| Usuário não encontrado | 401 | Unauthorized |

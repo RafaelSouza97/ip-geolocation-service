@@ -4,18 +4,18 @@
 
 Este documento organiza todas as tarefas necessárias para implementar o ip-geolocation-service do zero.
 
-**Estimativa Total:** 8-12 horas de desenvolvimento
+**Status:** ✅ **Concluído** (182 testes passando, 96%+ cobertura)
 
 ---
 
-## Fase 1: Setup do Projeto (1-2h)
+## Fase 1: Setup do Projeto (1-2h) ✅
 
 ### 1.1 Estrutura Base
-- [ ] Criar projeto Spring Boot 3.3.x com Spring Initializr
-- [ ] Configurar Java 21
-- [ ] Adicionar dependências (pom.xml)
-- [ ] Criar estrutura de pastas (application/, infrastructure/)
-- [ ] Configurar .gitignore
+- [x] Criar projeto Spring Boot 3.3.x com Spring Initializr
+- [x] Configurar Java 21
+- [x] Adicionar dependências (pom.xml)
+- [x] Criar estrutura de pastas (application/, infrastructure/)
+- [x] Configurar .gitignore
 
 ### 1.2 Dependências Maven
 
@@ -71,128 +71,128 @@ Este documento organiza todas as tarefas necessárias para implementar o ip-geol
 ```
 
 ### 1.3 Configuração
-- [ ] Criar application.yml com configurações base
-- [ ] Criar application-local.yml para desenvolvimento
-- [ ] Configurar GeolocationProperties com @ConfigurationProperties
+- [x] Criar application.yml com configurações base
+- [x] Criar application-local.yml para desenvolvimento
+- [x] Configurar GeolocationProperties com @ConfigurationProperties
 
 ---
 
-## Fase 2: Domain Layer (1h)
+## Fase 2: Domain Layer (1h) ✅
 
 ### 2.1 Models (Records)
-- [ ] `Country` - código e nome do país
-- [ ] `Region` - código e nome da região
-- [ ] `Coordinates` - latitude e longitude
-- [ ] `GeolocationInfo` - agregado com todos os dados
+- [x] `Country` - código e nome do país
+- [x] `Region` - código e nome da região
+- [x] `Coordinates` - latitude e longitude
+- [x] `GeolocationInfo` - agregado com todos os dados
 
 ### 2.2 Exceptions
-- [ ] `InvalidIpAddressException`
-- [ ] `PrivateIpAddressException`
-- [ ] `MissingPlatformHeaderException`
-- [ ] `InvalidPlatformException`
+- [x] `InvalidIpAddressException`
+- [x] `PrivateIpAddressException`
+- [x] `MissingPlatformHeaderException`
+- [x] `InvalidPlatformException`
 
 ### 2.3 Ports (Interfaces)
-- [ ] `GeolocationUseCase` (port/in)
-- [ ] `GeolocationProvider` (port/out)
-- [ ] `GeolocationCache` (port/out)
+- [x] `GeolocationUseCase` (port/in)
+- [x] `GeolocationProvider` (port/out)
+- [x] `GeolocationCache` (port/out)
 
 ---
 
-## Fase 3: Application Layer (2h)
+## Fase 3: Application Layer (2h) ✅
 
 ### 3.1 Service
-- [ ] `GeolocationService` implementando `GeolocationUseCase`
-  - [ ] Método `locate(String ip)`
-  - [ ] Lógica de verificação de cache
-  - [ ] Chamada ao provider externo
-  - [ ] Tratamento de fallback
-  - [ ] Armazenamento em cache
+- [x] `GeolocationService` implementando `GeolocationUseCase`
+  - [x] Método `locate(String ip)`
+  - [x] Lógica de verificação de cache
+  - [x] Chamada ao provider externo
+  - [x] Tratamento de fallback
+  - [x] Armazenamento em cache
 
 ### 3.2 Validação de IP
-- [ ] `IpValidator` - classe utilitária
-  - [ ] Regex para IPv4
-  - [ ] Regex para IPv6
-  - [ ] Detecção de IPs privados
-  - [ ] Detecção de localhost
+- [x] `IpValidator` - classe utilitária
+  - [x] Regex para IPv4
+  - [x] Regex para IPv6
+  - [x] Detecção de IPs privados
+  - [x] Detecção de localhost
 
 ---
 
-## Fase 4: Infrastructure Layer (2-3h)
+## Fase 4: Infrastructure Layer (2-3h) ✅
 
 ### 4.1 Controller
-- [ ] `GeolocationController`
-  - [ ] Endpoint GET /api/geolocation/v1/locate
-  - [ ] Validação de parâmetros
-  - [ ] Validação de headers
-  - [ ] Conversão Request → Domain → Response
+- [x] `GeolocationController`
+  - [x] Endpoint GET /api/geolocation/v1/locate
+  - [x] Validação de parâmetros
+  - [x] Validação de headers
+  - [x] Conversão Request → Domain → Response
 
 ### 4.2 DTOs
-- [ ] `GeolocationResponse` - resposta de sucesso
-- [ ] `ErrorResponse` - resposta de erro
+- [x] `GeolocationResponse` - resposta de sucesso
+- [x] `ErrorResponse` - resposta de erro
 
 ### 4.3 Validators
-- [ ] `@ValidIp` - annotation customizada
-- [ ] `IpAddressValidator` - implementação
-- [ ] `@ValidPlatform` - annotation customizada
-- [ ] `PlatformValidator` - implementação
+- [x] `@ValidIp` - annotation customizada
+- [x] `IpAddressValidator` - implementação
+- [x] `@ValidPlatform` - annotation customizada
+- [x] `PlatformValidator` - implementação
 
 ### 4.4 Exception Handler
-- [ ] `GlobalExceptionHandler` com @RestControllerAdvice
+- [x] `GlobalExceptionHandler` com @RestControllerAdvice
 
 ### 4.5 HTTP Client
-- [ ] `IpApiClient` implementando `GeolocationProvider`
-  - [ ] HttpClient configurado
-  - [ ] Timeout handling
-  - [ ] JSON parsing
-  - [ ] Error handling
+- [x] `IpApiClient` implementando `GeolocationProvider`
+  - [x] HttpClient configurado
+  - [x] Timeout handling
+  - [x] JSON parsing
+  - [x] Error handling
 
 ### 4.6 Cache
-- [ ] `CacheConfig` - bean do Caffeine
-- [ ] `CaffeineGeolocationCache` implementando `GeolocationCache`
+- [x] `CacheConfig` - bean do Caffeine
+- [x] `CaffeineGeolocationCache` implementando `GeolocationCache`
 
 ---
 
-## Fase 5: Testes (2-3h)
+## Fase 5: Testes (2-3h) ✅
 
 ### 5.1 Unit Tests
-- [ ] `GeolocationServiceTest`
-  - [ ] Teste de cache hit
-  - [ ] Teste de cache miss
-  - [ ] Teste de fallback
-  - [ ] Teste de IPs privados
-- [ ] `IpValidatorTest`
-  - [ ] IPv4 válido
-  - [ ] IPv6 válido
-  - [ ] IP inválido
-  - [ ] IPs privados
+- [x] `GeolocationServiceTest`
+  - [x] Teste de cache hit
+  - [x] Teste de cache miss
+  - [x] Teste de fallback
+  - [x] Teste de IPs privados
+- [x] `IpValidatorTest`
+  - [x] IPv4 válido
+  - [x] IPv6 válido
+  - [x] IP inválido
+  - [x] IPs privados
 
 ### 5.2 Integration Tests
-- [ ] `GeolocationControllerIT`
-  - [ ] Sucesso com IP válido
-  - [ ] Erro 400 para IP inválido
-  - [ ] Erro 400 para header ausente
-  - [ ] Erro 400 para platform inválido
-- [ ] `IpApiClientIT` (WireMock)
-  - [ ] Parsing de resposta sucesso
-  - [ ] Handling de timeout
-  - [ ] Handling de erro
+- [x] `GeolocationControllerTest`
+  - [x] Sucesso com IP válido
+  - [x] Erro 400 para IP inválido
+  - [x] Erro 400 para header ausente
+  - [x] Erro 400 para platform inválido
+- [x] `IpApiClientTest` (WireMock)
+  - [x] Parsing de resposta sucesso
+  - [x] Handling de timeout
+  - [x] Handling de erro
 
 ### 5.3 Coverage
-- [ ] Verificar 80%+ na camada service
-- [ ] Configurar JaCoCo
+- [x] Verificar 80%+ na camada service (96%+ alcançado)
+- [x] Configurar JaCoCo
 
 ---
 
-## Fase 6: Documentação (1h)
+## Fase 6: Documentação (1h) ✅
 
 ### 6.1 README.md
-- [ ] Descrição do projeto
-- [ ] Tecnologias utilizadas
-- [ ] Pré-requisitos
-- [ ] Como executar
-- [ ] Exemplos de uso (curl)
-- [ ] Como rodar os testes
-- [ ] Decisões técnicas
+- [x] Descrição do projeto
+- [x] Tecnologias utilizadas
+- [x] Pré-requisitos
+- [x] Como executar
+- [x] Exemplos de uso (curl)
+- [x] Como rodar os testes
+- [x] Decisões técnicas
 
 ### 6.2 OpenAPI (Diferencial)
 - [ ] Annotations no Controller
@@ -200,12 +200,12 @@ Este documento organiza todas as tarefas necessárias para implementar o ip-geol
 
 ---
 
-## Fase 7: Docker & Deploy (1h) - Diferencial
+## Fase 7: Docker & Deploy (1h) - Diferencial ✅
 
 ### 7.1 Containerização
-- [ ] Dockerfile multi-stage
-- [ ] docker-compose.yml
-- [ ] .dockerignore
+- [x] Dockerfile multi-stage
+- [x] docker-compose.yml
+- [x] .dockerignore
 
 ### 7.2 Azure Deploy
 - [ ] Configurar Azure Container Apps
@@ -213,24 +213,49 @@ Este documento organiza todas as tarefas necessárias para implementar o ip-geol
 
 ---
 
-## Checklist de Entrega
+## Fase 8: Segurança - JWT Authentication ✅
+
+### 8.1 Configuração
+- [x] Adicionar dependências Spring Security e jjwt
+- [x] Criar `SecurityProperties` com configuração externalizável
+- [x] Configurar usuário fixo (admin/admin123)
+- [x] Configurar expiração de token (24h)
+
+### 8.2 Componentes
+- [x] `JwtService` - geração e validação de tokens
+- [x] `JwtAuthenticationFilter` - filtro Bearer token
+- [x] `SecurityConfig` - configuração de segurança
+- [x] `AuthController` - endpoint de login
+
+### 8.3 DTOs
+- [x] `LoginRequest` - username e password
+- [x] `LoginResponse` - token JWT
+
+### 8.4 Testes
+- [x] `JwtServiceTest` - testes de geração/validação de tokens
+- [x] `AuthControllerTest` - testes de autenticação
+- [x] Atualizar testes existentes para considerar segurança
+
+---
+
+## Checklist de Entrega ✅
 
 ### Obrigatório
-- [ ] Código organizado em camadas
-- [ ] Testes unitários (80% service)
-- [ ] application.yml configurado
-- [ ] README.md completo
-- [ ] .gitignore configurado
-- [ ] Build funcionando (mvn clean package)
-- [ ] Commits incrementais com mensagens descritivas
+- [x] Código organizado em camadas
+- [x] Testes unitários (96%+ coverage)
+- [x] application.yml configurado
+- [x] README.md completo
+- [x] .gitignore configurado
+- [x] Build funcionando (mvn clean package)
+- [x] Commits incrementais com mensagens descritivas
 
 ### Diferencial
 - [ ] Aplicação hospedada
-- [ ] Dockerfile
-- [ ] docker-compose.yml
-- [ ] Swagger/OpenAPI
+- [x] Dockerfile
+- [x] docker-compose.yml
+- [ ] Swagger/OpenAPI annotations
 - [ ] GitHub Actions
-- [ ] Collection Postman
+- [x] Collection Insomnia
 
 ---
 
@@ -270,7 +295,7 @@ mvn clean package
 
 # Run
 mvn spring-boot:run
-mvn spring-boot:run -Dspring-boot.run.profiles=local
+mvn spring-boot:run "-Dspring-boot.run.profiles=local"
 
 # Test
 mvn test
@@ -279,12 +304,23 @@ mvn verify  # com integration tests
 
 # Coverage report
 mvn jacoco:report
+# Abrir: target/site/jacoco/index.html
 
 # Docker
 docker build -t ip-geolocation-service .
 docker-compose up -d
 
-# Testar API
+# Autenticação - Obter token JWT
+curl -X POST http://localhost:8080/auth/login \
+  -H "Content-Type: application/json" \
+  -d '{"username":"admin","password":"admin123"}'
+
+# Testar API (com token)
+TOKEN=$(curl -s -X POST http://localhost:8080/auth/login \
+  -H "Content-Type: application/json" \
+  -d '{"username":"admin","password":"admin123"}' | jq -r '.token')
+
 curl "http://localhost:8080/api/geolocation/v1/locate?ip=8.8.8.8" \
+  -H "Authorization: Bearer $TOKEN" \
   -H "x-device-platform: Web"
 ```

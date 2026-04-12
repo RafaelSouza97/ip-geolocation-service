@@ -13,6 +13,7 @@ O **ip-geolocation-service** é um microserviço REST que identifica informaçõ
 | Build Tool | Maven | 3.9.x | Padrão corporativo, CI/CD friendly |
 | Cache | Caffeine | 3.x | In-memory, alta performance |
 | HTTP Client | Java HttpClient | 21 | Nativo, suporte a HTTP/2 |
+| Segurança | Spring Security + JWT | 6.3.x | Autenticação stateless |
 | Validação | Hibernate Validator | 8.x | Bean Validation 3.0 |
 | Documentação | SpringDoc OpenAPI | 2.x | Swagger UI integrado |
 | Testes | JUnit 5 + Mockito + WireMock | - | Stack padrão |
@@ -169,10 +170,31 @@ O **ip-geolocation-service** é um microserviço REST que identifica informaçõ
 
 ## Considerações de Segurança
 
-1. **Não expor detalhes internos:** Erros de API externa não vazam para o cliente
-2. **Validação de entrada:** Regex para IPs, whitelist para platforms
-3. **IPs privados rejeitados:** Não consultar API externa para IPs de rede local
-4. **Rate limiting:** (Diferencial) Limitar requisições por cliente
+1. **Autenticação JWT:** Todas as rotas `/api/**` requerem token Bearer válido
+2. **Sessão stateless:** Não há estado no servidor, escalabilidade horizontal
+3. **Token expiration:** Tokens expiram em 24 horas
+4. **Não expor detalhes internos:** Erros de API externa não vazam para o cliente
+5. **Validação de entrada:** Regex para IPs, whitelist para platforms
+6. **IPs privados rejeitados:** Não consultar API externa para IPs de rede local
+7. **Rate limiting:** (Diferencial) Limitar requisições por cliente
+
+### Fluxo de Autenticação
+
+```
+1. POST /auth/login (username, password)
+   ↓
+2. Validar credenciais
+   ↓
+3. Gerar JWT (claims: sub, iat, exp)
+   ↓
+4. Retornar token ao cliente
+   ↓
+5. Cliente envia: Authorization: Bearer <token>
+   ↓
+6. JwtAuthenticationFilter valida token
+   ↓
+7. SecurityContext populado → Request autorizada
+```
 
 ## Métricas e Observabilidade
 

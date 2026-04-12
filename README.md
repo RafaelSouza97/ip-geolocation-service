@@ -4,12 +4,13 @@ Microserviço REST de geolocalização que identifica o país e informações ge
 
 ## Status do Projeto
 
-🚧 **Em desenvolvimento**
+✅ **MVP Concluído** (182 testes passando, 96%+ cobertura)
 
 ## Tecnologias
 
 - **Java 21** - LTS com Records, Pattern Matching, Virtual Threads
 - **Spring Boot 3.3.x** - Framework web
+- **Spring Security + JWT** - Autenticação stateless
 - **Caffeine** - Cache in-memory de alta performance
 - **Maven** - Build tool
 - **Docker** - Containerização
@@ -48,7 +49,58 @@ mvn spring-boot:run -Dspring-boot.run.profiles=local
 docker-compose up -d
 ```
 
+## Autenticação
+
+A API utiliza autenticação JWT (JSON Web Token). Todas as rotas `/api/**` requerem um token válido.
+
+### Credenciais
+
+| Usuário | Senha | Observação |
+|---------|-------|------------|
+| `admin` | `admin123` | Usuário fixo para demonstração |
+
+### Obtendo o Token
+
+```bash
+curl -X POST http://localhost:8080/auth/login \
+  -H "Content-Type: application/json" \
+  -d '{"username":"admin","password":"admin123"}'
+```
+
+**Resposta:**
+```json
+{
+  "token": "eyJhbGciOiJIUzI1NiIs..."
+}
+```
+
+### Rotas Públicas
+
+| Rota | Descrição |
+|------|-----------|
+| `POST /auth/login` | Autenticação |
+| `GET /actuator/health` | Health check |
+| `GET /swagger-ui/**` | Documentação |
+
+---
+
 ## Endpoints
+
+### POST /auth/login
+
+Autentica o usuário e retorna um token JWT.
+
+**Body:**
+```json
+{"username": "admin", "password": "admin123"}
+```
+
+**Resposta (200):**
+```json
+{"token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."}
+```
+
+---
 
 ### GET /api/geolocation/v1/locate
 
@@ -58,11 +110,19 @@ Retorna informações de geolocalização para um IP.
 - `ip` (query, obrigatório): Endereço IPv4 ou IPv6
 
 **Headers:**
+- `Authorization` (obrigatório): `Bearer <token>`
 - `x-device-platform` (obrigatório): `iOS`, `Android` ou `Web`
 
 **Exemplo:**
 ```bash
+# 1. Obter token
+TOKEN=$(curl -s -X POST http://localhost:8080/auth/login \
+  -H "Content-Type: application/json" \
+  -d '{"username":"admin","password":"admin123"}' | jq -r '.token')
+
+# 2. Consultar geolocalização
 curl "http://localhost:8080/api/geolocation/v1/locate?ip=8.8.8.8" \
+  -H "Authorization: Bearer $TOKEN" \
   -H "x-device-platform: Web"
 ```
 
