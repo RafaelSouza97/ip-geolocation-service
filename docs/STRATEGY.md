@@ -455,7 +455,7 @@ security:
     expiration: ${JWT_EXPIRATION:86400000}       # 24 horas em ms
   user:
     username: ${SECURITY_USER:admin}
-    password: ${SECURITY_PASSWORD:admin123}
+    password: ${SECURITY_PASSWORD:Admin123@}
 ```
 
 ### Componentes de Segurança
@@ -472,7 +472,7 @@ security:
 ```java
 // 1. Login
 POST /auth/login
-{"username": "admin", "password": "admin123"}
+{"username": "admin", "password": "Admin123@"}
 
 // 2. Resposta
 {"token": "eyJhbGciOiJIUzI1NiIs..."}

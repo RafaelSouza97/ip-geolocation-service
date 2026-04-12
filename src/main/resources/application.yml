@@ -25,7 +25,7 @@ security:
     expiration: ${JWT_EXPIRATION:86400000}  # 24 horas em milissegundos
   user:
     username: ${SECURITY_USER:admin}
-    password: ${SECURITY_PASSWORD:admin123}
+    password: ${SECURITY_PASSWORD:Admin123@}
 
 # Actuator
 management:

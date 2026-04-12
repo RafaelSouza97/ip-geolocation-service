@@ -57,14 +57,14 @@ A API utiliza autenticação JWT (JSON Web Token). Todas as rotas `/api/**` requ
 
 | Usuário | Senha | Observação |
 |---------|-------|------------|
-| `admin` | `admin123` | Usuário fixo para demonstração |
+| `admin` | `Admin123@` | Usuário fixo para demonstração |
 
 ### Obtendo o Token
 
 ```bash
 curl -X POST http://localhost:8080/auth/login \
   -H "Content-Type: application/json" \
-  -d '{"username":"admin","password":"admin123"}'
+  -d '{"username":"admin","password":"Admin123@"}'
 ```
 
 **Resposta:**
@@ -92,7 +92,7 @@ Autentica o usuário e retorna um token JWT.
 
 **Body:**
 ```json
-{"username": "admin", "password": "admin123"}
+{"username": "admin", "password": "Admin123@"}
 ```
 
 **Resposta (200):**
@@ -118,7 +118,7 @@ Retorna informações de geolocalização para um IP.
 # 1. Obter token
 TOKEN=$(curl -s -X POST http://localhost:8080/auth/login \
   -H "Content-Type: application/json" \
-  -d '{"username":"admin","password":"admin123"}' | jq -r '.token')
+  -d '{"username":"admin","password":"Admin123@"}' | jq -r '.token')
 
 # 2. Consultar geolocalização
 curl "http://localhost:8080/api/geolocation/v1/locate?ip=8.8.8.8" \

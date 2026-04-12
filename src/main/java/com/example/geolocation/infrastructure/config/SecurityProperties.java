@@ -28,7 +28,7 @@ public record SecurityProperties(
     ) {
         public UserProperties {
             if (username == null || username.isBlank()) username = "admin";
-            if (password == null || password.isBlank()) password = "admin123";
+            if (password == null || password.isBlank()) password = "Admin123@";
         }
     }
 }

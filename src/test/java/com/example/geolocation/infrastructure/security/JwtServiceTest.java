@@ -20,7 +20,7 @@ class JwtServiceTest {
     @BeforeEach
     void setUp() {
         var jwtProperties = new JwtProperties(SECRET_KEY, EXPIRATION);
-        var userProperties = new UserProperties("admin", "admin123");
+        var userProperties = new UserProperties("admin", "Admin123@");
         var securityProperties = new SecurityProperties(jwtProperties, userProperties);
         jwtService = new JwtService(securityProperties);
     }
@@ -120,7 +120,7 @@ class JwtServiceTest {
         void expiredTokenShouldBeInvalid() {
             // Arrange - create service with very short expiration
             var jwtProperties = new JwtProperties(SECRET_KEY, 1L); // 1ms expiration
-            var userProperties = new UserProperties("admin", "admin123");
+            var userProperties = new UserProperties("admin", "Admin123@");
             var securityProperties = new SecurityProperties(jwtProperties, userProperties);
             var shortExpirationService = new JwtService(securityProperties);
 

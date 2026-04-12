@@ -218,7 +218,7 @@ Este documento organiza todas as tarefas necessárias para implementar o ip-geol
 ### 8.1 Configuração
 - [x] Adicionar dependências Spring Security e jjwt
 - [x] Criar `SecurityProperties` com configuração externalizável
-- [x] Configurar usuário fixo (admin/admin123)
+- [x] Configurar usuário fixo (admin/Admin123@)
 - [x] Configurar expiração de token (24h)
 
 ### 8.2 Componentes
@@ -313,12 +313,12 @@ docker-compose up -d
 # Autenticação - Obter token JWT
 curl -X POST http://localhost:8080/auth/login \
   -H "Content-Type: application/json" \
-  -d '{"username":"admin","password":"admin123"}'
+  -d '{"username":"admin","password":"Admin123@"}'
 
 # Testar API (com token)
 TOKEN=$(curl -s -X POST http://localhost:8080/auth/login \
   -H "Content-Type: application/json" \
-  -d '{"username":"admin","password":"admin123"}' | jq -r '.token')
+  -d '{"username":"admin","password":"Admin123@"}' | jq -r '.token')
 
 curl "http://localhost:8080/api/geolocation/v1/locate?ip=8.8.8.8" \
   -H "Authorization: Bearer $TOKEN" \
