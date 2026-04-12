@@ -82,20 +82,25 @@ O **ip-geolocation-service** é um microserviço REST que identifica informaçõ
 │  ┌─────────────────────────────────────────────────────────────────────┐ │
 │  │                        adapter/out                                   │ │
 │  │  ┌────────────────────────────────┐  ┌────────────────────────────┐ │ │
-│  │  │ CaffeineGeolocationCache       │  │ IpApiClient                │ │ │
-│  │  │ - cache: Cache<String, Info>   │  │ - httpClient: HttpClient   │ │ │
-│  │  │ + get(ip): Optional<>          │  │ - properties: ApiProperties│ │ │
-│  │  │ + put(ip, info): void          │  │ + lookup(ip): Info         │ │ │
+│  │  │ CaffeineGeolocationCache       │  │ ProviderSelector (@Primary)  │ │ │
+│  │  │ - cache: Cache<String, Info>   │  │ - primary: IpApiClient       │ │ │
+│  │  │ + get(ip): Optional<>          │  │ - secondary: IpApiCoClient   │ │ │
+│  │  │ + put(ip, info): void          │  │ + lookup(ip): Info           │ │ │
 │  │  └────────────────────────────────┘  └──────────────┬─────────────┘ │ │
-│  └─────────────────────────────────────────────────────┼───────────────┘ │
-│                                                        │                  │
-└────────────────────────────────────────────────────────┼──────────────────┘
-                                                         │
-                                                         ▼
-                                               ┌──────────────────┐
-                                               │   ip-api.com     │
-                                               │ (External API)   │
-                                               └──────────────────┘
+│  │                                            ┌────────┴────────┐        │ │
+│  │                                            │                 │        │ │
+│  │                                      ┌─────▼─────┐    ┌──────▼─────┐  │ │
+│  │                                      │IpApiClient│    │IpApiCoClient│ │ │
+│  │                                      └─────┬─────┘    └──────┬─────┘  │ │
+│  └────────────────────────────────────────────┼─────────────────┼────────┘ │
+│                                               │                 │          │
+└───────────────────────────────────────────────┼─────────────────┼──────────┘
+                                                │                 │
+                                                ▼                 ▼
+                                      ┌──────────────────┐ ┌──────────────┐
+                                      │   ip-api.com     │ │   ipapi.co   │
+                                      │   (Primary)      │ │  (Secondary) │
+                                      └──────────────────┘ └──────────────┘
 ```
 
 ## Fluxo de Requisição
@@ -111,9 +116,12 @@ O **ip-geolocation-service** é um microserviço REST que identifica informaçõ
    ├── HIT → Retorna do cache (source: "cache")
    └── MISS → Continua
          ↓
-5. Chama API Externa (ip-api.com)
-   ├── Sucesso → Armazena no cache, retorna (source: "api")
-   └── Falha → Retorna fallback Brasil (source: "fallback")
+5. Chama ProviderSelector (com failover)
+   ├── Primário OK → Armazena no cache, retorna (source: "api")
+   ├── Primário falha → Tenta secundário
+   │     ├── Secundário OK → Armazena no cache, retorna (source: "api")
+   │     └── Secundário falha → Retorna fallback Brasil (source: "fallback")
+   └── Em modo failover (5 min) → Usa secundário diretamente
          ↓
 6. Controller converte para DTO de Response
    ↓
@@ -167,6 +175,88 @@ O **ip-geolocation-service** é um microserviço REST que identifica informaçõ
 - ✅ Código conciso
 - ✅ Imutabilidade garantida
 - ✅ equals/hashCode/toString automáticos
+
+### ADR-005: Dual Provider Failover com Circuit Breaker
+
+**Contexto:** Dependência de uma única API externa (ip-api.com) representa um ponto único de falha. APIs gratuitas têm limites de requisição e podem ficar indisponíveis.
+
+**Decisão:** Implementar sistema de failover com dois providers externos:
+- **Primário:** ip-api.com (45 req/min, sem API key)
+- **Secundário:** ipapi.co (1000 req/day, sem API key)
+- **Circuit Breaker:** Quando primário falha, redireciona para secundário por 5 minutos
+- **Fallback local:** Usado apenas quando ambos os providers externos falham
+
+**Componentes:**
+```
+┌─────────────────────────────────────────────────────────────────┐
+│                      ProviderSelector                           │
+│  ┌─────────────────────────────────────────────────────────────┐│
+│  │ State: PRIMARY | SECONDARY                                  ││
+│  │ failoverUntil: Instant                                      ││
+│  │                                                             ││
+│  │ tryWithFailover(ip):                                        ││
+│  │   1. Check if failover expired → reset to PRIMARY           ││
+│  │   2. Try current provider                                   ││
+│  │   3. If fails and state=PRIMARY → switch to SECONDARY (5m)  ││
+│  │   4. If both fail → throw exception                         ││
+│  └─────────────────────────────────────────────────────────────┘│
+│                         │                                       │
+│         ┌───────────────┼───────────────┐                       │
+│         ▼               ▼               ▼                       │
+│  ┌─────────────┐ ┌─────────────┐ ┌─────────────────────────┐   │
+│  │ IpApiClient │ │IpApiCoClient│ │ GeolocationService      │   │
+│  │ (PRIMARY)   │ │ (SECONDARY) │ │ (handles local fallback)│   │
+│  └──────┬──────┘ └──────┬──────┘ └─────────────────────────┘   │
+│         │               │                                       │
+└─────────┼───────────────┼───────────────────────────────────────┘
+          ▼               ▼
+   ┌─────────────┐ ┌─────────────┐
+   │ ip-api.com  │ │  ipapi.co   │
+   └─────────────┘ └─────────────┘
+```
+
+**Fluxo de Failover:**
+```
+Request → ProviderSelector
+    │
+    ├── State = PRIMARY?
+    │   ├── Yes → Try ip-api.com
+    │   │         ├── Success → Return result
+    │   │         └── Fail → Switch to SECONDARY (5 min)
+    │   │                    └── Try ipapi.co
+    │   │                        ├── Success → Return result
+    │   │                        └── Fail → Throw exception
+    │   │                                    └── Service uses local fallback
+    │   │
+    │   └── No (State = SECONDARY)
+    │       ├── Failover expired? → Reset to PRIMARY, retry
+    │       └── Try ipapi.co
+    │           ├── Success → Return result
+    │           └── Fail → Throw exception
+```
+
+**Consequências:**
+- ✅ Alta disponibilidade: dois providers externos antes de fallback local
+- ✅ Resiliente a falhas temporárias: 5 minutos no secundário permite recuperação
+- ✅ Transparente: cliente não percebe qual provider foi usado
+- ✅ Thread-safe: AtomicReference para estado
+- ⚠️ Limites acumulados: 45 req/min + 1000 req/day entre os dois
+- ⚠️ Latência adicional: primeira requisição após falha tenta dois providers
+
+**Configuração (application.yml):**
+```yaml
+geolocation:
+  providers:
+    primary:
+      name: ip-api.com
+      url: http://ip-api.com/json
+      timeout: 5s
+    secondary:
+      name: ipapi.co
+      url: https://ipapi.co
+      timeout: 5s
+    failover-duration: 5m
+```
 
 ## Considerações de Segurança
 
