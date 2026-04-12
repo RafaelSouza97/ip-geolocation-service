@@ -9,10 +9,13 @@ import com.example.geolocation.infrastructure.adapter.in.web.dto.ErrorResponse;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.MissingServletRequestParameterException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+
+import java.util.stream.Collectors;
 
 /**
  * Handler global de exceções para a API REST.
@@ -64,6 +67,16 @@ public class GlobalExceptionHandler {
             "MISSING_PARAMETER",
             "Missing required parameter: " + ex.getParameterName()
         );
+    }
+
+    @ExceptionHandler(MethodArgumentNotValidException.class)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public ErrorResponse handleValidationException(MethodArgumentNotValidException ex) {
+        var errors = ex.getBindingResult().getFieldErrors().stream()
+            .map(error -> error.getField() + ": " + error.getDefaultMessage())
+            .collect(Collectors.joining(", "));
+        log.warn("Validation error: {}", errors);
+        return new ErrorResponse("VALIDATION_ERROR", errors);
     }
 
     @ExceptionHandler(Exception.class)

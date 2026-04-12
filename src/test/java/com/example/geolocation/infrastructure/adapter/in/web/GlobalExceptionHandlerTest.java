@@ -3,10 +3,13 @@ package com.example.geolocation.infrastructure.adapter.in.web;
 import com.example.geolocation.application.domain.exception.InvalidIpAddressException;
 import com.example.geolocation.application.domain.exception.PrivateIpAddressException;
 import com.example.geolocation.application.port.in.GeolocationUseCase;
+import com.example.geolocation.infrastructure.config.SecurityProperties;
+import com.example.geolocation.infrastructure.security.JwtService;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.web.servlet.MockMvc;
@@ -17,6 +20,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @WebMvcTest(GeolocationController.class)
+@AutoConfigureMockMvc(addFilters = false)
 @DisplayName("GlobalExceptionHandler")
 class GlobalExceptionHandlerTest {
 
@@ -25,6 +29,12 @@ class GlobalExceptionHandlerTest {
 
     @MockBean
     private GeolocationUseCase geolocationUseCase;
+
+    @MockBean
+    private JwtService jwtService;
+
+    @MockBean
+    private SecurityProperties securityProperties;
 
     private static final String LOCATE_URL = "/api/geolocation/v1/locate";
     private static final String PLATFORM_HEADER = "x-device-platform";

@@ -18,6 +18,15 @@ geolocation:
     country-code: ${GEOLOCATION_FALLBACK_COUNTRY_CODE:BR}
     country-name: ${GEOLOCATION_FALLBACK_COUNTRY_NAME:Brazil}
 
+# Segurança JWT
+security:
+  jwt:
+    secret-key: ${JWT_SECRET_KEY:minha-chave-secreta-super-segura-para-jwt-256-bits-minimo}
+    expiration: ${JWT_EXPIRATION:86400000}  # 24 horas em milissegundos
+  user:
+    username: ${SECURITY_USER:admin}
+    password: ${SECURITY_PASSWORD:admin123}
+
 # Actuator
 management:
   endpoints:
