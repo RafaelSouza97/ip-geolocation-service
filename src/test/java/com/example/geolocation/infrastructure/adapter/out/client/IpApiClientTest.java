@@ -2,6 +2,7 @@ package com.example.geolocation.infrastructure.adapter.out.client;
 
 import com.example.geolocation.application.domain.exception.ExternalApiException;
 import com.example.geolocation.infrastructure.config.GeolocationProperties;
+import com.example.geolocation.infrastructure.config.GeolocationProperties.*;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.tomakehurst.wiremock.WireMockServer;
 import com.github.tomakehurst.wiremock.client.WireMock;
@@ -32,18 +33,25 @@ class IpApiClientTest {
         wireMockServer.stop();
     }
 
+    private GeolocationProperties createProperties(String baseUrl, Duration timeout) {
+        var primary = new ApiProperties("ip-api.com", baseUrl, timeout);
+        var secondary = new ApiProperties("ipapi.co", "https://ipapi.co", timeout);
+        var providers = new ProviderProperties(primary, secondary, Duration.ofMinutes(5));
+        return new GeolocationProperties(
+            providers,
+            new CacheProperties(Duration.ofHours(24), 10000),
+            new FallbackProperties("BR", "Brazil")
+        );
+    }
+
     @BeforeEach
     void setUp() {
         wireMockServer.resetAll();
         objectMapper = new ObjectMapper();
         
-        var properties = new GeolocationProperties(
-            new GeolocationProperties.ApiProperties(
-                "http://localhost:" + wireMockServer.port(),
-                Duration.ofSeconds(5)
-            ),
-            new GeolocationProperties.CacheProperties(Duration.ofHours(24), 10000),
-            new GeolocationProperties.FallbackProperties("BR", "Brazil")
+        var properties = createProperties(
+            "http://localhost:" + wireMockServer.port(),
+            Duration.ofSeconds(5)
         );
         
         client = new IpApiClient(properties, objectMapper);
@@ -179,14 +187,7 @@ class IpApiClientTest {
         @DisplayName("should throw exception on connection error")
         void shouldThrowExceptionOnConnectionError() {
             // Arrange - usar porta diferente para simular erro de conexão
-            var badProperties = new GeolocationProperties(
-                new GeolocationProperties.ApiProperties(
-                    "http://localhost:1", // porta inválida
-                    Duration.ofSeconds(1)
-                ),
-                new GeolocationProperties.CacheProperties(Duration.ofHours(24), 10000),
-                new GeolocationProperties.FallbackProperties("BR", "Brazil")
-            );
+            var badProperties = createProperties("http://localhost:1", Duration.ofSeconds(1));
             var badClient = new IpApiClient(badProperties, objectMapper);
 
             // Act & Assert

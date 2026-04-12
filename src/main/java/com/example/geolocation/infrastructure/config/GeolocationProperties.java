@@ -6,15 +6,43 @@ import java.time.Duration;
 
 @ConfigurationProperties(prefix = "geolocation")
 public record GeolocationProperties(
-    ApiProperties api,
+    ProviderProperties providers,
     CacheProperties cache,
     FallbackProperties fallback
 ) {
+    /**
+     * Configuração dos provedores de geolocalização.
+     */
+    public record ProviderProperties(
+        ApiProperties primary,
+        ApiProperties secondary,
+        Duration failoverDuration
+    ) {
+        public ProviderProperties {
+            if (primary == null) primary = new ApiProperties(
+                "ip-api.com",
+                "http://ip-api.com/json",
+                Duration.ofSeconds(5)
+            );
+            if (secondary == null) secondary = new ApiProperties(
+                "ipapi.co",
+                "https://ipapi.co",
+                Duration.ofSeconds(5)
+            );
+            if (failoverDuration == null) failoverDuration = Duration.ofMinutes(5);
+        }
+    }
+
+    /**
+     * Configuração de um provedor de API.
+     */
     public record ApiProperties(
+        String name,
         String url,
         Duration timeout
     ) {
         public ApiProperties {
+            if (name == null) name = "unknown";
             if (url == null) url = "http://ip-api.com/json";
             if (timeout == null) timeout = Duration.ofSeconds(5);
         }
@@ -38,5 +66,14 @@ public record GeolocationProperties(
             if (countryCode == null) countryCode = "BR";
             if (countryName == null) countryName = "Brazil";
         }
+    }
+
+    // Compatibilidade - método legado para IpApiClient existente
+    public ApiProperties api() {
+        return providers != null ? providers.primary() : new ApiProperties(
+            "ip-api.com",
+            "http://ip-api.com/json",
+            Duration.ofSeconds(5)
+        );
     }
 }

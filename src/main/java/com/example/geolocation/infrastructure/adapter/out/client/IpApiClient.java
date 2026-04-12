@@ -21,9 +21,10 @@ import java.time.Instant;
 
 /**
  * Cliente HTTP para a API ip-api.com.
+ * Provedor primário de geolocalização.
  */
 @Slf4j
-@Component
+@Component("ipApiClient")
 public class IpApiClient implements GeolocationProvider {
 
     private static final String API_NAME = "ip-api.com";
@@ -38,6 +39,10 @@ public class IpApiClient implements GeolocationProvider {
         this.httpClient = HttpClient.newBuilder()
             .connectTimeout(properties.api().timeout())
             .build();
+    }
+
+    public String getProviderName() {
+        return API_NAME;
     }
 
     @Override

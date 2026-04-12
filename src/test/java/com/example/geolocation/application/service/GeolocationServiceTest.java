@@ -9,6 +9,7 @@ import com.example.geolocation.application.domain.model.Region;
 import com.example.geolocation.application.port.out.GeolocationCache;
 import com.example.geolocation.application.port.out.GeolocationProvider;
 import com.example.geolocation.infrastructure.config.GeolocationProperties;
+import com.example.geolocation.infrastructure.config.GeolocationProperties.*;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -47,10 +48,13 @@ class GeolocationServiceTest {
 
     @BeforeEach
     void setUp() {
+        var primary = new ApiProperties("ip-api.com", "http://ip-api.com/json", Duration.ofSeconds(5));
+        var secondary = new ApiProperties("ipapi.co", "https://ipapi.co", Duration.ofSeconds(5));
+        var providers = new ProviderProperties(primary, secondary, Duration.ofMinutes(5));
         var properties = new GeolocationProperties(
-            new GeolocationProperties.ApiProperties("http://ip-api.com/json", Duration.ofSeconds(5)),
-            new GeolocationProperties.CacheProperties(Duration.ofHours(24), 10000),
-            new GeolocationProperties.FallbackProperties("BR", "Brazil")
+            providers,
+            new CacheProperties(Duration.ofHours(24), 10000),
+            new FallbackProperties("BR", "Brazil")
         );
         service = new GeolocationService(cache, provider, properties);
     }

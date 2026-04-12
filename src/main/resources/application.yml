@@ -8,9 +8,16 @@ server:
 
 # Configurações de geolocalização
 geolocation:
-  api:
-    url: ${GEOLOCATION_API_URL:http://ip-api.com/json}
-    timeout: ${GEOLOCATION_API_TIMEOUT:5s}
+  providers:
+    primary:
+      name: ip-api.com
+      url: ${GEOLOCATION_PRIMARY_URL:http://ip-api.com/json}
+      timeout: ${GEOLOCATION_PRIMARY_TIMEOUT:5s}
+    secondary:
+      name: ipapi.co
+      url: ${GEOLOCATION_SECONDARY_URL:https://ipapi.co}
+      timeout: ${GEOLOCATION_SECONDARY_TIMEOUT:5s}
+    failover-duration: ${GEOLOCATION_FAILOVER_DURATION:5m}
   cache:
     ttl: ${GEOLOCATION_CACHE_TTL:24h}
     max-size: ${GEOLOCATION_CACHE_MAX_SIZE:10000}
