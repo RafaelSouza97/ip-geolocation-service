@@ -142,10 +142,14 @@ public final class IpValidator {
 
     /**
      * Normaliza o IP (trim e lowercase para IPv6).
+     *
+     * @param ip endereço IP a ser normalizado
+     * @return IP normalizado
+     * @throws IllegalArgumentException se ip for null ou vazio
      */
     public static String normalize(String ip) {
-        if (ip == null) {
-            return null;
+        if (ip == null || ip.isBlank()) {
+            throw new IllegalArgumentException("IP cannot be null or blank");
         }
         String trimmed = ip.trim();
         if (isValidIpv6(trimmed)) {

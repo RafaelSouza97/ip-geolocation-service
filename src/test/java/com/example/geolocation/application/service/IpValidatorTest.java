@@ -187,9 +187,15 @@ class IpValidatorTest {
         }
 
         @Test
-        @DisplayName("should return null for null input")
-        void shouldReturnNullForNullInput() {
-            assertNull(IpValidator.normalize(null));
+        @DisplayName("should throw exception for null input")
+        void shouldThrowExceptionForNullInput() {
+            assertThrows(IllegalArgumentException.class, () -> IpValidator.normalize(null));
+        }
+
+        @Test
+        @DisplayName("should throw exception for blank input")
+        void shouldThrowExceptionForBlankInput() {
+            assertThrows(IllegalArgumentException.class, () -> IpValidator.normalize("  "));
         }
     }
 

@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import com.example.geolocation.application.domain.exception.ErrorCode;
+import com.example.geolocation.application.domain.exception.ExternalApiException;
 import com.example.geolocation.application.domain.exception.GeolocationException;
 import com.example.geolocation.application.domain.exception.InvalidIpAddressException;
 import com.example.geolocation.application.domain.exception.InvalidPlatformException;
@@ -49,6 +50,13 @@ public class GlobalExceptionHandler {
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public ErrorResponse handleInvalidPlatform(InvalidPlatformException ex) {
         log.warn("Invalid platform: {}", ex.getPlatform());
+        return new ErrorResponse(ex.getErrorCode(), ex.getMessage());
+    }
+
+    @ExceptionHandler(ExternalApiException.class)
+    @ResponseStatus(HttpStatus.SERVICE_UNAVAILABLE)
+    public ErrorResponse handleExternalApiException(ExternalApiException ex) {
+        log.error("External API error [{}]: {}", ex.getApiName(), ex.getMessage());
         return new ErrorResponse(ex.getErrorCode(), ex.getMessage());
     }
 

@@ -35,11 +35,10 @@ public class IpApiCoClient implements GeolocationProvider {
     private final ObjectMapper objectMapper;
     private final GeolocationProperties properties;
 
-    public IpApiCoClient(GeolocationProperties properties, ObjectMapper objectMapper) {
+    public IpApiCoClient(GeolocationProperties properties, ObjectMapper objectMapper, HttpClient httpClient) {
         this.properties = properties;
         this.objectMapper = objectMapper;
-        this.httpClient = HttpClient.newBuilder()
-                .connectTimeout(properties.providers().secondary().timeout()).build();
+        this.httpClient = httpClient;
     }
 
     @Override
@@ -85,15 +84,18 @@ public class IpApiCoClient implements GeolocationProvider {
     }
 
     private GeolocationInfo mapToGeolocationInfo(IpApiCoResponse response) {
-        return new GeolocationInfo(response.ip(),
-                new Country(response.countryCode(), response.countryName()),
-                new Region(response.regionCode() != null ? response.regionCode() : "",
-                        response.region() != null ? response.region() : ""),
-                response.city() != null ? response.city() : "",
-                new Coordinates(response.latitude() != null ? response.latitude() : 0.0,
-                        response.longitude() != null ? response.longitude() : 0.0),
-                response.timezone() != null ? response.timezone() : "",
-                response.org() != null ? response.org() : "", DataSource.API, Instant.now());
+        return GeolocationInfoMapper.fromApiResponse(
+            response.ip(),
+            response.countryCode(),
+            response.countryName(),
+            response.regionCode(),
+            response.region(),
+            response.city(),
+            response.latitude(),
+            response.longitude(),
+            response.timezone(),
+            response.org()
+        );
     }
 
     /**

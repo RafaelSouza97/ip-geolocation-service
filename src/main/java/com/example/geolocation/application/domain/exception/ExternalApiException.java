@@ -3,7 +3,7 @@ package com.example.geolocation.application.domain.exception;
 /**
  * Exceção lançada quando a API externa falha.
  */
-public class ExternalApiException extends RuntimeException {
+public class ExternalApiException extends GeolocationException {
 
     private final String apiName;
 
@@ -19,5 +19,10 @@ public class ExternalApiException extends RuntimeException {
 
     public String getApiName() {
         return apiName;
+    }
+
+    @Override
+    public String getErrorCode() {
+        return ErrorCode.EXTERNAL_API_ERROR.getCode();
     }
 }

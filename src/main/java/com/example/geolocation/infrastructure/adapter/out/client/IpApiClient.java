@@ -34,11 +34,10 @@ public class IpApiClient implements GeolocationProvider {
     private final ObjectMapper objectMapper;
     private final GeolocationProperties properties;
 
-    public IpApiClient(GeolocationProperties properties, ObjectMapper objectMapper) {
+    public IpApiClient(GeolocationProperties properties, ObjectMapper objectMapper, HttpClient httpClient) {
         this.properties = properties;
         this.objectMapper = objectMapper;
-        this.httpClient =
-                HttpClient.newBuilder().connectTimeout(properties.api().timeout()).build();
+        this.httpClient = httpClient;
     }
 
     public String getProviderName() {
@@ -80,11 +79,18 @@ public class IpApiClient implements GeolocationProvider {
     }
 
     private GeolocationInfo mapToGeolocationInfo(IpApiResponse response) {
-        return new GeolocationInfo(response.query(),
-                new Country(response.countryCode(), response.country()),
-                new Region(response.region(), response.regionName()), response.city(),
-                new Coordinates(response.lat(), response.lon()), response.timezone(),
-                response.isp(), DataSource.API, Instant.now());
+        return GeolocationInfoMapper.fromApiResponse(
+            response.query(),
+            response.countryCode(),
+            response.country(),
+            response.region(),
+            response.regionName(),
+            response.city(),
+            response.lat(),
+            response.lon(),
+            response.timezone(),
+            response.isp()
+        );
     }
 
     /**

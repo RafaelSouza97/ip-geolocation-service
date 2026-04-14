@@ -10,6 +10,7 @@ import com.github.tomakehurst.wiremock.client.WireMock;
 import com.github.tomakehurst.wiremock.core.WireMockConfiguration;
 import org.junit.jupiter.api.*;
 
+import java.net.http.HttpClient;
 import java.time.Duration;
 
 import static com.github.tomakehurst.wiremock.client.WireMock.*;
@@ -55,7 +56,11 @@ class IpApiClientTest {
             Duration.ofSeconds(5)
         );
         
-        client = new IpApiClient(properties, objectMapper);
+        var httpClient = HttpClient.newBuilder()
+            .connectTimeout(Duration.ofSeconds(5))
+            .build();
+        
+        client = new IpApiClient(properties, objectMapper, httpClient);
     }
 
     @Nested
@@ -189,7 +194,10 @@ class IpApiClientTest {
         void shouldThrowExceptionOnConnectionError() {
             // Arrange - usar porta diferente para simular erro de conexão
             var badProperties = createProperties("http://localhost:1", Duration.ofSeconds(1));
-            var badClient = new IpApiClient(badProperties, objectMapper);
+            var badHttpClient = HttpClient.newBuilder()
+                .connectTimeout(Duration.ofSeconds(1))
+                .build();
+            var badClient = new IpApiClient(badProperties, objectMapper, badHttpClient);
 
             // Act & Assert
             assertThrows(ExternalApiException.class, 
