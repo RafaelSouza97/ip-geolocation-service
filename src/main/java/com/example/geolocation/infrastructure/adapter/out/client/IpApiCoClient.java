@@ -71,6 +71,9 @@ public class IpApiCoClient implements GeolocationProvider {
 
         } catch (ExternalApiException e) {
             throw e;
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+            throw new ExternalApiException(API_NAME, "Request interrupted", e);
         } catch (Exception e) {
             log.error("Error calling {} API for IP {}: {}", API_NAME, ip, e.getMessage());
             throw new ExternalApiException(API_NAME, e.getMessage(), e);
@@ -82,7 +85,7 @@ public class IpApiCoClient implements GeolocationProvider {
     }
 
     private GeolocationInfo mapToGeolocationInfo(IpApiCoResponse response) {
-        return GeolocationInfoMapper.fromApiResponse(
+        return GeolocationInfoMapper.fromApiResponse(new GeolocationInfoMapper.ApiResponseData(
             response.ip(),
             response.countryCode(),
             response.countryName(),
@@ -93,7 +96,7 @@ public class IpApiCoClient implements GeolocationProvider {
             response.longitude(),
             response.timezone(),
             response.org()
-        );
+        ));
     }
 
     /**

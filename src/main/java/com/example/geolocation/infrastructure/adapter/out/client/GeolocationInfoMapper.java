@@ -19,8 +19,7 @@ public final class GeolocationInfoMapper {
     }
 
     /**
-     * Cria um GeolocationInfo a partir de valores da API externa.
-     * Trata valores nulos de forma segura.
+     * Dados de resposta de API de geolocalização.
      *
      * @param ip          endereço IP consultado
      * @param countryCode código ISO do país
@@ -32,9 +31,8 @@ public final class GeolocationInfoMapper {
      * @param longitude   longitude (pode ser null)
      * @param timezone    fuso horário (pode ser null)
      * @param isp         provedor de internet (pode ser null)
-     * @return GeolocationInfo preenchido
      */
-    public static GeolocationInfo fromApiResponse(
+    public record ApiResponseData(
             String ip,
             String countryCode,
             String countryName,
@@ -45,21 +43,30 @@ public final class GeolocationInfoMapper {
             Double longitude,
             String timezone,
             String isp) {
-        
+    }
+
+    /**
+     * Cria um GeolocationInfo a partir de dados de resposta da API externa.
+     * Trata valores nulos de forma segura.
+     *
+     * @param data dados da resposta da API
+     * @return GeolocationInfo preenchido
+     */
+    public static GeolocationInfo fromApiResponse(ApiResponseData data) {
         return new GeolocationInfo(
-            ip,
-            new Country(countryCode, countryName),
+            data.ip(),
+            new Country(data.countryCode(), data.countryName()),
             new Region(
-                regionCode != null ? regionCode : "",
-                regionName != null ? regionName : ""
+                data.regionCode() != null ? data.regionCode() : "",
+                data.regionName() != null ? data.regionName() : ""
             ),
-            city != null ? city : "",
+            data.city() != null ? data.city() : "",
             new Coordinates(
-                latitude != null ? latitude : 0.0,
-                longitude != null ? longitude : 0.0
+                data.latitude() != null ? data.latitude() : 0.0,
+                data.longitude() != null ? data.longitude() : 0.0
             ),
-            timezone != null ? timezone : "",
-            isp != null ? isp : "",
+            data.timezone() != null ? data.timezone() : "",
+            data.isp() != null ? data.isp() : "",
             DataSource.API,
             Instant.now()
         );

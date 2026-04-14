@@ -43,9 +43,6 @@ class GeolocationServiceTest {
     private GeolocationService service;
 
     private static final String PUBLIC_IP = "8.8.8.8";
-    private static final String PRIVATE_IP = "192.168.1.1";
-    private static final String LOCALHOST = "127.0.0.1";
-    private static final String INVALID_IP = "invalid";
 
     @BeforeEach
     void setUp() {
