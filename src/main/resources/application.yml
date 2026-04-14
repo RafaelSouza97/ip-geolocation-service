@@ -3,6 +3,20 @@ spring:
   application:
     name: ip-geolocation-service
 
+# Informações da API
+info:
+  app:
+    name: IP Geolocation Service
+    description: Microserviço REST para identificação de informações geográficas a partir de endereços IP
+    version: 1.0.0
+    author: Rafael Souza
+  api:
+    providers:
+      primary: ip-api.com
+      secondary: ipapi.co
+    authentication: JWT Bearer Token
+    documentation: /swagger-ui.html
+
 server:
   port: 8080
 
@@ -45,6 +59,11 @@ management:
       show-details: when_authorized
       probes:
         enabled: true
+    info:
+      enabled: true
+  info:
+    env:
+      enabled: true
 
 # OpenAPI
 springdoc:
