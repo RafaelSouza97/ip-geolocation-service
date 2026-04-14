@@ -8,12 +8,12 @@ public class ExternalApiException extends RuntimeException {
     private final String apiName;
 
     public ExternalApiException(String apiName, String message) {
-        super("External API error [" + apiName + "]: " + message);
+        super(ErrorCode.EXTERNAL_API_ERROR.format(apiName, message));
         this.apiName = apiName;
     }
 
     public ExternalApiException(String apiName, String message, Throwable cause) {
-        super("External API error [" + apiName + "]: " + message, cause);
+        super(ErrorCode.EXTERNAL_API_ERROR.format(apiName, message), cause);
         this.apiName = apiName;
     }
 

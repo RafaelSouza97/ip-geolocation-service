@@ -1,28 +1,25 @@
 package com.example.geolocation.infrastructure.adapter.out.client;
 
-import com.example.geolocation.application.domain.constants.ErrorMessages;
+import java.time.Duration;
+import java.time.Instant;
+import java.util.concurrent.atomic.AtomicReference;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.context.annotation.Primary;
+import org.springframework.stereotype.Component;
+import com.example.geolocation.application.domain.exception.ErrorCode;
 import com.example.geolocation.application.domain.exception.ExternalApiException;
 import com.example.geolocation.application.domain.model.GeolocationInfo;
 import com.example.geolocation.application.port.out.GeolocationProvider;
 import com.example.geolocation.infrastructure.config.GeolocationProperties;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.context.annotation.Primary;
-import org.springframework.stereotype.Component;
-
-import java.time.Duration;
-import java.time.Instant;
-import java.util.concurrent.atomic.AtomicReference;
 
 /**
  * Seletor de provedor com lógica de circuit breaker.
  * 
- * Comportamento:
- * 1. Tenta o provedor primário (ip-api.com)
- * 2. Se falhar, muda para o secundário (ipapi.co) por 5 minutos
- * 3. Durante o período de failover, todas as requisições vão para o secundário
- * 4. Se o secundário também falhar, tenta o primário
- * 5. Se ambos falharem, lança exceção (fallback local será tratado pelo service)
+ * Comportamento: 1. Tenta o provedor primário (ip-api.com) 2. Se falhar, muda para o secundário
+ * (ipapi.co) por 5 minutos 3. Durante o período de failover, todas as requisições vão para o
+ * secundário 4. Se o secundário também falhar, tenta o primário 5. Se ambos falharem, lança exceção
+ * (fallback local será tratado pelo service)
  * 
  * Após o período de failover, tenta novamente o provedor original.
  */
@@ -36,25 +33,23 @@ public class ProviderSelector implements GeolocationProvider {
     private final Duration failoverDuration;
 
     // Estado do circuit breaker
-    private final AtomicReference<ProviderState> currentState = new AtomicReference<>(
-        new ProviderState(ProviderType.PRIMARY, null)
-    );
+    private final AtomicReference<ProviderState> currentState =
+            new AtomicReference<>(new ProviderState(ProviderType.PRIMARY, null));
 
-    public ProviderSelector(
-            @Qualifier("ipApiClient") GeolocationProvider primaryProvider,
+    public ProviderSelector(@Qualifier("ipApiClient") GeolocationProvider primaryProvider,
             @Qualifier("ipApiCoClient") GeolocationProvider secondaryProvider,
             GeolocationProperties properties) {
         this.primaryProvider = primaryProvider;
         this.secondaryProvider = secondaryProvider;
         this.failoverDuration = properties.providers().failoverDuration();
-        
+
         log.info("ProviderSelector initialized with failover duration: {}", failoverDuration);
     }
 
     @Override
     public GeolocationInfo lookup(String ip) {
         ProviderState state = currentState.get();
-        
+
         // Verificar se o período de failover expirou
         if (state.isInFailover() && state.hasFailoverExpired(failoverDuration)) {
             log.info("Failover period expired, resetting to primary provider");
@@ -70,33 +65,30 @@ public class ProviderSelector implements GeolocationProvider {
         }
     }
 
-    private GeolocationInfo tryWithFailover(
-            String ip, 
-            GeolocationProvider activeProvider, 
-            GeolocationProvider fallbackProvider,
-            ProviderType fallbackType) {
-        
+    private GeolocationInfo tryWithFailover(String ip, GeolocationProvider activeProvider,
+            GeolocationProvider fallbackProvider, ProviderType fallbackType) {
+
         try {
             return activeProvider.lookup(ip);
         } catch (ExternalApiException e) {
             log.warn("Provider failed, attempting failover: {}", e.getMessage());
-            
+
             try {
                 GeolocationInfo result = fallbackProvider.lookup(ip);
-                
+
                 // Sucesso no fallback - ativar período de failover
                 ProviderState newState = new ProviderState(fallbackType, Instant.now());
                 currentState.set(newState);
-                log.info("Switched to {} provider for {} minutes", 
-                    fallbackType, failoverDuration.toMinutes());
-                
+                log.info("Switched to {} provider for {} minutes", fallbackType,
+                        failoverDuration.toMinutes());
+
                 return result;
             } catch (ExternalApiException e2) {
-                log.error("Both providers failed. Primary: {}, Secondary: {}", 
-                    e.getMessage(), e2.getMessage());
+                log.error("Both providers failed. Primary: {}, Secondary: {}", e.getMessage(),
+                        e2.getMessage());
                 // Ambos falharam - lançar exceção para fallback local
-                throw new ExternalApiException("all-providers", 
-                    ErrorMessages.bothProvidersFailed(e.getMessage(), e2.getMessage()));
+                throw new ExternalApiException("all-providers",
+                        ErrorCode.BOTH_PROVIDERS_FAILED.format(e.getMessage(), e2.getMessage()));
             }
         }
     }
@@ -134,7 +126,8 @@ public class ProviderSelector implements GeolocationProvider {
         }
 
         boolean hasFailoverExpired(Duration failoverDuration) {
-            if (failoverStartTime == null) return true;
+            if (failoverStartTime == null)
+                return true;
             return Instant.now().isAfter(failoverStartTime.plus(failoverDuration));
         }
     }

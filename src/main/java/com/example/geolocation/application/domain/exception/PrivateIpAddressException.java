@@ -1,18 +1,15 @@
 package com.example.geolocation.application.domain.exception;
 
-import com.example.geolocation.application.domain.constants.ErrorMessages;
-
 /**
- * Exceção lançada quando o IP é privado ou reservado.
- * IPs privados retornam fallback, não erro, mas esta exceção
- * pode ser usada em contextos que exigem IP público.
+ * Exceção lançada quando o IP é privado ou reservado. IPs privados retornam fallback, não erro, mas
+ * esta exceção pode ser usada em contextos que exigem IP público.
  */
 public class PrivateIpAddressException extends GeolocationException {
 
     private final String ip;
 
     public PrivateIpAddressException(String ip) {
-        super(ErrorMessages.privateIpAddress(ip));
+        super(ErrorCode.PRIVATE_IP_ADDRESS.format(ip));
         this.ip = ip;
     }
 

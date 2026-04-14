@@ -8,10 +8,8 @@ import java.util.stream.Collectors;
  * Enum que representa as plataformas de dispositivo suportadas.
  */
 public enum Platform {
-    
-    IOS("iOS"),
-    ANDROID("Android"),
-    WEB("Web");
+
+    IOS("iOS"), ANDROID("Android"), WEB("Web");
 
     private final String value;
 
@@ -32,18 +30,14 @@ public enum Platform {
      * Retorna um conjunto com todos os valores válidos de plataforma.
      */
     public static Set<String> validValues() {
-        return Arrays.stream(values())
-                .map(Platform::getValue)
-                .collect(Collectors.toSet());
+        return Arrays.stream(values()).map(Platform::getValue).collect(Collectors.toSet());
     }
 
     /**
      * Retorna uma string formatada com os valores válidos.
      */
     public static String validValuesAsString() {
-        return Arrays.stream(values())
-                .map(Platform::getValue)
-                .collect(Collectors.joining(", "));
+        return Arrays.stream(values()).map(Platform::getValue).collect(Collectors.joining(", "));
     }
 
     /**
@@ -55,12 +49,13 @@ public enum Platform {
 
     /**
      * Converte uma string para o enum Platform.
+     * 
      * @throws IllegalArgumentException se o valor não for válido
      */
     public static Platform fromValue(String value) {
-        return Arrays.stream(values())
-                .filter(p -> p.getValue().equals(value))
-                .findFirst()
-                .orElseThrow(() -> new IllegalArgumentException("Invalid platform: " + value));
+        return Arrays.stream(values()).filter(p -> p.getValue().equals(value)).findFirst()
+                .orElseThrow(() -> new IllegalArgumentException(
+                        com.example.geolocation.application.domain.exception.ErrorCode.INVALID_PLATFORM_SIMPLE
+                                .format(value)));
     }
 }

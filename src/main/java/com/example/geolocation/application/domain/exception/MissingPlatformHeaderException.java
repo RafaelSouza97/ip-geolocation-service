@@ -1,14 +1,12 @@
 package com.example.geolocation.application.domain.exception;
 
-import com.example.geolocation.application.domain.constants.ErrorMessages;
-
 /**
  * Exceção lançada quando o header x-device-platform está ausente.
  */
 public class MissingPlatformHeaderException extends GeolocationException {
 
     public MissingPlatformHeaderException() {
-        super(ErrorMessages.MISSING_PLATFORM_HEADER);
+        super(ErrorCode.MISSING_PLATFORM_HEADER.getMessage());
     }
 
     @Override
