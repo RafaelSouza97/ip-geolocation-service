@@ -11,7 +11,6 @@ import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
-import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
@@ -36,17 +35,15 @@ public class GeolocationController {
         summary = "Localiza informações geográficas de um IP",
         description = "Retorna informações de geolocalização (país, região, cidade, coordenadas) para o IP informado"
     )
-    @ApiResponses({
-        @ApiResponse(
-            responseCode = "200",
-            description = "Geolocalização encontrada com sucesso",
-            content = @Content(schema = @Schema(implementation = GeolocationResponse.class))
-        ),
-        @ApiResponse(
-            responseCode = "400",
-            description = "IP inválido, header ausente ou plataforma inválida"
-        )
-    })
+    @ApiResponse(
+        responseCode = "200",
+        description = "Geolocalização encontrada com sucesso",
+        content = @Content(schema = @Schema(implementation = GeolocationResponse.class))
+    )
+    @ApiResponse(
+        responseCode = "400",
+        description = "IP inválido, header ausente ou plataforma inválida"
+    )
     @GetMapping("/locate")
     public ResponseEntity<GeolocationResponse> locate(
             @Parameter(description = "Endereço IP (IPv4 ou IPv6)", example = "8.8.8.8", required = true)

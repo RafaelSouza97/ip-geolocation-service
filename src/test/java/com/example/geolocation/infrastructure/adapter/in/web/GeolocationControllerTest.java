@@ -11,6 +11,8 @@ import com.example.geolocation.infrastructure.security.JwtService;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
@@ -146,36 +148,15 @@ class GeolocationControllerTest {
                 .andExpect(jsonPath("$.code").value("INVALID_PLATFORM"));
         }
 
-        @Test
-        @DisplayName("should accept iOS platform")
-        void shouldAcceptIOSPlatform() throws Exception {
+        @ParameterizedTest(name = "should accept {0} platform")
+        @ValueSource(strings = {"iOS", "Android", "Web"})
+        @DisplayName("should accept valid platforms")
+        void shouldAcceptValidPlatforms(String platform) throws Exception {
             when(geolocationUseCase.locate(anyString())).thenReturn(createMockResponse("8.8.8.8", DataSource.API));
 
             mockMvc.perform(get(LOCATE_URL)
                     .param("ip", "8.8.8.8")
-                    .header(PLATFORM_HEADER, "iOS"))
-                .andExpect(status().isOk());
-        }
-
-        @Test
-        @DisplayName("should accept Android platform")
-        void shouldAcceptAndroidPlatform() throws Exception {
-            when(geolocationUseCase.locate(anyString())).thenReturn(createMockResponse("8.8.8.8", DataSource.API));
-
-            mockMvc.perform(get(LOCATE_URL)
-                    .param("ip", "8.8.8.8")
-                    .header(PLATFORM_HEADER, "Android"))
-                .andExpect(status().isOk());
-        }
-
-        @Test
-        @DisplayName("should accept Web platform")
-        void shouldAcceptWebPlatform() throws Exception {
-            when(geolocationUseCase.locate(anyString())).thenReturn(createMockResponse("8.8.8.8", DataSource.API));
-
-            mockMvc.perform(get(LOCATE_URL)
-                    .param("ip", "8.8.8.8")
-                    .header(PLATFORM_HEADER, "Web"))
+                    .header(PLATFORM_HEADER, platform))
                 .andExpect(status().isOk());
         }
     }

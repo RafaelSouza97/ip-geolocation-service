@@ -124,7 +124,7 @@ class GeolocationServiceTest {
             service.locate(PUBLIC_IP);
 
             // Assert
-            verify(cache).put(eq(PUBLIC_IP), eq(apiResponse));
+            verify(cache).put(PUBLIC_IP, apiResponse);
         }
     }
 

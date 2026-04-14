@@ -1,6 +1,5 @@
 package com.example.geolocation.infrastructure.adapter.in.web;
 
-import com.example.geolocation.infrastructure.security.JwtService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -27,9 +26,6 @@ class AuthControllerTest {
 
     @Autowired
     private ObjectMapper objectMapper;
-
-    @Autowired
-    private JwtService jwtService;
 
     private static final String LOGIN_URL = "/auth/login";
 

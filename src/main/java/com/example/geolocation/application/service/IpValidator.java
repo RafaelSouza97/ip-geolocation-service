@@ -6,6 +6,7 @@ import java.util.regex.Pattern;
  * Validador de endereços IP (IPv4 e IPv6).
  * Detecta IPs inválidos, privados e localhost.
  */
+@SuppressWarnings("java:S5843") // Regex complexity is necessary for IPv6 validation
 public final class IpValidator {
 
     private IpValidator() {
