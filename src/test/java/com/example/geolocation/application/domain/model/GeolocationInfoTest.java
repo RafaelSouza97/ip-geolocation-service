@@ -33,7 +33,7 @@ class GeolocationInfoTest {
                 coords,
                 "America/Sao_Paulo",
                 "Google LLC",
-                "api",
+                DataSource.API,
                 timestamp
             );
 
@@ -45,7 +45,8 @@ class GeolocationInfoTest {
             assertEquals(coords, info.coordinates());
             assertEquals("America/Sao_Paulo", info.timezone());
             assertEquals("Google LLC", info.isp());
-            assertEquals("api", info.source());
+            assertEquals(DataSource.API, info.source());
+            assertEquals("api", info.sourceValue());
             assertEquals(timestamp, info.timestamp());
         }
 
@@ -64,7 +65,7 @@ class GeolocationInfoTest {
                 null,  // coordinates
                 null,  // timezone
                 null,  // isp
-                "api",
+                DataSource.API,
                 null   // timestamp
             );
 
@@ -76,7 +77,7 @@ class GeolocationInfoTest {
             assertEquals(Coordinates.zero(), info.coordinates());
             assertEquals("", info.timezone());
             assertEquals("", info.isp());
-            assertEquals("api", info.source());
+            assertEquals(DataSource.API, info.source());
             assertNotNull(info.timestamp());
         }
     }
@@ -93,7 +94,7 @@ class GeolocationInfoTest {
 
             // Act & Assert
             assertThrows(NullPointerException.class, () -> new GeolocationInfo(
-                null, country, null, null, null, null, null, "api", null
+                null, country, null, null, null, null, null, DataSource.API, null
             ));
         }
 
@@ -102,7 +103,7 @@ class GeolocationInfoTest {
         void shouldThrowExceptionForNullCountry() {
             // Act & Assert
             assertThrows(NullPointerException.class, () -> new GeolocationInfo(
-                "8.8.8.8", null, null, null, null, null, null, "api", null
+                "8.8.8.8", null, null, null, null, null, null, DataSource.API, null
             ));
         }
 
@@ -129,14 +130,15 @@ class GeolocationInfoTest {
             // Arrange
             var country = new Country("BR", "Brazil");
             var info = new GeolocationInfo(
-                "8.8.8.8", country, null, null, null, null, null, "api", null
+                "8.8.8.8", country, null, null, null, null, null, DataSource.API, null
             );
 
             // Act
             var cached = info.withCacheSource();
 
             // Assert
-            assertEquals("cache", cached.source());
+            assertEquals(DataSource.CACHE, cached.source());
+            assertEquals("cache", cached.sourceValue());
             assertEquals(info.ip(), cached.ip());
             assertEquals(info.country(), cached.country());
         }
@@ -147,10 +149,10 @@ class GeolocationInfoTest {
             // Arrange
             var country = new Country("BR", "Brazil");
             var fallbackInfo = new GeolocationInfo(
-                "8.8.8.8", country, null, null, null, null, null, "fallback", null
+                "8.8.8.8", country, null, null, null, null, null, DataSource.FALLBACK, null
             );
             var apiInfo = new GeolocationInfo(
-                "8.8.8.8", country, null, null, null, null, null, "api", null
+                "8.8.8.8", country, null, null, null, null, null, DataSource.API, null
             );
 
             // Assert
@@ -170,10 +172,10 @@ class GeolocationInfoTest {
             var country = new Country("BR", "Brazil");
             var timestamp = Instant.now();
             var info1 = new GeolocationInfo(
-                "8.8.8.8", country, null, null, null, null, null, "api", timestamp
+                "8.8.8.8", country, null, null, null, null, null, DataSource.API, timestamp
             );
             var info2 = new GeolocationInfo(
-                "8.8.8.8", country, null, null, null, null, null, "api", timestamp
+                "8.8.8.8", country, null, null, null, null, null, DataSource.API, timestamp
             );
 
             // Assert

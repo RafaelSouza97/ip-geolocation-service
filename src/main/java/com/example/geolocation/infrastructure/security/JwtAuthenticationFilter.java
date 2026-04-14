@@ -1,5 +1,6 @@
 package com.example.geolocation.infrastructure.security;
 
+import com.example.geolocation.application.domain.constants.HttpHeaders;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -26,9 +27,6 @@ import java.io.IOException;
 @RequiredArgsConstructor
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
-    private static final String AUTHORIZATION_HEADER = "Authorization";
-    private static final String BEARER_PREFIX = "Bearer ";
-
     private final JwtService jwtService;
     private final UserDetailsService userDetailsService;
 
@@ -39,16 +37,16 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             @NonNull FilterChain filterChain
     ) throws ServletException, IOException {
         
-        final String authHeader = request.getHeader(AUTHORIZATION_HEADER);
+        final String authHeader = request.getHeader(HttpHeaders.AUTHORIZATION);
 
         // Se não tem header Authorization ou não começa com "Bearer ", continua sem autenticar
-        if (authHeader == null || !authHeader.startsWith(BEARER_PREFIX)) {
+        if (authHeader == null || !authHeader.startsWith(HttpHeaders.BEARER_PREFIX)) {
             filterChain.doFilter(request, response);
             return;
         }
 
         try {
-            final String jwt = authHeader.substring(BEARER_PREFIX.length());
+            final String jwt = authHeader.substring(HttpHeaders.BEARER_PREFIX.length());
             final String username = jwtService.extractUsername(jwt);
 
             // Se extraiu username e ainda não está autenticado

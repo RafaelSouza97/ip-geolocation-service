@@ -1,5 +1,7 @@
 package com.example.geolocation.infrastructure.adapter.in.web;
 
+import com.example.geolocation.application.domain.constants.ErrorMessages;
+import com.example.geolocation.application.domain.exception.ErrorCode;
 import com.example.geolocation.application.domain.exception.GeolocationException;
 import com.example.geolocation.application.domain.exception.InvalidIpAddressException;
 import com.example.geolocation.application.domain.exception.InvalidPlatformException;
@@ -64,8 +66,8 @@ public class GlobalExceptionHandler {
     public ErrorResponse handleMissingParameter(MissingServletRequestParameterException ex) {
         log.warn("Missing request parameter: {}", ex.getParameterName());
         return new ErrorResponse(
-            "MISSING_PARAMETER",
-            "Missing required parameter: " + ex.getParameterName()
+            ErrorCode.MISSING_PARAMETER.getCode(),
+            ErrorMessages.missingParameter(ex.getParameterName())
         );
     }
 
@@ -76,7 +78,7 @@ public class GlobalExceptionHandler {
             .map(error -> error.getField() + ": " + error.getDefaultMessage())
             .collect(Collectors.joining(", "));
         log.warn("Validation error: {}", errors);
-        return new ErrorResponse("VALIDATION_ERROR", errors);
+        return new ErrorResponse(ErrorCode.VALIDATION_ERROR.getCode(), errors);
     }
 
     @ExceptionHandler(Exception.class)
@@ -84,6 +86,6 @@ public class GlobalExceptionHandler {
         log.error("Unexpected error: {}", ex.getMessage(), ex);
         return ResponseEntity
             .status(HttpStatus.INTERNAL_SERVER_ERROR)
-            .body(new ErrorResponse("INTERNAL_ERROR", "An unexpected error occurred"));
+            .body(new ErrorResponse(ErrorCode.INTERNAL_ERROR.getCode(), ErrorMessages.INTERNAL_ERROR));
     }
 }

@@ -3,10 +3,13 @@ package com.example.geolocation.infrastructure.adapter.out.client;
 import com.example.geolocation.application.domain.exception.ExternalApiException;
 import com.example.geolocation.application.domain.model.Coordinates;
 import com.example.geolocation.application.domain.model.Country;
+import com.example.geolocation.application.domain.model.DataSource;
 import com.example.geolocation.application.domain.model.GeolocationInfo;
 import com.example.geolocation.application.domain.model.Region;
 import com.example.geolocation.application.port.out.GeolocationProvider;
 import com.example.geolocation.infrastructure.config.GeolocationProperties;
+import com.example.geolocation.application.domain.constants.ApiConstants;
+import com.example.geolocation.application.domain.constants.ErrorMessages;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -27,7 +30,7 @@ import java.time.Instant;
 @Component("ipApiClient")
 public class IpApiClient implements GeolocationProvider {
 
-    private static final String API_NAME = "ip-api.com";
+    private static final String API_NAME = ApiConstants.PRIMARY_PROVIDER_NAME;
     
     private final HttpClient httpClient;
     private final ObjectMapper objectMapper;
@@ -61,12 +64,12 @@ public class IpApiClient implements GeolocationProvider {
 
             if (response.statusCode() != 200) {
                 log.error("API returned status {}: {}", response.statusCode(), response.body());
-                throw new ExternalApiException(API_NAME, "HTTP " + response.statusCode());
+                throw new ExternalApiException(API_NAME, ErrorMessages.httpError(response.statusCode()));
             }
 
             var apiResponse = objectMapper.readValue(response.body(), IpApiResponse.class);
 
-            if (!"success".equals(apiResponse.status())) {
+            if (!ApiConstants.IP_API_SUCCESS_STATUS.equals(apiResponse.status())) {
                 log.warn("API returned failure status for IP {}: {}", ip, apiResponse.message());
                 throw new ExternalApiException(API_NAME, apiResponse.message());
             }
@@ -90,7 +93,7 @@ public class IpApiClient implements GeolocationProvider {
             new Coordinates(response.lat(), response.lon()),
             response.timezone(),
             response.isp(),
-            "api",
+            DataSource.API,
             Instant.now()
         );
     }

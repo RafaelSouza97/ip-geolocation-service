@@ -1,15 +1,16 @@
 package com.example.geolocation.application.domain.exception;
 
+import com.example.geolocation.application.domain.constants.ErrorMessages;
+
 /**
  * Exceção lançada quando o formato do endereço IP é inválido.
  */
 public class InvalidIpAddressException extends GeolocationException {
 
-    private static final String ERROR_CODE = "INVALID_IP_FORMAT";
     private final String ip;
 
     public InvalidIpAddressException(String ip) {
-        super("Invalid IP address format: " + ip);
+        super(ErrorMessages.invalidIpFormat(ip));
         this.ip = ip;
     }
 
@@ -19,6 +20,6 @@ public class InvalidIpAddressException extends GeolocationException {
 
     @Override
     public String getErrorCode() {
-        return ERROR_CODE;
+        return ErrorCode.INVALID_IP_FORMAT.getCode();
     }
 }

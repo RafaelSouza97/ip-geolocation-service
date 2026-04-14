@@ -1,6 +1,7 @@
 package com.example.geolocation.infrastructure.adapter.out.client;
 
 import com.example.geolocation.application.domain.exception.ExternalApiException;
+import com.example.geolocation.application.domain.model.DataSource;
 import com.example.geolocation.infrastructure.config.GeolocationProperties;
 import com.example.geolocation.infrastructure.config.GeolocationProperties.*;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -97,7 +98,7 @@ class IpApiClientTest {
             assertEquals(-122.0775, result.coordinates().longitude());
             assertEquals("America/Los_Angeles", result.timezone());
             assertEquals("Google LLC", result.isp());
-            assertEquals("api", result.source());
+            assertEquals(DataSource.API, result.source());
         }
 
         @Test

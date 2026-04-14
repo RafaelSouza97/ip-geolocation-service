@@ -1,5 +1,7 @@
 package com.example.geolocation.application.domain.exception;
 
+import com.example.geolocation.application.domain.constants.ErrorMessages;
+
 /**
  * Exceção lançada quando o IP é privado ou reservado.
  * IPs privados retornam fallback, não erro, mas esta exceção
@@ -7,11 +9,10 @@ package com.example.geolocation.application.domain.exception;
  */
 public class PrivateIpAddressException extends GeolocationException {
 
-    private static final String ERROR_CODE = "PRIVATE_IP_ADDRESS";
     private final String ip;
 
     public PrivateIpAddressException(String ip) {
-        super("Private or reserved IP address: " + ip);
+        super(ErrorMessages.privateIpAddress(ip));
         this.ip = ip;
     }
 
@@ -21,6 +22,6 @@ public class PrivateIpAddressException extends GeolocationException {
 
     @Override
     public String getErrorCode() {
-        return ERROR_CODE;
+        return ErrorCode.PRIVATE_IP_ADDRESS.getCode();
     }
 }

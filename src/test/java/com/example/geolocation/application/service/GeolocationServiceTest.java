@@ -4,6 +4,7 @@ import com.example.geolocation.application.domain.exception.ExternalApiException
 import com.example.geolocation.application.domain.exception.InvalidIpAddressException;
 import com.example.geolocation.application.domain.model.Coordinates;
 import com.example.geolocation.application.domain.model.Country;
+import com.example.geolocation.application.domain.model.DataSource;
 import com.example.geolocation.application.domain.model.GeolocationInfo;
 import com.example.geolocation.application.domain.model.Region;
 import com.example.geolocation.application.port.out.GeolocationCache;
@@ -68,7 +69,7 @@ class GeolocationServiceTest {
             new Coordinates(37.4056, -122.0775),
             "America/Los_Angeles",
             "Google LLC",
-            "api",
+            DataSource.API,
             Instant.now()
         );
     }
@@ -88,7 +89,7 @@ class GeolocationServiceTest {
             var result = service.locate(PUBLIC_IP);
 
             // Assert
-            assertEquals("cache", result.source());
+            assertEquals(DataSource.CACHE, result.source());
             assertEquals(PUBLIC_IP, result.ip());
             verify(cache).get(PUBLIC_IP);
             verify(provider, never()).lookup(any());
@@ -106,7 +107,7 @@ class GeolocationServiceTest {
             var result = service.locate(PUBLIC_IP);
 
             // Assert
-            assertEquals("api", result.source());
+            assertEquals(DataSource.API, result.source());
             assertEquals(PUBLIC_IP, result.ip());
             assertEquals("United States", result.country().name());
             verify(cache).get(PUBLIC_IP);
@@ -142,7 +143,7 @@ class GeolocationServiceTest {
             var result = service.locate(ip);
 
             // Assert
-            assertEquals("fallback", result.source());
+            assertEquals(DataSource.FALLBACK, result.source());
             assertEquals("BR", result.country().code());
             assertEquals("Brazil", result.country().name());
             verify(cache, never()).get(any());
@@ -156,7 +157,7 @@ class GeolocationServiceTest {
             var result = service.locate("::1");
 
             // Assert
-            assertEquals("fallback", result.source());
+            assertEquals(DataSource.FALLBACK, result.source());
             assertEquals("BR", result.country().code());
             verify(provider, never()).lookup(any());
         }
@@ -200,7 +201,7 @@ class GeolocationServiceTest {
             var result = service.locate(PUBLIC_IP);
 
             // Assert
-            assertEquals("fallback", result.source());
+            assertEquals(DataSource.FALLBACK, result.source());
             assertEquals("BR", result.country().code());
         }
 
@@ -215,7 +216,7 @@ class GeolocationServiceTest {
             var result = service.locate(PUBLIC_IP);
 
             // Assert
-            assertEquals("fallback", result.source());
+            assertEquals(DataSource.FALLBACK, result.source());
             assertEquals("BR", result.country().code());
         }
 

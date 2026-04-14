@@ -2,6 +2,7 @@ package com.example.geolocation.infrastructure.adapter.in.web;
 
 import com.example.geolocation.application.domain.model.Coordinates;
 import com.example.geolocation.application.domain.model.Country;
+import com.example.geolocation.application.domain.model.DataSource;
 import com.example.geolocation.application.domain.model.GeolocationInfo;
 import com.example.geolocation.application.domain.model.Region;
 import com.example.geolocation.application.port.in.GeolocationUseCase;
@@ -43,7 +44,7 @@ class GeolocationControllerTest {
     private static final String LOCATE_URL = "/api/geolocation/v1/locate";
     private static final String PLATFORM_HEADER = "x-device-platform";
 
-    private GeolocationInfo createMockResponse(String ip, String source) {
+    private GeolocationInfo createMockResponse(String ip, DataSource source) {
         return new GeolocationInfo(
             ip,
             new Country("US", "United States"),
@@ -66,7 +67,7 @@ class GeolocationControllerTest {
         void shouldReturn200ForValidIp() throws Exception {
             // Arrange
             var ip = "8.8.8.8";
-            when(geolocationUseCase.locate(ip)).thenReturn(createMockResponse(ip, "api"));
+            when(geolocationUseCase.locate(ip)).thenReturn(createMockResponse(ip, DataSource.API));
 
             // Act & Assert
             mockMvc.perform(get(LOCATE_URL)
@@ -84,7 +85,7 @@ class GeolocationControllerTest {
         void shouldReturn200WithCacheSource() throws Exception {
             // Arrange
             var ip = "8.8.8.8";
-            when(geolocationUseCase.locate(ip)).thenReturn(createMockResponse(ip, "cache"));
+            when(geolocationUseCase.locate(ip)).thenReturn(createMockResponse(ip, DataSource.CACHE));
 
             // Act & Assert
             mockMvc.perform(get(LOCATE_URL)
@@ -107,7 +108,7 @@ class GeolocationControllerTest {
                 Coordinates.zero(),
                 "",
                 "",
-                "fallback",
+                DataSource.FALLBACK,
                 Instant.now()
             );
             when(geolocationUseCase.locate(ip)).thenReturn(fallbackResponse);
@@ -148,7 +149,7 @@ class GeolocationControllerTest {
         @Test
         @DisplayName("should accept iOS platform")
         void shouldAcceptIOSPlatform() throws Exception {
-            when(geolocationUseCase.locate(anyString())).thenReturn(createMockResponse("8.8.8.8", "api"));
+            when(geolocationUseCase.locate(anyString())).thenReturn(createMockResponse("8.8.8.8", DataSource.API));
 
             mockMvc.perform(get(LOCATE_URL)
                     .param("ip", "8.8.8.8")
@@ -159,7 +160,7 @@ class GeolocationControllerTest {
         @Test
         @DisplayName("should accept Android platform")
         void shouldAcceptAndroidPlatform() throws Exception {
-            when(geolocationUseCase.locate(anyString())).thenReturn(createMockResponse("8.8.8.8", "api"));
+            when(geolocationUseCase.locate(anyString())).thenReturn(createMockResponse("8.8.8.8", DataSource.API));
 
             mockMvc.perform(get(LOCATE_URL)
                     .param("ip", "8.8.8.8")
@@ -170,7 +171,7 @@ class GeolocationControllerTest {
         @Test
         @DisplayName("should accept Web platform")
         void shouldAcceptWebPlatform() throws Exception {
-            when(geolocationUseCase.locate(anyString())).thenReturn(createMockResponse("8.8.8.8", "api"));
+            when(geolocationUseCase.locate(anyString())).thenReturn(createMockResponse("8.8.8.8", DataSource.API));
 
             mockMvc.perform(get(LOCATE_URL)
                     .param("ip", "8.8.8.8")

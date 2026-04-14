@@ -4,6 +4,7 @@ import com.example.geolocation.application.domain.exception.ExternalApiException
 import com.example.geolocation.application.domain.exception.InvalidIpAddressException;
 import com.example.geolocation.application.domain.model.Coordinates;
 import com.example.geolocation.application.domain.model.Country;
+import com.example.geolocation.application.domain.model.DataSource;
 import com.example.geolocation.application.domain.model.GeolocationInfo;
 import com.example.geolocation.application.domain.model.Region;
 import com.example.geolocation.application.port.in.GeolocationUseCase;
@@ -100,7 +101,7 @@ public class GeolocationService implements GeolocationUseCase {
             Coordinates.zero(),
             "",
             "",
-            "fallback",
+            DataSource.FALLBACK,
             Instant.now()
         );
     }

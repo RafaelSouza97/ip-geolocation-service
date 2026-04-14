@@ -76,7 +76,7 @@ public record GeolocationResponse(
             new CoordinatesDto(info.coordinates().latitude(), info.coordinates().longitude()),
             info.timezone(),
             info.isp(),
-            info.source(),
+            info.sourceValue(),
             info.timestamp()
         );
     }

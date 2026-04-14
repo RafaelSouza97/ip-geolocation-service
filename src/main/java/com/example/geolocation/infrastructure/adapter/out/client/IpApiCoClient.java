@@ -1,8 +1,12 @@
 package com.example.geolocation.infrastructure.adapter.out.client;
 
+import com.example.geolocation.application.domain.constants.ApiConstants;
+import com.example.geolocation.application.domain.constants.ErrorMessages;
+import com.example.geolocation.application.domain.constants.HttpHeaders;
 import com.example.geolocation.application.domain.exception.ExternalApiException;
 import com.example.geolocation.application.domain.model.Coordinates;
 import com.example.geolocation.application.domain.model.Country;
+import com.example.geolocation.application.domain.model.DataSource;
 import com.example.geolocation.application.domain.model.GeolocationInfo;
 import com.example.geolocation.application.domain.model.Region;
 import com.example.geolocation.application.port.out.GeolocationProvider;
@@ -27,7 +31,7 @@ import java.time.Instant;
 @Component("ipApiCoClient")
 public class IpApiCoClient implements GeolocationProvider {
 
-    private static final String API_NAME = "ipapi.co";
+    private static final String API_NAME = ApiConstants.SECONDARY_PROVIDER_NAME;
     
     private final HttpClient httpClient;
     private final ObjectMapper objectMapper;
@@ -51,7 +55,7 @@ public class IpApiCoClient implements GeolocationProvider {
             var request = HttpRequest.newBuilder()
                 .uri(URI.create(url))
                 .timeout(properties.providers().secondary().timeout())
-                .header("User-Agent", "ip-geolocation-service")
+                .header(HttpHeaders.USER_AGENT, ApiConstants.DEFAULT_USER_AGENT)
                 .GET()
                 .build();
 
@@ -59,7 +63,7 @@ public class IpApiCoClient implements GeolocationProvider {
 
             if (response.statusCode() != 200) {
                 log.error("API {} returned status {}: {}", API_NAME, response.statusCode(), response.body());
-                throw new ExternalApiException(API_NAME, "HTTP " + response.statusCode());
+                throw new ExternalApiException(API_NAME, ErrorMessages.httpError(response.statusCode()));
             }
 
             var apiResponse = objectMapper.readValue(response.body(), IpApiCoResponse.class);
@@ -97,7 +101,7 @@ public class IpApiCoClient implements GeolocationProvider {
             ),
             response.timezone() != null ? response.timezone() : "",
             response.org() != null ? response.org() : "",
-            "api",
+            DataSource.API,
             Instant.now()
         );
     }

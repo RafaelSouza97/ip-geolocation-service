@@ -1,7 +1,9 @@
 package com.example.geolocation.infrastructure.adapter.in.web;
 
+import com.example.geolocation.application.domain.constants.HttpHeaders;
 import com.example.geolocation.application.domain.exception.InvalidPlatformException;
 import com.example.geolocation.application.domain.exception.MissingPlatformHeaderException;
+import com.example.geolocation.application.domain.model.Platform;
 import com.example.geolocation.application.port.in.GeolocationUseCase;
 import com.example.geolocation.infrastructure.adapter.in.web.dto.GeolocationResponse;
 import io.swagger.v3.oas.annotations.Operation;
@@ -17,8 +19,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.Set;
-
 /**
  * Controller REST para geolocalização de IPs.
  */
@@ -29,8 +29,6 @@ import java.util.Set;
 @Tag(name = "Geolocation", description = "API de geolocalização por IP")
 @SecurityRequirement(name = "bearerAuth")
 public class GeolocationController {
-
-    private static final Set<String> VALID_PLATFORMS = Set.of("iOS", "Android", "Web");
     
     private final GeolocationUseCase geolocationUseCase;
 
@@ -55,7 +53,7 @@ public class GeolocationController {
             @RequestParam String ip,
             
             @Parameter(description = "Plataforma do dispositivo", example = "Web", required = true)
-            @RequestHeader(value = "x-device-platform", required = false) String platform
+            @RequestHeader(value = HttpHeaders.DEVICE_PLATFORM, required = false) String platform
     ) {
         log.debug("Received locate request for IP: {} from platform: {}", ip, platform);
         
@@ -65,7 +63,7 @@ public class GeolocationController {
         // Executar caso de uso
         var result = geolocationUseCase.locate(ip);
         
-        log.info("Geolocation for IP {} returned from {}", ip, result.source());
+        log.info("Geolocation for IP {} returned from {}", ip, result.sourceValue());
         
         return ResponseEntity.ok(GeolocationResponse.fromDomain(result));
     }
@@ -75,7 +73,7 @@ public class GeolocationController {
             throw new MissingPlatformHeaderException();
         }
         
-        if (!VALID_PLATFORMS.contains(platform)) {
+        if (!Platform.isValid(platform)) {
             throw new InvalidPlatformException(platform);
         }
     }

@@ -13,7 +13,7 @@ import java.util.Objects;
  * @param coordinates coordenadas geográficas
  * @param timezone    fuso horário (ex: "America/Sao_Paulo")
  * @param isp         provedor de internet
- * @param source      origem dos dados: "api", "cache" ou "fallback"
+ * @param source      origem dos dados: API, CACHE ou FALLBACK
  * @param timestamp   momento da consulta
  */
 public record GeolocationInfo(
@@ -24,7 +24,7 @@ public record GeolocationInfo(
     Coordinates coordinates,
     String timezone,
     String isp,
-    String source,
+    DataSource source,
     Instant timestamp
 ) {
     public GeolocationInfo {
@@ -41,12 +41,12 @@ public record GeolocationInfo(
     }
 
     /**
-     * Cria uma cópia com source alterado para "cache".
+     * Cria uma cópia com source alterado para CACHE.
      */
     public GeolocationInfo withCacheSource() {
         return new GeolocationInfo(
             ip, country, region, city, coordinates, 
-            timezone, isp, "cache", timestamp
+            timezone, isp, DataSource.CACHE, timestamp
         );
     }
 
@@ -54,6 +54,13 @@ public record GeolocationInfo(
      * Verifica se esta informação veio do fallback.
      */
     public boolean isFallback() {
-        return "fallback".equals(source);
+        return DataSource.FALLBACK.equals(source);
+    }
+    
+    /**
+     * Retorna o valor da source como string (para serialização).
+     */
+    public String sourceValue() {
+        return source.getValue();
     }
 }

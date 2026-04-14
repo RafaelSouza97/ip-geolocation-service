@@ -1,16 +1,17 @@
 package com.example.geolocation.application.domain.exception;
 
+import com.example.geolocation.application.domain.constants.ErrorMessages;
+
 /**
  * Exceção lançada quando a plataforma informada não é válida.
  * Plataformas válidas: iOS, Android, Web
  */
 public class InvalidPlatformException extends GeolocationException {
 
-    private static final String ERROR_CODE = "INVALID_PLATFORM";
     private final String platform;
 
     public InvalidPlatformException(String platform) {
-        super("Invalid platform: " + platform + ". Valid values: iOS, Android, Web");
+        super(ErrorMessages.invalidPlatform(platform));
         this.platform = platform;
     }
 
@@ -20,6 +21,6 @@ public class InvalidPlatformException extends GeolocationException {
 
     @Override
     public String getErrorCode() {
-        return ERROR_CODE;
+        return ErrorCode.INVALID_PLATFORM.getCode();
     }
 }

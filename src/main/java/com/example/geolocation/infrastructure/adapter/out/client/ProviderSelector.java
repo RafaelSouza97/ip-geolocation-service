@@ -1,5 +1,6 @@
 package com.example.geolocation.infrastructure.adapter.out.client;
 
+import com.example.geolocation.application.domain.constants.ErrorMessages;
 import com.example.geolocation.application.domain.exception.ExternalApiException;
 import com.example.geolocation.application.domain.model.GeolocationInfo;
 import com.example.geolocation.application.port.out.GeolocationProvider;
@@ -95,7 +96,7 @@ public class ProviderSelector implements GeolocationProvider {
                     e.getMessage(), e2.getMessage());
                 // Ambos falharam - lançar exceção para fallback local
                 throw new ExternalApiException("all-providers", 
-                    "Both providers failed: " + e.getMessage() + " | " + e2.getMessage());
+                    ErrorMessages.bothProvidersFailed(e.getMessage(), e2.getMessage()));
             }
         }
     }

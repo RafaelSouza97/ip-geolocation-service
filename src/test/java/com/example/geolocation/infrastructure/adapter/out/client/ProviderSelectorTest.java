@@ -3,6 +3,7 @@ package com.example.geolocation.infrastructure.adapter.out.client;
 import com.example.geolocation.application.domain.exception.ExternalApiException;
 import com.example.geolocation.application.domain.model.Coordinates;
 import com.example.geolocation.application.domain.model.Country;
+import com.example.geolocation.application.domain.model.DataSource;
 import com.example.geolocation.application.domain.model.GeolocationInfo;
 import com.example.geolocation.application.domain.model.Region;
 import com.example.geolocation.application.port.out.GeolocationProvider;
@@ -48,7 +49,7 @@ class ProviderSelectorTest {
         selector = new ProviderSelector(primaryProvider, secondaryProvider, properties);
     }
 
-    private GeolocationInfo createMockResponse(String ip, String source) {
+    private GeolocationInfo createMockResponse(String ip, DataSource source) {
         return new GeolocationInfo(
             ip,
             new Country("US", "United States"),
@@ -70,7 +71,7 @@ class ProviderSelectorTest {
         @DisplayName("should return result from primary provider")
         void shouldReturnFromPrimaryProvider() {
             // Arrange
-            var expected = createMockResponse(TEST_IP, "api");
+            var expected = createMockResponse(TEST_IP, DataSource.API);
             when(primaryProvider.lookup(TEST_IP)).thenReturn(expected);
 
             // Act
@@ -86,7 +87,7 @@ class ProviderSelectorTest {
         @DisplayName("should not be in failover mode")
         void shouldNotBeInFailoverMode() {
             // Arrange
-            when(primaryProvider.lookup(TEST_IP)).thenReturn(createMockResponse(TEST_IP, "api"));
+            when(primaryProvider.lookup(TEST_IP)).thenReturn(createMockResponse(TEST_IP, DataSource.API));
 
             // Act
             selector.lookup(TEST_IP);
@@ -107,7 +108,7 @@ class ProviderSelectorTest {
             // Arrange
             when(primaryProvider.lookup(TEST_IP))
                 .thenThrow(new ExternalApiException("ip-api.com", "Connection timeout"));
-            var expected = createMockResponse(TEST_IP, "api");
+            var expected = createMockResponse(TEST_IP, DataSource.API);
             when(secondaryProvider.lookup(TEST_IP)).thenReturn(expected);
 
             // Act
@@ -126,7 +127,7 @@ class ProviderSelectorTest {
             when(primaryProvider.lookup(TEST_IP))
                 .thenThrow(new ExternalApiException("ip-api.com", "Connection timeout"));
             when(secondaryProvider.lookup(TEST_IP))
-                .thenReturn(createMockResponse(TEST_IP, "api"));
+                .thenReturn(createMockResponse(TEST_IP, DataSource.API));
 
             // Act
             selector.lookup(TEST_IP);
@@ -143,7 +144,7 @@ class ProviderSelectorTest {
             when(primaryProvider.lookup(anyString()))
                 .thenThrow(new ExternalApiException("ip-api.com", "Connection timeout"));
             when(secondaryProvider.lookup(anyString()))
-                .thenReturn(createMockResponse(TEST_IP, "api"));
+                .thenReturn(createMockResponse(TEST_IP, DataSource.API));
 
             // Act - first call triggers failover
             selector.lookup(TEST_IP);
@@ -151,7 +152,7 @@ class ProviderSelectorTest {
             // Reset mocks to track subsequent calls
             reset(primaryProvider, secondaryProvider);
             when(secondaryProvider.lookup(anyString()))
-                .thenReturn(createMockResponse("1.1.1.1", "api"));
+                .thenReturn(createMockResponse("1.1.1.1", DataSource.API));
             
             // Act - second call should go directly to secondary
             selector.lookup("1.1.1.1");
@@ -193,7 +194,7 @@ class ProviderSelectorTest {
             when(primaryProvider.lookup(TEST_IP))
                 .thenThrow(new ExternalApiException("ip-api.com", "Timeout"));
             when(secondaryProvider.lookup(TEST_IP))
-                .thenReturn(createMockResponse(TEST_IP, "api"));
+                .thenReturn(createMockResponse(TEST_IP, DataSource.API));
             
             selector.lookup(TEST_IP);
             assertTrue(selector.isInFailover());
@@ -204,7 +205,7 @@ class ProviderSelectorTest {
             // Reset mocks
             reset(primaryProvider, secondaryProvider);
             when(primaryProvider.lookup(TEST_IP))
-                .thenReturn(createMockResponse(TEST_IP, "api"));
+                .thenReturn(createMockResponse(TEST_IP, DataSource.API));
             
             // Act
             selector.lookup(TEST_IP);
@@ -227,7 +228,7 @@ class ProviderSelectorTest {
             when(primaryProvider.lookup(TEST_IP))
                 .thenThrow(new ExternalApiException("ip-api.com", "Timeout"));
             when(secondaryProvider.lookup(TEST_IP))
-                .thenReturn(createMockResponse(TEST_IP, "api"));
+                .thenReturn(createMockResponse(TEST_IP, DataSource.API));
             
             selector.lookup(TEST_IP);
             assertTrue(selector.isInFailover());

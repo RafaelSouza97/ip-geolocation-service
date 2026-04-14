@@ -2,6 +2,7 @@ package com.example.geolocation.infrastructure.adapter.out.cache;
 
 import com.example.geolocation.application.domain.model.Coordinates;
 import com.example.geolocation.application.domain.model.Country;
+import com.example.geolocation.application.domain.model.DataSource;
 import com.example.geolocation.application.domain.model.GeolocationInfo;
 import com.example.geolocation.application.domain.model.Region;
 import com.github.benmanes.caffeine.cache.Cache;
@@ -39,7 +40,7 @@ class CaffeineGeolocationCacheTest {
             new Coordinates(37.4056, -122.0775),
             "America/Los_Angeles",
             "Google LLC",
-            "api",
+            DataSource.API,
             Instant.now()
         );
     }

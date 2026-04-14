@@ -1,5 +1,6 @@
 package com.example.geolocation.infrastructure.config;
 
+import com.example.geolocation.application.domain.constants.ApiConstants;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 
 import java.time.Duration;
@@ -20,13 +21,13 @@ public record GeolocationProperties(
     ) {
         public ProviderProperties {
             if (primary == null) primary = new ApiProperties(
-                "ip-api.com",
-                "http://ip-api.com/json",
+                ApiConstants.PRIMARY_PROVIDER_NAME,
+                ApiConstants.PRIMARY_PROVIDER_URL,
                 Duration.ofSeconds(5)
             );
             if (secondary == null) secondary = new ApiProperties(
-                "ipapi.co",
-                "https://ipapi.co",
+                ApiConstants.SECONDARY_PROVIDER_NAME,
+                ApiConstants.SECONDARY_PROVIDER_URL,
                 Duration.ofSeconds(5)
             );
             if (failoverDuration == null) failoverDuration = Duration.ofMinutes(5);
@@ -43,7 +44,7 @@ public record GeolocationProperties(
     ) {
         public ApiProperties {
             if (name == null) name = "unknown";
-            if (url == null) url = "http://ip-api.com/json";
+            if (url == null) url = ApiConstants.PRIMARY_PROVIDER_URL;
             if (timeout == null) timeout = Duration.ofSeconds(5);
         }
     }
@@ -71,8 +72,8 @@ public record GeolocationProperties(
     // Compatibilidade - método legado para IpApiClient existente
     public ApiProperties api() {
         return providers != null ? providers.primary() : new ApiProperties(
-            "ip-api.com",
-            "http://ip-api.com/json",
+            ApiConstants.PRIMARY_PROVIDER_NAME,
+            ApiConstants.PRIMARY_PROVIDER_URL,
             Duration.ofSeconds(5)
         );
     }
