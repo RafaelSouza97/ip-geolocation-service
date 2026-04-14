@@ -4,22 +4,20 @@ import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
-import java.time.Instant;
+
 import org.springframework.stereotype.Component;
+
 import com.example.geolocation.application.domain.constants.ApiConstants;
 import com.example.geolocation.application.domain.constants.HttpHeaders;
 import com.example.geolocation.application.domain.exception.ErrorCode;
 import com.example.geolocation.application.domain.exception.ExternalApiException;
-import com.example.geolocation.application.domain.model.Coordinates;
-import com.example.geolocation.application.domain.model.Country;
-import com.example.geolocation.application.domain.model.DataSource;
 import com.example.geolocation.application.domain.model.GeolocationInfo;
-import com.example.geolocation.application.domain.model.Region;
 import com.example.geolocation.application.port.out.GeolocationProvider;
 import com.example.geolocation.infrastructure.config.GeolocationProperties;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.ObjectMapper;
+
 import lombok.extern.slf4j.Slf4j;
 
 /**
