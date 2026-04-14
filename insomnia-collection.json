@@ -1,7 +1,7 @@
 {
   "_type": "export",
   "__export_format": 4,
-  "__export_date": "2026-04-11T00:00:00.000Z",
+  "__export_date": "2026-04-14T00:00:00.000Z",
   "__export_source": "insomnia.desktop.app:v2023.5.8",
   "resources": [
     {
@@ -22,10 +22,11 @@
       "name": "Local",
       "data": {
         "base_url": "http://localhost:8080",
-        "api_version": "v1"
+        "api_version": "v1",
+        "jwt_token": ""
       },
       "dataPropertyOrder": {
-        "&": ["base_url", "api_version"]
+        "&": ["base_url", "api_version", "jwt_token"]
       },
       "color": "#7ED321",
       "isPrivate": false,
@@ -33,12 +34,55 @@
       "_type": "environment"
     },
     {
+      "_id": "fld_auth",
+      "parentId": "wrk_ip_geolocation",
+      "modified": 1712800000000,
+      "created": 1712800000000,
+      "name": "Authentication",
+      "description": "Endpoints de autenticação JWT",
+      "environment": {},
+      "environmentPropertyOrder": null,
+      "metaSortKey": -2,
+      "_type": "request_group"
+    },
+    {
+      "_id": "req_login",
+      "parentId": "fld_auth",
+      "modified": 1712800000000,
+      "created": 1712800000000,
+      "url": "{{ _.base_url }}/auth/login",
+      "name": "Login (Get JWT Token)",
+      "description": "Autentica com username/password e retorna JWT token. Copie o token para a variável jwt_token do environment.",
+      "method": "POST",
+      "body": {
+        "mimeType": "application/json",
+        "text": "{\n  \"username\": \"admin\",\n  \"password\": \"Admin123@\"\n}"
+      },
+      "parameters": [],
+      "headers": [
+        {
+          "name": "Content-Type",
+          "value": "application/json"
+        }
+      ],
+      "authentication": {},
+      "metaSortKey": -1,
+      "isPrivate": false,
+      "settingStoreCookies": true,
+      "settingSendCookies": true,
+      "settingDisableRenderRequestBody": false,
+      "settingEncodeUrl": true,
+      "settingRebuildPath": true,
+      "settingFollowRedirects": "global",
+      "_type": "request"
+    },
+    {
       "_id": "fld_geolocation",
       "parentId": "wrk_ip_geolocation",
       "modified": 1712800000000,
       "created": 1712800000000,
       "name": "Geolocation",
-      "description": "Endpoints de geolocalização",
+      "description": "Endpoints de geolocalização (requer JWT token)",
       "environment": {},
       "environmentPropertyOrder": null,
       "metaSortKey": -1,
@@ -62,7 +106,10 @@
           "description": "Plataforma do dispositivo (iOS, Android, Web)"
         }
       ],
-      "authentication": {},
+      "authentication": {
+        "type": "bearer",
+        "token": "{{ _.jwt_token }}"
+      },
       "metaSortKey": -1,
       "isPrivate": false,
       "settingStoreCookies": true,
@@ -90,7 +137,10 @@
           "value": "Android"
         }
       ],
-      "authentication": {},
+      "authentication": {
+        "type": "bearer",
+        "token": "{{ _.jwt_token }}"
+      },
       "metaSortKey": 0,
       "_type": "request"
     },
@@ -111,7 +161,10 @@
           "value": "iOS"
         }
       ],
-      "authentication": {},
+      "authentication": {
+        "type": "bearer",
+        "token": "{{ _.jwt_token }}"
+      },
       "metaSortKey": 1,
       "_type": "request"
     },
@@ -132,7 +185,10 @@
           "value": "Web"
         }
       ],
-      "authentication": {},
+      "authentication": {
+        "type": "bearer",
+        "token": "{{ _.jwt_token }}"
+      },
       "metaSortKey": 2,
       "_type": "request"
     },
@@ -148,8 +204,32 @@
       "body": {},
       "parameters": [],
       "headers": [],
-      "authentication": {},
+      "authentication": {
+        "type": "bearer",
+        "token": "{{ _.jwt_token }}"
+      },
       "metaSortKey": 3,
+      "_type": "request"
+    },
+    {
+      "_id": "req_no_auth",
+      "parentId": "fld_geolocation",
+      "modified": 1712800000000,
+      "created": 1712800000000,
+      "url": "{{ _.base_url }}/api/geolocation/{{ _.api_version }}/locate?ip=8.8.8.8",
+      "name": "No Auth (Error 403)",
+      "description": "Requisição sem token JWT deve retornar 403",
+      "method": "GET",
+      "body": {},
+      "parameters": [],
+      "headers": [
+        {
+          "name": "x-device-platform",
+          "value": "Web"
+        }
+      ],
+      "authentication": {},
+      "metaSortKey": 4,
       "_type": "request"
     },
     {
@@ -158,7 +238,7 @@
       "modified": 1712800000000,
       "created": 1712800000000,
       "name": "Health & Metrics",
-      "description": "Endpoints de monitoramento",
+      "description": "Endpoints de monitoramento (públicos)",
       "environment": {},
       "metaSortKey": 0,
       "_type": "request_group"
