@@ -10,6 +10,7 @@ import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -26,6 +27,7 @@ import java.util.Set;
 @RequestMapping("/api/geolocation/v1")
 @RequiredArgsConstructor
 @Tag(name = "Geolocation", description = "API de geolocalização por IP")
+@SecurityRequirement(name = "bearerAuth")
 public class GeolocationController {
 
     private static final Set<String> VALID_PLATFORMS = Set.of("iOS", "Android", "Web");
