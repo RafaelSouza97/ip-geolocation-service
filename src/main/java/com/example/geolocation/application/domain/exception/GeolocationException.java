@@ -10,7 +10,6 @@ public abstract class GeolocationException extends RuntimeException {
         super(message, cause);
     }
 
-    
     public abstract String getErrorCode();
 }
 

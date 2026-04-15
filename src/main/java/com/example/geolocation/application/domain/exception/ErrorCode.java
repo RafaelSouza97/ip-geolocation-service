@@ -39,17 +39,14 @@ public enum ErrorCode {
         this.messageTemplate = messageTemplate;
     }
 
-    
     public String getCode() {
         return name();
     }
 
-    
     public String getMessage() {
         return messageTemplate;
     }
 
-    
     public String format(Object... args) {
         return args.length > 0 ? String.format(messageTemplate, args) : messageTemplate;
     }
@@ -59,7 +56,6 @@ public enum ErrorCode {
         return messageTemplate;
     }
 
-    
     public static final class Validation {
         public static final String USERNAME_REQUIRED = "Username is required";
         public static final String PASSWORD_REQUIRED = "Password is required";
@@ -67,5 +63,4 @@ public enum ErrorCode {
         private Validation() {}
     }
 }
-
 
