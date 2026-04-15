@@ -12,6 +12,7 @@ import org.junit.jupiter.params.provider.NullAndEmptySource;
 import org.junit.jupiter.params.provider.ValueSource;
 
 @DisplayName("IpValidator")
+@SuppressWarnings("java:S2187")
 class IpValidatorTest {
 
     @Nested

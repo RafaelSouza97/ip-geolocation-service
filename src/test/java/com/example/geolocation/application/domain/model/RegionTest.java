@@ -7,6 +7,7 @@ import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.*;
 
 @DisplayName("Region")
+@SuppressWarnings("java:S2187")
 class RegionTest {
 
     @Nested

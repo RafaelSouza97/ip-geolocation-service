@@ -5,6 +5,7 @@ import com.example.geolocation.application.domain.model.Country;
 import com.example.geolocation.application.domain.model.DataSource;
 import com.example.geolocation.application.domain.model.GeolocationInfo;
 import com.example.geolocation.application.domain.model.Region;
+import lombok.experimental.UtilityClass;
 
 import java.time.Instant;
 
@@ -12,11 +13,8 @@ import java.time.Instant;
  * Utilitário para criar GeolocationInfo a partir de respostas de APIs externas.
  * Centraliza o tratamento de valores nulos e a criação do objeto de domínio.
  */
-public final class GeolocationInfoMapper {
-
-    private GeolocationInfoMapper() {
-        // Utility class
-    }
+@UtilityClass
+public class GeolocationInfoMapper {
 
     /**
      * Dados de resposta de API de geolocalização.
@@ -52,7 +50,7 @@ public final class GeolocationInfoMapper {
      * @param data dados da resposta da API
      * @return GeolocationInfo preenchido
      */
-    public static GeolocationInfo fromApiResponse(ApiResponseData data) {
+    public GeolocationInfo fromApiResponse(ApiResponseData data) {
         return new GeolocationInfo(
             data.ip(),
             new Country(data.countryCode(), data.countryName()),

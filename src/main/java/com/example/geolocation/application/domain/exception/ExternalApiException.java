@@ -1,8 +1,11 @@
 package com.example.geolocation.application.domain.exception;
 
+import lombok.Getter;
+
 /**
  * Exceção lançada quando a API externa falha.
  */
+@Getter
 public class ExternalApiException extends GeolocationException {
 
     private final String apiName;
@@ -15,10 +18,6 @@ public class ExternalApiException extends GeolocationException {
     public ExternalApiException(String apiName, String message, Throwable cause) {
         super(ErrorCode.EXTERNAL_API_ERROR.format(apiName, message), cause);
         this.apiName = apiName;
-    }
-
-    public String getApiName() {
-        return apiName;
     }
 
     @Override

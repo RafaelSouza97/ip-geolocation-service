@@ -29,6 +29,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @WebMvcTest(GeolocationController.class)
 @AutoConfigureMockMvc(addFilters = false)
 @DisplayName("GeolocationController")
+@SuppressWarnings("java:S2187")
 class GeolocationControllerTest {
 
     @Autowired

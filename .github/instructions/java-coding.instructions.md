@@ -23,9 +23,19 @@ description: "Java coding standards and conventions for ip-geolocation-service"
 // ✅ Use Optional para retornos que podem ser nulos
 public Optional<GeolocationInfo> findByIp(String ip) {}
 
-// ✅ Use Objects.requireNonNull para parâmetros obrigatórios
-public GeolocationService(GeolocationProvider provider) {
-    this.provider = Objects.requireNonNull(provider, "provider cannot be null");
+// ✅ Use Lombok @NonNull para validação automática em construtores
+@RequiredArgsConstructor
+public class GeolocationService {
+    private final @NonNull GeolocationProvider provider;
+    private final @NonNull GeolocationCache cache;
+}
+
+// ✅ Use Objects.requireNonNull em compact constructors de Records
+public record Country(String code, String name) {
+    public Country {
+        Objects.requireNonNull(code, "code cannot be null");
+        Objects.requireNonNull(name, "name cannot be null");
+    }
 }
 
 // ❌ Nunca retorne null de método público
@@ -68,7 +78,8 @@ public class GeolocationService {
 
 ### Exception Handling
 ```java
-// ✅ Crie exceções específicas do domínio
+// ✅ Crie exceções específicas do domínio com Lombok @Getter
+@Getter
 public class InvalidIpAddressException extends RuntimeException {
     private final String ip;
     
@@ -76,8 +87,6 @@ public class InvalidIpAddressException extends RuntimeException {
         super("Invalid IP address format: " + ip);
         this.ip = ip;
     }
-    
-    public String getIp() { return ip; }
 }
 
 // ✅ Use try-with-resources para recursos
@@ -96,6 +105,36 @@ private static final Pattern IP_V4_PATTERN = Pattern.compile(
 // ❌ Não compile dentro de métodos
 public boolean isValidIp(String ip) {
     return Pattern.matches("...", ip); // Cria novo Pattern a cada chamada
+}
+```
+
+### Utility Classes
+```java
+// ✅ Use @UtilityClass do Lombok para classes com métodos estáticos
+@UtilityClass
+public class IpValidator {
+    public boolean isValid(String ip) {
+        return isValidIpv4(ip) || isValidIpv6(ip);
+    }
+}
+
+// ❌ Não crie construtores privados manualmente
+public final class IpValidator {
+    private IpValidator() {} // Desnecessário com @UtilityClass
+}
+```
+
+### Enums
+```java
+// ✅ Use Lombok para enums com campos
+@Getter
+@RequiredArgsConstructor
+public enum DataSource {
+    API("api"),
+    CACHE("cache"),
+    FALLBACK("fallback");
+    
+    private final String value;
 }
 ```
 
@@ -132,10 +171,38 @@ public record GeolocationProperties(
 
 ### Validation
 ```java
-// ✅ Use Bean Validation
-@GetMapping("/locate")
-public ResponseEntity<GeolocationResponse> locate(
-    @RequestParam @NotBlank @ValidIp String ip,
-    @RequestHeader("x-device-platform") @Pattern(regexp = "iOS|Android|Web") String platform
+// ✅ Use @Validated no controller e @NotBlank nos parâmetros
+@RestController
+@Validated
+public class GeolocationController {
+    
+    @GetMapping("/locate")
+    public ResponseEntity<GeolocationResponse> locate(
+        @RequestParam @NotBlank String ip,
+        @RequestHeader("x-device-platform") String platform
+    ) {}
+}
+
+// ✅ Trate ConstraintViolationException no GlobalExceptionHandler
+@ExceptionHandler(ConstraintViolationException.class)
+public ResponseEntity<ErrorResponse> handleConstraintViolation(ConstraintViolationException ex) {
+    return ResponseEntity.badRequest().body(...);
+}
+```
+
+### DTOs com OpenAPI
+```java
+// ✅ Use @Schema para documentação Swagger
+public record LoginRequest(
+    @Schema(description = "Username", example = "admin")
+    @NotBlank String username,
+    
+    @Schema(description = "Password", example = "Admin123@")
+    @NotBlank String password
+) {}
+
+public record LoginResponse(
+    @Schema(description = "JWT token", example = "eyJhbGciOiJIUzI1NiIs...")
+    String token
 ) {}
 ```

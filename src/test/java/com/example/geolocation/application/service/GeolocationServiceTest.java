@@ -32,6 +32,7 @@ import static org.mockito.Mockito.*;
 
 @DisplayName("GeolocationService")
 @ExtendWith(MockitoExtension.class)
+@SuppressWarnings("java:S2187")
 class GeolocationServiceTest {
 
     @Mock

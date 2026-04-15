@@ -1,34 +1,25 @@
 package com.example.geolocation.application.domain.model;
 
+import lombok.Getter;
+import lombok.RequiredArgsConstructor;
+
 /**
  * Enum que representa a origem dos dados de geolocalização.
  */
+@Getter
+@RequiredArgsConstructor
 public enum DataSource {
-    
-    /**
-     * Dados obtidos do cache local.
-     */
+
+    /** Dados obtidos do cache local. */
     CACHE("cache"),
-    
-    /**
-     * Dados obtidos da API externa.
-     */
+
+    /** Dados obtidos da API externa. */
     API("api"),
-    
-    /**
-     * Dados de fallback (padrão quando a API falha).
-     */
+
+    /** Dados de fallback (padrão quando a API falha). */
     FALLBACK("fallback");
 
     private final String value;
-
-    DataSource(String value) {
-        this.value = value;
-    }
-
-    public String getValue() {
-        return value;
-    }
 
     @Override
     public String toString() {

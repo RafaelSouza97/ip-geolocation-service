@@ -17,6 +17,7 @@ import static com.github.tomakehurst.wiremock.client.WireMock.*;
 import static org.junit.jupiter.api.Assertions.*;
 
 @DisplayName("IpApiClient")
+@SuppressWarnings("java:S2187")
 class IpApiClientTest {
 
     private static WireMockServer wireMockServer;

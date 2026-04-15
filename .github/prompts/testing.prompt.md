@@ -9,18 +9,18 @@ description: "Use when: writing tests, creating test classes, implementing unit 
 
 ```java
 @Test
-@DisplayName("Should return cached geolocation when IP exists in cache")
+@DisplayName("should return cached geolocation when IP exists in cache")
 void shouldReturnCachedGeolocationWhenIpExistsInCache() {
-    // Arrange (Given)
+    // Arrange
     var ip = "8.8.8.8";
     var cachedResult = createGeolocationInfo(ip);
     when(cache.get(ip)).thenReturn(Optional.of(cachedResult));
 
-    // Act (When)
+    // Act
     var result = service.locate(ip);
 
-    // Assert (Then)
-    assertThat(result.source()).isEqualTo("cache");
+    // Assert
+    assertEquals(DataSource.CACHE, result.source());
     verify(externalProvider, never()).lookup(any());
 }
 ```
@@ -63,6 +63,7 @@ src/test/java/
 ## Unit Tests - Service Layer
 
 ```java
+@DisplayName("GeolocationService")
 @ExtendWith(MockitoExtension.class)
 class GeolocationServiceTest {
 
@@ -72,18 +73,57 @@ class GeolocationServiceTest {
     @Mock
     private GeolocationCache cache;
 
-    @InjectMocks
     private GeolocationService service;
 
+    @BeforeEach
+    void setUp() {
+        service = new GeolocationService(cache, provider, properties);
+    }
+
     @Nested
-    @DisplayName("IP Validation")
-    class IpValidation {
+    @DisplayName("when IP is private or localhost")
+    class PrivateOrLocalhostIp {
+        
         @ParameterizedTest
-        @ValueSource(strings = {"192.168.1.1", "10.0.0.1", "172.16.0.1"})
+        @ValueSource(strings = {"192.168.1.1", "10.0.0.1", "172.16.0.1", "127.0.0.1"})
+        @DisplayName("should return fallback for private IPs without calling provider")
         void shouldReturnFallbackForPrivateIps(String privateIp) {
+            // Act
             var result = service.locate(privateIp);
-            assertThat(result.country().code()).isEqualTo("BR");
+
+            // Assert
+            assertEquals(DataSource.FALLBACK, result.source());
+            assertEquals("BR", result.country().code());
+            verify(provider, never()).lookup(any());
         }
+    }
+}
+```
+
+## Test Class Organization with @Nested
+
+Use `@Nested` para organizar testes em grupos lógicos:
+
+```java
+@DisplayName("IpValidator")
+class IpValidatorTest {
+
+    @Nested
+    @DisplayName("IPv4 validation")
+    class Ipv4Validation {
+        // testes de IPv4
+    }
+
+    @Nested
+    @DisplayName("IPv6 validation")
+    class Ipv6Validation {
+        // testes de IPv6
+    }
+
+    @Nested
+    @DisplayName("private/reserved IP detection")
+    class PrivateIpDetection {
+        // testes de IPs privados
     }
 }
 ```
@@ -148,6 +188,24 @@ class IpApiClientIT {
 - **Mínimo 80%** cobertura na camada de serviço
 - 100% de cobertura em validações de IP
 - Testar todos os cenários de erro e fallback
+
+## Assertion Best Practices
+
+```java
+// ✅ Use mensagens descritivas quando há múltiplas assertions similares
+assertTrue(IpValidator.isPrivateOrReserved(ip),
+    "IPv4 " + ip + " should be private/reserved");
+
+// ✅ Verifique interações com mocks após asserts de valor
+assertEquals(DataSource.FALLBACK, result.source());
+verify(cache, never()).get(any());
+verify(provider, never()).lookup(any());
+
+// ✅ Use assertThrows para verificar exceções
+var exception = assertThrows(InvalidIpAddressException.class, 
+    () -> service.locate(ip));
+assertEquals(ip, exception.getIp());
+```
 - Testar cache hit e cache miss
 
 ## Test Data Builders

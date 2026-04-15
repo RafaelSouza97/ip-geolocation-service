@@ -23,6 +23,7 @@ import static org.mockito.Mockito.*;
 
 @DisplayName("ProviderSelector")
 @ExtendWith(MockitoExtension.class)
+@SuppressWarnings("java:S2187")
 class ProviderSelectorTest {
 
     @Mock

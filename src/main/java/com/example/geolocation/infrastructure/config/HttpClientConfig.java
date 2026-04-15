@@ -1,5 +1,6 @@
 package com.example.geolocation.infrastructure.config;
 
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
@@ -9,6 +10,7 @@ import java.time.Duration;
 /**
  * Configuração do HttpClient compartilhado entre os clientes de API externa.
  */
+@Slf4j
 @Configuration
 public class HttpClientConfig {
 
@@ -25,6 +27,8 @@ public class HttpClientConfig {
         Duration timeout = properties.api() != null && properties.api().timeout() != null 
             ? properties.api().timeout() 
             : DEFAULT_CONNECT_TIMEOUT;
+        
+        log.info("Configuring shared HttpClient with timeout: {}", timeout);
         
         return HttpClient.newBuilder()
             .connectTimeout(timeout)

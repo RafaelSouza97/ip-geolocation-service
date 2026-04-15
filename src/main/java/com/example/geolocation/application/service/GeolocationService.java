@@ -1,9 +1,7 @@
 package com.example.geolocation.application.service;
 
 import java.time.Instant;
-import java.util.Objects;
 import org.springframework.stereotype.Service;
-import com.example.geolocation.application.domain.exception.ErrorCode;
 import com.example.geolocation.application.domain.exception.ExternalApiException;
 import com.example.geolocation.application.domain.exception.InvalidIpAddressException;
 import com.example.geolocation.application.domain.model.Coordinates;
@@ -15,6 +13,8 @@ import com.example.geolocation.application.port.in.GeolocationUseCase;
 import com.example.geolocation.application.port.out.GeolocationCache;
 import com.example.geolocation.application.port.out.GeolocationProvider;
 import com.example.geolocation.infrastructure.config.GeolocationProperties;
+import lombok.NonNull;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
 /**
@@ -26,19 +26,15 @@ import lombok.extern.slf4j.Slf4j;
  */
 @Slf4j
 @Service
+@RequiredArgsConstructor
 public class GeolocationService implements GeolocationUseCase {
 
+    @NonNull
     private final GeolocationCache cache;
+    @NonNull
     private final GeolocationProvider provider;
+    @NonNull
     private final GeolocationProperties properties;
-
-    public GeolocationService(GeolocationCache cache, GeolocationProvider provider,
-            GeolocationProperties properties) {
-        this.cache = Objects.requireNonNull(cache, ErrorCode.CACHE_NULL.getMessage());
-        this.provider = Objects.requireNonNull(provider, ErrorCode.PROVIDER_NULL.getMessage());
-        this.properties =
-                Objects.requireNonNull(properties, ErrorCode.PROPERTIES_NULL.getMessage());
-    }
 
     @Override
     public GeolocationInfo locate(String ip) {

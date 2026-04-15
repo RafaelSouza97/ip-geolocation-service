@@ -19,6 +19,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @SpringBootTest
 @AutoConfigureMockMvc
 @DisplayName("AuthController")
+@SuppressWarnings("java:S2187")
 class AuthControllerTest {
 
     @Autowired

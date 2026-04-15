@@ -22,6 +22,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @WebMvcTest(GeolocationController.class)
 @AutoConfigureMockMvc(addFilters = false)
 @DisplayName("GlobalExceptionHandler")
+@SuppressWarnings("java:S2187")
 class GlobalExceptionHandlerTest {
 
     @Autowired

@@ -9,6 +9,7 @@ import java.time.Instant;
 import static org.junit.jupiter.api.Assertions.*;
 
 @DisplayName("GeolocationInfo")
+@SuppressWarnings("java:S2187")
 class GeolocationInfoTest {
 
     @Nested

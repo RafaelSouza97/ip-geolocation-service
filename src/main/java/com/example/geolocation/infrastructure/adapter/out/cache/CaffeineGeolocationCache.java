@@ -3,6 +3,7 @@ package com.example.geolocation.infrastructure.adapter.out.cache;
 import com.example.geolocation.application.domain.model.GeolocationInfo;
 import com.example.geolocation.application.port.out.GeolocationCache;
 import com.github.benmanes.caffeine.cache.Cache;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
@@ -13,13 +14,10 @@ import java.util.Optional;
  */
 @Slf4j
 @Component
+@RequiredArgsConstructor
 public class CaffeineGeolocationCache implements GeolocationCache {
 
     private final Cache<String, GeolocationInfo> cache;
-
-    public CaffeineGeolocationCache(Cache<String, GeolocationInfo> cache) {
-        this.cache = cache;
-    }
 
     @Override
     public Optional<GeolocationInfo> get(String ip) {

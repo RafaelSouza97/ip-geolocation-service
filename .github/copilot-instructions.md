@@ -42,9 +42,22 @@ com.example.geolocation.infrastructure.validation   → Validators
 
 ### Testes
 - Nome: `*Test.java` para unit, `*IT.java` para integration
+- Use `@DisplayName` na classe e métodos de teste
+- Use `@Nested` para agrupar testes relacionados
 - Use AAA pattern (Arrange, Act, Assert)
 - Mock apenas ports.out nos serviços
 - Use WireMock para testar HTTP clients
+
+### Lombok Annotations
+- `@RequiredArgsConstructor` + `@NonNull` para injeção com validação
+- `@Getter` para exceções e enums com campos
+- `@UtilityClass` para classes utilitárias estáticas
+- `@Slf4j` para logging
+
+### Spring Annotations
+- `@Validated` em controllers para Bean Validation
+- `@NotBlank` para parâmetros obrigatórios
+- `@Schema` em DTOs para documentação Swagger
 
 ## Arquivos Importantes
 

@@ -14,10 +14,12 @@ description: "Use when: writing Java code, Spring Boot configuration, creating s
 
 ## Spring Boot 3.x Conventions
 - Use **constructor injection** (não @Autowired em fields)
-- Prefira `@RequiredArgsConstructor` do Lombok para injeção
+- Prefira `@RequiredArgsConstructor` com `@NonNull` do Lombok para injeção
 - Configure beans com `@Configuration` + `@Bean` ao invés de `@Component` para dependências externas
-- Use `@ConfigurationProperties` para configurações tipadas
-- Valide inputs com `@Valid` e Bean Validation annotations
+- Use `@ConfigurationProperties` para configurações tipadas (prefer Records)
+- Use `@Validated` em controllers para ativar Bean Validation
+- Use `@NotBlank` para parâmetros obrigatórios de String
+- Use `@Schema` em DTOs para documentação Swagger/OpenAPI
 
 ## Naming Conventions
 ```java
@@ -45,10 +47,13 @@ com.example.geolocation.application.service
 
 ## Lombok Usage
 - `@RequiredArgsConstructor` - injeção de dependências
-- `@Builder` - construção de objetos complexos
+- `@NonNull` - validação automática de null em parâmetros de construtor
+- `@Getter` - getters em exceções e enums com campos
 - `@Slf4j` - logging
-- `@Value` - objetos imutáveis (ou use Records)
+- `@UtilityClass` - classes com métodos estáticos (substitui construtor privado)
+- `@Builder` - construção de objetos complexos
 - Evite `@Data` em entidades JPA (problemas com equals/hashCode)
+- Prefira Records ao invés de `@Value` para DTOs imutáveis
 
 ## HTTP Client Best Practices
 - Configure timeouts explícitos (connect, read)

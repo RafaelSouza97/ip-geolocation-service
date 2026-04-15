@@ -17,6 +17,7 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
 /**
@@ -24,19 +25,14 @@ import lombok.extern.slf4j.Slf4j;
  */
 @Slf4j
 @Component("ipApiClient")
+@RequiredArgsConstructor
 public class IpApiClient implements GeolocationProvider {
 
     private static final String API_NAME = ApiConstants.PRIMARY_PROVIDER_NAME;
 
-    private final HttpClient httpClient;
-    private final ObjectMapper objectMapper;
     private final GeolocationProperties properties;
-
-    public IpApiClient(GeolocationProperties properties, ObjectMapper objectMapper, HttpClient httpClient) {
-        this.properties = properties;
-        this.objectMapper = objectMapper;
-        this.httpClient = httpClient;
-    }
+    private final ObjectMapper objectMapper;
+    private final HttpClient httpClient;
 
     public String getProviderName() {
         return API_NAME;

@@ -1,12 +1,11 @@
 package com.example.geolocation.application.port.out;
 
+import java.util.Optional;
 import com.example.geolocation.application.domain.model.GeolocationInfo;
 
-import java.util.Optional;
-
 /**
- * Port de saída para cache de geolocalização.
- * Implementado por adaptadores de cache (Caffeine, Redis, etc).
+ * Port de saída para cache de geolocalização. Implementado por adaptadores de cache (Caffeine,
+ * Redis, etc).
  */
 public interface GeolocationCache {
 
@@ -21,7 +20,7 @@ public interface GeolocationCache {
     /**
      * Armazena informações de geolocalização no cache.
      *
-     * @param ip   endereço IP como chave
+     * @param ip endereço IP como chave
      * @param info informações a serem cacheadas
      */
     void put(String ip, GeolocationInfo info);
@@ -34,7 +33,7 @@ public interface GeolocationCache {
     void evict(String ip);
 
     /**
-     * Limpa todo o cache.
+     * Limpa o cache.
      */
     void clear();
 }

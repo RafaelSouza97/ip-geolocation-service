@@ -1,6 +1,7 @@
 package com.example.geolocation.infrastructure.adapter.in.web;
 
 import java.util.stream.Collectors;
+import jakarta.validation.ConstraintViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.MethodArgumentNotValidException;
@@ -82,6 +83,16 @@ public class GlobalExceptionHandler {
                 .map(error -> error.getField() + ": " + error.getDefaultMessage())
                 .collect(Collectors.joining(", "));
         log.warn("Validation error: {}", errors);
+        return new ErrorResponse(ErrorCode.VALIDATION_ERROR.getCode(), errors);
+    }
+
+    @ExceptionHandler(ConstraintViolationException.class)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public ErrorResponse handleConstraintViolation(ConstraintViolationException ex) {
+        var errors = ex.getConstraintViolations().stream()
+                .map(v -> v.getPropertyPath() + ": " + v.getMessage())
+                .collect(Collectors.joining(", "));
+        log.warn("Constraint violation: {}", errors);
         return new ErrorResponse(ErrorCode.VALIDATION_ERROR.getCode(), errors);
     }
 
