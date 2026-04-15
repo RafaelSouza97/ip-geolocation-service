@@ -8,7 +8,7 @@ RUN apk add --no-cache maven && \
 FROM eclipse-temurin:21-jre-alpine
 WORKDIR /app
 
-LABEL org.opencontainers.image.source="https://github.com/your-username/ip-geolocation-service"
+LABEL org.opencontainers.image.source="https://github.com/RafaelSouza97/ip-geolocation-service"
 LABEL org.opencontainers.image.description="IP Geolocation Service - Microservico REST"
 LABEL org.opencontainers.image.licenses="MIT"
 
