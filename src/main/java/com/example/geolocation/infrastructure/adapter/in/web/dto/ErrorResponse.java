@@ -8,10 +8,10 @@ import java.time.Instant;
 public record ErrorResponse(
     @Schema(description = "Código do erro", example = "INVALID_IP_FORMAT")
     String code,
-    
+
     @Schema(description = "Mensagem de erro", example = "Invalid IP address format")
     String message,
-    
+
     @Schema(description = "Timestamp do erro")
     Instant timestamp
 ) {

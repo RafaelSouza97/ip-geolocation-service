@@ -36,8 +36,9 @@ public class GeolocationController {
 
     private final GeolocationUseCase geolocationUseCase;
 
-    @Operation(summary = "Localiza informações geográficas de um IP",
-            description = "Retorna informações de geolocalização (país, região, cidade, coordenadas) para o IP informado. "
+    @Operation(
+            summary = "Localiza informações geográficas de um IP",
+            description = "Retorna informações de geolocalização para o IP informado. "
                     + "Se o IP for privado/localhost ou a API externa falhar, retorna fallback com dados do Brasil.")
     @ApiResponse(responseCode = "200", description = "Geolocalização encontrada com sucesso",
             content = @Content(schema = @Schema(implementation = GeolocationResponse.class)))
