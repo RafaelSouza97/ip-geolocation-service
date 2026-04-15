@@ -8,21 +8,15 @@ import lombok.experimental.UtilityClass;
 
 @UtilityClass
 public class IpValidator {
-    private final Pattern IPV4_PATTERN = Pattern.compile(
+    private static final Pattern IPV4_PATTERN = Pattern.compile(
             "^((25[0-5]|(2[0-4]|1\\d|[1-9]|)\\d)\\.){3}(25[0-5]|(2[0-4]|1\\d|[1-9]|)\\d)$");
-    private final Pattern PRIVATE_IPV4_PATTERN = Pattern.compile("^(10\\." + // 10.0.0.0/8
-            "|172\\.(1[6-9]|2\\d|3[01])\\." + // 172.16.0.0/12
-            "|192\\.168\\." + // 192.168.0.0/16
-            "|127\\." + // 127.0.0.0/8 (localhost)
-            "|0\\." + // 0.0.0.0/8
-            "|169\\.254\\." + // 169.254.0.0/16 (link-local)
-            "|100\\.(6[4-9]|[7-9]\\d|1[01]\\d|12[0-7])\\." + // 100.64.0.0/10 (CGNAT)
-            ")");
-    private final Pattern LOCALHOST_IPV6_PATTERN = Pattern.compile("^(::1|0:0:0:0:0:0:0:1)$");
-    private final Pattern PRIVATE_IPV6_PATTERN =
+    private static final Pattern PRIVATE_IPV4_PATTERN = Pattern.compile(
+            "^(10\\.|172\\.(1[6-9]|2\\d|3[01])\\.|192\\.168\\.|127\\.|0\\.|169\\.254\\."
+                    + "|100\\.(6[4-9]|[7-9]\\d|1[01]\\d|12[0-7])\\.)");
+    private static final Pattern LOCALHOST_IPV6_PATTERN = Pattern.compile("^(::1|0:0:0:0:0:0:0:1)$");
+    private static final Pattern PRIVATE_IPV6_PATTERN =
             Pattern.compile("^(fe80:|fc00:|fd00:)", Pattern.CASE_INSENSITIVE);
 
-    
     public boolean isValid(String ip) {
         if (ip == null || ip.isBlank()) {
             return false;
@@ -31,7 +25,6 @@ public class IpValidator {
         return isValidIpv4(trimmed) || isValidIpv6(trimmed);
     }
 
-    
     public boolean isValidIpv4(String ip) {
         if (ip == null || ip.isBlank()) {
             return false;
@@ -39,7 +32,6 @@ public class IpValidator {
         return IPV4_PATTERN.matcher(ip.trim()).matches();
     }
 
-    
     public boolean isValidIpv6(String ip) {
         if (ip == null || ip.isBlank()) {
             return false;
@@ -58,7 +50,6 @@ public class IpValidator {
         }
     }
 
-    
     public boolean isPrivateOrReserved(String ip) {
         if (ip == null || ip.isBlank()) {
             return false;
@@ -77,7 +68,6 @@ public class IpValidator {
         return false;
     }
 
-    
     public boolean isLocalhost(String ip) {
         if (ip == null || ip.isBlank()) {
             return false;
@@ -86,12 +76,10 @@ public class IpValidator {
         return trimmed.startsWith("127.") || LOCALHOST_IPV6_PATTERN.matcher(trimmed).matches();
     }
 
-    
     public boolean isPublic(String ip) {
         return isValid(ip) && !isPrivateOrReserved(ip);
     }
 
-    
     public String normalize(String ip) {
         if (ip == null || ip.isBlank()) {
             throw new IllegalArgumentException("IP cannot be null or blank");

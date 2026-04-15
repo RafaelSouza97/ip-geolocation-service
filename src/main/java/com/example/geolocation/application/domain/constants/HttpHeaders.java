@@ -5,16 +5,12 @@ import lombok.experimental.UtilityClass;
 @UtilityClass
 public class HttpHeaders {
 
-    
-    public final String DEVICE_PLATFORM = "x-device-platform";
+    public static final String DEVICE_PLATFORM = "x-device-platform";
 
-    
-    public final String AUTHORIZATION = "Authorization";
+    public static final String AUTHORIZATION = "Authorization";
 
-    
-    public final String BEARER_PREFIX = "Bearer ";
+    public static final String BEARER_PREFIX = "Bearer ";
 
-    
-    public final String USER_AGENT = "User-Agent";
+    public static final String USER_AGENT = "User-Agent";
 }
 

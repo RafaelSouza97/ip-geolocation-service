@@ -5,22 +5,16 @@ import lombok.experimental.UtilityClass;
 @UtilityClass
 public class ApiConstants {
 
-    
-    public final String PRIMARY_PROVIDER_NAME = "ip-api.com";
+    public static final String PRIMARY_PROVIDER_NAME = "ip-api.com";
 
-    
-    public final String SECONDARY_PROVIDER_NAME = "ipapi.co";
+    public static final String SECONDARY_PROVIDER_NAME = "ipapi.co";
 
-    
-    public final String PRIMARY_PROVIDER_URL = "http://ip-api.com/json";
+    public static final String PRIMARY_PROVIDER_URL = "http://ip-api.com/json";
 
-    
-    public final String SECONDARY_PROVIDER_URL = "https://ipapi.co";
+    public static final String SECONDARY_PROVIDER_URL = "https://ipapi.co";
 
-    
-    public final String IP_API_SUCCESS_STATUS = "success";
+    public static final String IP_API_SUCCESS_STATUS = "success";
 
-    
-    public final String DEFAULT_USER_AGENT = "ip-geolocation-service/1.0";
+    public static final String DEFAULT_USER_AGENT = "ip-geolocation-service/1.0";
 }
 
