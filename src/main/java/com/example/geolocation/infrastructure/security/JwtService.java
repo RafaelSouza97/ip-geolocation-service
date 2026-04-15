@@ -29,12 +29,10 @@ public class JwtService {
         this.expiration = properties.jwt().expiration();
     }
 
-    
     public String generateToken(String username) {
         return generateToken(new HashMap<>(), username);
     }
 
-    
     public String generateToken(Map<String, Object> extraClaims, String username) {
         return Jwts.builder()
             .claims(extraClaims)
@@ -45,12 +43,10 @@ public class JwtService {
             .compact();
     }
 
-    
     public String extractUsername(String token) {
         return extractClaim(token, Claims::getSubject);
     }
 
-    
     public boolean isTokenValid(String token, String username) {
         try {
             final String extractedUsername = extractUsername(token);
@@ -61,7 +57,6 @@ public class JwtService {
         }
     }
 
-    
     public boolean isTokenExpired(String token) {
         return extractExpiration(token).before(new Date());
     }
