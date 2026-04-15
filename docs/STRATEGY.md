@@ -11,6 +11,7 @@ Este documento detalha as estratégias técnicas adotadas para implementar o ip-
 ## 1. Estratégia de Validação de IP
 
 ### Abordagem
+
 Implementação híbrida usando Regex + biblioteca `inet.ipaddr` para validação robusta.
 
 ### Regex Patterns
@@ -37,13 +38,13 @@ private static final Pattern PRIVATE_IP_PATTERN = Pattern.compile(
 
 ### Categorias de IP
 
-| Categoria | Exemplos | Ação |
-|-----------|----------|------|
-| IPv4 público válido | 8.8.8.8, 177.45.123.45 | Consultar API |
-| IPv6 público válido | 2001:4860:4860::8888 | Consultar API |
-| IP privado | 10.x.x.x, 192.168.x.x, 172.16-31.x.x | Retornar fallback |
-| Localhost | 127.0.0.1, ::1 | Retornar fallback |
-| IP inválido | abc, 999.999.999.999 | Erro 400 |
+| Categoria           | Exemplos                             | Ação              |
+| ------------------- | ------------------------------------ | ----------------- |
+| IPv4 público válido | 8.8.8.8, 177.45.123.45               | Consultar API     |
+| IPv6 público válido | 2001:4860:4860::8888                 | Consultar API     |
+| IP privado          | 10.x.x.x, 192.168.x.x, 172.16-31.x.x | Retornar fallback |
+| Localhost           | 127.0.0.1, ::1                       | Retornar fallback |
+| IP inválido         | abc, 999.999.999.999                 | Erro 400          |
 
 ### Performance
 
@@ -70,12 +71,12 @@ public Cache<String, GeolocationInfo> geolocationCache(GeolocationProperties pro
 
 ### Política de Cache
 
-| Cenário | Cachear? | Justificativa |
-|---------|----------|---------------|
-| Resposta sucesso da API | ✅ Sim | Dados válidos |
-| Resposta fallback | ❌ Não | Evitar cache de dados imprecisos |
-| IP privado/localhost | ❌ Não | Fallback fixo, não precisa cache |
-| Erro de validação | ❌ Não | Não há dados para cachear |
+| Cenário                 | Cachear? | Justificativa                    |
+| ----------------------- | -------- | -------------------------------- |
+| Resposta sucesso da API | ✅ Sim   | Dados válidos                    |
+| Resposta fallback       | ❌ Não   | Evitar cache de dados imprecisos |
+| IP privado/localhost    | ❌ Não   | Fallback fixo, não precisa cache |
+| Erro de validação       | ❌ Não   | Não há dados para cachear        |
 
 ### Cache Key Strategy
 
@@ -100,6 +101,7 @@ public record GeolocationInfo(
 ### Escolha: ip-api.com
 
 **Justificativa:**
+
 - ✅ Sem necessidade de API key
 - ✅ 45 req/min no plano gratuito (suficiente para demo)
 - ✅ Resposta JSON rica
@@ -121,14 +123,14 @@ HttpRequest request = HttpRequest.newBuilder()
 
 ### Tratamento de Erros
 
-| Erro | Ação | Log Level |
-|------|------|-----------|
-| Timeout | Retornar fallback | WARN |
-| Connection refused | Retornar fallback | ERROR |
-| HTTP 4xx | Retornar fallback | WARN |
-| HTTP 5xx | Retornar fallback | ERROR |
-| JSON parsing error | Retornar fallback | ERROR |
-| IP não encontrado | Retornar fallback | INFO |
+| Erro               | Ação              | Log Level |
+| ------------------ | ----------------- | --------- |
+| Timeout            | Retornar fallback | WARN      |
+| Connection refused | Retornar fallback | ERROR     |
+| HTTP 4xx           | Retornar fallback | WARN      |
+| HTTP 5xx           | Retornar fallback | ERROR     |
+| JSON parsing error | Retornar fallback | ERROR     |
+| IP não encontrado  | Retornar fallback | INFO      |
 
 ### Parsing da Resposta
 
@@ -201,13 +203,13 @@ public class GlobalExceptionHandler {
 
 ### Error Codes
 
-| Código | HTTP Status | Descrição |
-|--------|-------------|-----------|
-| INVALID_IP_FORMAT | 400 | IP mal formatado |
-| PRIVATE_IP_ADDRESS | 400 | IP privado/reservado |
-| MISSING_PLATFORM_HEADER | 400 | Header x-device-platform ausente |
-| INVALID_PLATFORM | 400 | Platform não é iOS/Android/Web |
-| INTERNAL_ERROR | 500 | Erro interno inesperado |
+| Código                  | HTTP Status | Descrição                        |
+| ----------------------- | ----------- | -------------------------------- |
+| INVALID_IP_FORMAT       | 400         | IP mal formatado                 |
+| PRIVATE_IP_ADDRESS      | 400         | IP privado/reservado             |
+| MISSING_PLATFORM_HEADER | 400         | Header x-device-platform ausente |
+| INVALID_PLATFORM        | 400         | Platform não é iOS/Android/Web   |
+| INTERNAL_ERROR          | 500         | Erro interno inesperado          |
 
 ---
 
@@ -228,13 +230,13 @@ public class GlobalExceptionHandler {
 
 ### Cobertura por Camada
 
-| Camada | Cobertura Mínima | Tipo de Teste |
-|--------|------------------|---------------|
-| application/service | 80% | Unit (Mockito) |
-| application/domain | 100% | Unit |
-| infrastructure/validation | 100% | Unit |
-| infrastructure/adapter/out | 70% | Integration (WireMock) |
-| infrastructure/adapter/in | 70% | Integration (MockMvc) |
+| Camada                     | Cobertura Mínima | Tipo de Teste          |
+| -------------------------- | ---------------- | ---------------------- |
+| application/service        | 80%              | Unit (Mockito)         |
+| application/domain         | 100%             | Unit                   |
+| infrastructure/validation  | 100%             | Unit                   |
+| infrastructure/adapter/out | 70%              | Integration (WireMock) |
+| infrastructure/adapter/in  | 70%              | Integration (MockMvc)  |
 
 ### Test Fixtures
 
@@ -245,7 +247,7 @@ public class TestFixtures {
     public static final String PRIVATE_IP = "192.168.1.1";
     public static final String INVALID_IP = "999.999.999.999";
     public static final String BRAZIL_CODE = "BR";
-    
+
     public static GeolocationInfo createDefaultInfo(String ip) {
         return GeolocationInfo.builder()
             .ip(ip)
@@ -257,17 +259,112 @@ public class TestFixtures {
 }
 ```
 
+### Estratégia de Correção de Warnings em Testes
+
+**Princípio:** Sempre corrigir na origem em vez de suprimir com `@SuppressWarnings`.
+
+| Warning                      | Problema                                             | Solução                                                          |
+| ---------------------------- | ---------------------------------------------------- | ---------------------------------------------------------------- |
+| **Null type safety**         | APIs Spring/Jackson sem `@NonNull`                   | `Objects.requireNonNull(MediaType.APPLICATION_JSON)`             |
+| **Hamcrest Matcher**         | `notNullValue()`, `containsString()` causam warnings | `jsonPath().exists()` ou AssertJ `assertThat().doesNotContain()` |
+| **Thread.sleep (S2925)**     | Testes flaky, código bloqueante                      | Awaitility `await().pollInterval().atMost().until()`             |
+| **Regex complexity (S5843)** | Regex IPv6 muito complexo                            | Usar `java.net.InetAddress.getByName()`                          |
+
+**Único @SuppressWarnings aceitável:**
+
+```java
+@SuppressWarnings("java:S2187") // Falso positivo: classes @Nested contêm os testes
+```
+
+### Mutation Testing (PITest)
+
+**Objetivo:** Avaliar a qualidade dos testes além da cobertura de linhas.
+
+#### Como Funciona
+
+1. **PIT** modifica o código (mutantes): `>=` vira `>`, `true` vira `false`
+2. Executa os testes contra cada mutante
+3. **Mutante morto** = teste falhou ✅ (teste é eficaz)
+4. **Mutante sobreviveu** = teste passou ❌ (teste é fraco)
+
+```java
+// Código original
+public boolean isAdult(int age) {
+    return age >= 18;  // PIT muta para: age > 18
+}
+
+// Teste fraco (mutante sobrevive)
+@Test void testAdult() {
+    assertTrue(isAdult(25));  // Passa com >= ou >
+}
+
+// Teste forte (mutante morre)
+@Test void testBoundary() {
+    assertTrue(isAdult(18));   // Falha se > usado
+    assertFalse(isAdult(17));
+}
+```
+
+#### Configuração
+
+```xml
+<plugin>
+    <groupId>org.pitest</groupId>
+    <artifactId>pitest-maven</artifactId>
+    <configuration>
+        <targetClasses>
+            <param>com.example.geolocation.application.*</param>
+            <param>com.example.geolocation.infrastructure.validation.*</param>
+        </targetClasses>
+        <excludedClasses>
+            <param>com.example.geolocation.infrastructure.config.*</param>
+            <param>com.example.geolocation.infrastructure.adapter.in.web.dto.*</param>
+        </excludedClasses>
+        <mutators>
+            <mutator>STRONGER</mutator>
+        </mutators>
+        <mutationThreshold>70</mutationThreshold>
+    </configuration>
+</plugin>
+```
+
+#### Execução
+
+```bash
+# Executar mutation testing
+mvn test pitest:mutationCoverage
+
+# Relatório em: target/pit-reports/index.html
+```
+
+#### Thresholds
+
+| Métrica           | Mínimo | Excelente | Descrição                    |
+| ----------------- | ------ | --------- | ---------------------------- |
+| Mutation Coverage | 70%    | **>80%**  | % de mutantes mortos         |
+| Line Coverage     | 80%    | **>90%**  | Cobertura de linhas (JaCoCo) |
+
+> **Objetivo:** Sempre buscar o nível **Excelente** (>80% mutation, >90% coverage)
+>
+> **Status atual do projeto:** 89% mutation, 99% line ✅
+
+#### Classes Excluídas
+
+- **Configs**: Classes `@Configuration` são wiring, não lógica
+- **DTOs**: Records sem comportamento
+- **Application.java**: Classe main do Spring Boot
+
 ---
 
 ## 6. Estratégia de Configuração
 
 ### Profiles Spring
 
-| Profile | Uso | Configurações |
-|---------|-----|---------------|
-| (default) | Produção | Configs via env vars |
-| local | Desenvolvimento | Logs DEBUG, config local |
-| test | Testes | Mocks, timeouts curtos |
+| Profile   | Uso             | Configurações            |
+| --------- | --------------- | ------------------------ |
+| (default) | Produção        | Configs via env vars     |
+| local     | Desenvolvimento | Logs DEBUG, config local |
+| test      | Testes          | Mocks, timeouts curtos   |
 
 ### Configuração Externalizada
 
@@ -290,11 +387,11 @@ geolocation:
 
 ### Opções Avaliadas
 
-| Opção | Prós | Contras | Escolha |
-|-------|------|---------|---------|
-| Azure Container Apps | Serverless, auto-scale | Menos controle | ✅ Recomendado |
-| Azure App Service | Simples, managed | Custo fixo | Alternativa |
-| Azure Kubernetes (AKS) | Flexível | Complexo demais | Não recomendado |
+| Opção                  | Prós                   | Contras         | Escolha         |
+| ---------------------- | ---------------------- | --------------- | --------------- |
+| Azure Container Apps   | Serverless, auto-scale | Menos controle  | ✅ Recomendado  |
+| Azure App Service      | Simples, managed       | Custo fixo      | Alternativa     |
+| Azure Kubernetes (AKS) | Flexível               | Complexo demais | Não recomendado |
 
 ### Dockerfile
 
@@ -340,11 +437,11 @@ resources:
 
 ### Níveis por Categoria
 
-| Logger | Development | Production |
-|--------|-------------|------------|
-| com.example.geolocation | DEBUG | INFO |
-| org.springframework | INFO | WARN |
-| com.github.benmanes.caffeine | INFO | WARN |
+| Logger                       | Development | Production |
+| ---------------------------- | ----------- | ---------- |
+| com.example.geolocation      | DEBUG       | INFO       |
+| org.springframework          | INFO        | WARN       |
+| com.github.benmanes.caffeine | INFO        | WARN       |
 
 ### Informações Logadas
 
@@ -363,25 +460,25 @@ resources:
 
 Os princípios SOLID são aplicados através da Clean Architecture:
 
-| Princípio | Aplicação | Exemplo |
-|-----------|-----------|---------|
-| **S**ingle Responsibility | Cada classe tem uma única responsabilidade | `IpValidator` apenas valida, `GeolocationService` apenas orquestra |
-| **O**pen/Closed | Extensível via interfaces (ports) sem modificar core | Trocar `IpApiClient` por outro provider sem alterar `GeolocationService` |
-| **L**iskov Substitution | Implementações são intercambiáveis | Qualquer `GeolocationProvider` funciona no service |
-| **I**nterface Segregation | Interfaces pequenas e focadas | `GeolocationCache` (get/put) separada de `GeolocationProvider` (lookup) |
-| **D**ependency Inversion | Dependência de abstrações, não implementações | `GeolocationService` depende de `GeolocationCache` (interface), não de `CaffeineGeolocationCache` |
+| Princípio                 | Aplicação                                            | Exemplo                                                                                           |
+| ------------------------- | ---------------------------------------------------- | ------------------------------------------------------------------------------------------------- |
+| **S**ingle Responsibility | Cada classe tem uma única responsabilidade           | `IpValidator` apenas valida, `GeolocationService` apenas orquestra                                |
+| **O**pen/Closed           | Extensível via interfaces (ports) sem modificar core | Trocar `IpApiClient` por outro provider sem alterar `GeolocationService`                          |
+| **L**iskov Substitution   | Implementações são intercambiáveis                   | Qualquer `GeolocationProvider` funciona no service                                                |
+| **I**nterface Segregation | Interfaces pequenas e focadas                        | `GeolocationCache` (get/put) separada de `GeolocationProvider` (lookup)                           |
+| **D**ependency Inversion  | Dependência de abstrações, não implementações        | `GeolocationService` depende de `GeolocationCache` (interface), não de `CaffeineGeolocationCache` |
 
 ### KISS (Keep It Simple, Stupid)
 
 **Objetivo:** Manter soluções simples e diretas, evitando complexidade desnecessária.
 
-| Área | Aplicação |
-|------|-----------|
-| Models | Uso de **Records** ao invés de classes verbosas |
-| Cache | Caffeine in-memory (sem Redis distribuído para este escopo) |
-| HTTP Client | `java.net.http.HttpClient` nativo (sem Feign/RestTemplate) |
-| Configuração | YAML simples com valores default sensatos |
-| Validação | Regex compilado (sem biblioteca externa complexa) |
+| Área         | Aplicação                                                   |
+| ------------ | ----------------------------------------------------------- |
+| Models       | Uso de **Records** ao invés de classes verbosas             |
+| Cache        | Caffeine in-memory (sem Redis distribuído para este escopo) |
+| HTTP Client  | `java.net.http.HttpClient` nativo (sem Feign/RestTemplate)  |
+| Configuração | YAML simples com valores default sensatos                   |
+| Validação    | Regex compilado (sem biblioteca externa complexa)           |
 
 ```java
 // ✅ KISS: Record simples
@@ -399,19 +496,19 @@ public class CountryBuilder {
 
 **Objetivo:** Eliminar duplicação de código e conhecimento.
 
-| Técnica | Aplicação |
-|---------|-----------|
-| **Constantes** | Patterns de regex como `static final` |
-| **Records** | Reutilização de estruturas de dados |
-| **Test Fixtures** | Dados de teste centralizados em `TestFixtures` |
-| **Configuration Properties** | Valores centralizados em YAML |
-| **Global Exception Handler** | Tratamento de erros em um único lugar |
+| Técnica                      | Aplicação                                      |
+| ---------------------------- | ---------------------------------------------- |
+| **Constantes**               | Patterns de regex como `static final`          |
+| **Records**                  | Reutilização de estruturas de dados            |
+| **Test Fixtures**            | Dados de teste centralizados em `TestFixtures` |
+| **Configuration Properties** | Valores centralizados em YAML                  |
+| **Global Exception Handler** | Tratamento de erros em um único lugar          |
 
 ```java
 // ✅ DRY: Fixture reutilizável
 public class TestFixtures {
     public static final String VALID_IPV4 = "8.8.8.8";
-    
+
     public static GeolocationInfo createDefaultInfo(String ip) {
         return new GeolocationInfo(ip, /* ... */);
     }
@@ -436,11 +533,108 @@ Antes de cada PR, verificar:
 
 ---
 
-## 10. Estratégia de Autenticação (JWT)
+## 10. Estratégia de Uso de Lombok e Spring Annotations
+
+### Objetivo
+
+Reduzir código boilerplate mantendo clareza e type-safety.
+
+### Lombok Annotations
+
+| Annotation                 | Uso                                | Benefício                                                    |
+| -------------------------- | ---------------------------------- | ------------------------------------------------------------ |
+| `@RequiredArgsConstructor` | Services, Controllers, Adapters    | Injeção de dependências via construtor                       |
+| `@NonNull`                 | Parâmetros de construtor           | Validação automática de null (gera `Objects.requireNonNull`) |
+| `@Getter`                  | Exceções e Enums com campos        | Elimina getters manuais                                      |
+| `@UtilityClass`            | Classes com métodos estáticos      | Construtor privado + final automático                        |
+| `@Slf4j`                   | Qualquer classe que precisa de log | Logger `log` automático                                      |
+
+```java
+// ✅ Service com injeção e validação de null
+@Service
+@RequiredArgsConstructor
+@Slf4j
+public class GeolocationService implements GeolocationUseCase {
+    private final @NonNull GeolocationCache cache;
+    private final @NonNull GeolocationProvider provider;
+    private final @NonNull GeolocationProperties properties;
+}
+
+// ✅ Exceção com getter automático
+@Getter
+public class InvalidIpAddressException extends RuntimeException {
+    private final String ip;
+}
+
+// ✅ Classe utilitária sem boilerplate
+@UtilityClass
+public class IpValidator {
+    public boolean isValid(String ip) { /* ... */ }
+}
+
+// ✅ Enum com campos
+@Getter
+@RequiredArgsConstructor
+public enum DataSource {
+    API("api"), CACHE("cache"), FALLBACK("fallback");
+    private final String value;
+}
+```
+
+### Spring Annotations
+
+| Annotation   | Uso                            | Benefício                             |
+| ------------ | ------------------------------ | ------------------------------------- |
+| `@Validated` | Controllers                    | Ativa validação de parâmetros         |
+| `@NotBlank`  | Parâmetros String obrigatórios | Rejeita null e strings vazias/brancas |
+| `@Schema`    | DTOs (Request/Response)        | Documentação OpenAPI automática       |
+
+```java
+// ✅ Controller com validação
+@RestController
+@Validated
+@RequiredArgsConstructor
+@Slf4j
+public class GeolocationController {
+
+    @GetMapping("/locate")
+    public ResponseEntity<GeolocationResponse> locate(
+        @RequestParam @NotBlank String ip,
+        @RequestHeader("x-device-platform") String platform
+    ) { /* ... */ }
+}
+
+// ✅ DTO com documentação OpenAPI
+public record LoginRequest(
+    @Schema(description = "Username", example = "admin")
+    @NotBlank String username,
+
+    @Schema(description = "Password", example = "Admin123@")
+    @NotBlank String password
+) {}
+```
+
+### Records e Validação
+
+Para Records, use `Objects.requireNonNull` no compact constructor (Lombok não suporta):
+
+```java
+public record Country(String code, String name) {
+    public Country {
+        Objects.requireNonNull(code, "code cannot be null");
+        Objects.requireNonNull(name, "name cannot be null");
+    }
+}
+```
+
+---
+
+## 11. Estratégia de Autenticação (JWT)
 
 ### Escolha: JWT Stateless
 
 **Justificativa:**
+
 - ✅ Sem necessidade de sessão no servidor
 - ✅ Escalabilidade horizontal (qualquer instância valida o token)
 - ✅ Padrão amplamente adotado em APIs REST
@@ -451,8 +645,8 @@ Antes de cada PR, verificar:
 ```yaml
 security:
   jwt:
-    secret-key: ${JWT_SECRET_KEY:404E635266...}  # 256-bit key
-    expiration: ${JWT_EXPIRATION:86400000}       # 24 horas em ms
+    secret-key: ${JWT_SECRET_KEY:404E635266...} # 256-bit key
+    expiration: ${JWT_EXPIRATION:86400000} # 24 horas em ms
   user:
     username: ${SECURITY_USER:admin}
     password: ${SECURITY_PASSWORD:Admin123@}
@@ -460,12 +654,12 @@ security:
 
 ### Componentes de Segurança
 
-| Componente | Responsabilidade |
-|------------|------------------|
-| `SecurityConfig` | Configura filtros, endpoints públicos/protegidos |
-| `JwtService` | Gera e valida tokens JWT |
+| Componente                | Responsabilidade                                  |
+| ------------------------- | ------------------------------------------------- |
+| `SecurityConfig`          | Configura filtros, endpoints públicos/protegidos  |
+| `JwtService`              | Gera e valida tokens JWT                          |
 | `JwtAuthenticationFilter` | Intercepta requests, extrai e valida Bearer token |
-| `AuthController` | Endpoint POST /auth/login |
+| `AuthController`          | Endpoint POST /auth/login                         |
 
 ### Fluxo de Autenticação
 
@@ -501,19 +695,19 @@ HMACSHA256(base64(header) + "." + base64(payload), secret)
 
 ### Endpoints por Acesso
 
-| Endpoint | Acesso | Justificativa |
-|----------|--------|---------------|
-| `POST /auth/login` | Público | Necessário para obter token |
-| `GET /actuator/health` | Público | Health checks (k8s, load balancer) |
-| `GET /swagger-ui/**` | Público | Documentação da API |
-| `GET /api/**` | Autenticado | Rotas de negócio protegidas |
+| Endpoint               | Acesso      | Justificativa                      |
+| ---------------------- | ----------- | ---------------------------------- |
+| `POST /auth/login`     | Público     | Necessário para obter token        |
+| `GET /actuator/health` | Público     | Health checks (k8s, load balancer) |
+| `GET /swagger-ui/**`   | Público     | Documentação da API                |
+| `GET /api/**`          | Autenticado | Rotas de negócio protegidas        |
 
 ### Tratamento de Erros
 
-| Cenário | HTTP Status | Resposta |
-|---------|-------------|----------|
-| Sem Authorization header | 403 | Forbidden |
-| Token expirado | 403 | Forbidden |
-| Token inválido/mal formado | 403 | Forbidden |
-| Credenciais inválidas | 401 | Unauthorized |
-| Usuário não encontrado | 401 | Unauthorized |
+| Cenário                    | HTTP Status | Resposta     |
+| -------------------------- | ----------- | ------------ |
+| Sem Authorization header   | 403         | Forbidden    |
+| Token expirado             | 403         | Forbidden    |
+| Token inválido/mal formado | 403         | Forbidden    |
+| Credenciais inválidas      | 401         | Unauthorized |
+| Usuário não encontrado     | 401         | Unauthorized |

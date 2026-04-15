@@ -6,19 +6,21 @@ O **ip-geolocation-service** é um microserviço REST que identifica informaçõ
 
 ## Stack Tecnológica
 
-| Componente | Tecnologia | Versão | Justificativa |
-|------------|------------|--------|---------------|
-| Linguagem | Java | 21 LTS | Records, Pattern Matching, Virtual Threads |
-| Framework | Spring Boot | 3.3.x | Ecossistema maduro, produtividade |
-| Build Tool | Maven | 3.9.x | Padrão corporativo, CI/CD friendly |
-| Cache | Caffeine | 3.x | In-memory, alta performance |
-| HTTP Client | Java HttpClient | 21 | Nativo, suporte a HTTP/2 |
-| Segurança | Spring Security + JWT | 6.3.x | Autenticação stateless |
-| Validação | Hibernate Validator | 8.x | Bean Validation 3.0 |
-| Documentação | SpringDoc OpenAPI | 2.x | Swagger UI integrado |
-| Testes | JUnit 5 + Mockito + WireMock | - | Stack padrão |
-| Containers | Docker + Docker Compose | - | Portabilidade |
-| Cloud | Azure Container Apps | - | Serverless containers |
+| Componente       | Tecnologia                   | Versão | Justificativa                                            |
+| ---------------- | ---------------------------- | ------ | -------------------------------------------------------- |
+| Linguagem        | Java                         | 21 LTS | Records, Pattern Matching, Virtual Threads               |
+| Framework        | Spring Boot                  | 3.3.x  | Ecossistema maduro, produtividade                        |
+| Build Tool       | Maven                        | 3.9.x  | Padrão corporativo, CI/CD friendly                       |
+| Boilerplate      | Lombok                       | 1.18.x | @RequiredArgsConstructor, @Getter, @UtilityClass, @Slf4j |
+| Cache            | Caffeine                     | 3.x    | In-memory, alta performance                              |
+| HTTP Client      | Java HttpClient              | 21     | Nativo, suporte a HTTP/2                                 |
+| Segurança        | Spring Security + JWT        | 6.3.x  | Autenticação stateless                                   |
+| Validação        | Hibernate Validator          | 8.x    | Bean Validation 3.0 (@Validated, @NotBlank)              |
+| Documentação     | SpringDoc OpenAPI            | 2.x    | Swagger UI integrado (@Schema)                           |
+| Testes           | JUnit 5 + Mockito + WireMock | -      | Stack padrão (317 testes)                                |
+| Mutation Testing | PITest                       | 1.15.x | 89% mutation coverage                                    |
+| Containers       | Docker + Docker Compose      | -      | Portabilidade                                            |
+| Cloud            | Azure Container Apps         | -      | Serverless containers                                    |
 
 ## Diagrama de Arquitetura
 
@@ -137,6 +139,7 @@ O **ip-geolocation-service** é um microserviço REST que identifica informaçõ
 **Decisão:** Adotar Clean Architecture com camadas application/ e infrastructure/.
 
 **Consequências:**
+
 - ✅ Testabilidade: serviços testados sem dependências externas
 - ✅ Flexibilidade: trocar API externa sem alterar regras de negócio
 - ⚠️ Mais arquivos e indireção
@@ -148,6 +151,7 @@ O **ip-geolocation-service** é um microserviço REST que identifica informaçõ
 **Decisão:** Usar Caffeine para cache local, TTL de 24h.
 
 **Consequências:**
+
 - ✅ Latência baixa (microsegundos)
 - ✅ Zero dependência externa
 - ⚠️ Cache não compartilhado entre instâncias (OK para este escopo)
@@ -161,6 +165,7 @@ O **ip-geolocation-service** é um microserviço REST que identifica informaçõ
 **Decisão:** Retornar país padrão (Brasil) com source: "fallback".
 
 **Consequências:**
+
 - ✅ Serviço sempre retorna 200 para IPs válidos
 - ✅ Cliente pode verificar o campo `source`
 - ⚠️ Dados imprecisos quando em fallback
@@ -172,6 +177,7 @@ O **ip-geolocation-service** é um microserviço REST que identifica informaçõ
 **Decisão:** Usar Records para todas as estruturas imutáveis.
 
 **Consequências:**
+
 - ✅ Código conciso
 - ✅ Imutabilidade garantida
 - ✅ equals/hashCode/toString automáticos
@@ -181,12 +187,14 @@ O **ip-geolocation-service** é um microserviço REST que identifica informaçõ
 **Contexto:** Dependência de uma única API externa (ip-api.com) representa um ponto único de falha. APIs gratuitas têm limites de requisição e podem ficar indisponíveis.
 
 **Decisão:** Implementar sistema de failover com dois providers externos:
+
 - **Primário:** ip-api.com (45 req/min, sem API key)
 - **Secundário:** ipapi.co (1000 req/day, sem API key)
 - **Circuit Breaker:** Quando primário falha, redireciona para secundário por 5 minutos
 - **Fallback local:** Usado apenas quando ambos os providers externos falham
 
 **Componentes:**
+
 ```
 ┌─────────────────────────────────────────────────────────────────┐
 │                      ProviderSelector                           │
@@ -216,6 +224,7 @@ O **ip-geolocation-service** é um microserviço REST que identifica informaçõ
 ```
 
 **Fluxo de Failover:**
+
 ```
 Request → ProviderSelector
     │
@@ -236,6 +245,7 @@ Request → ProviderSelector
 ```
 
 **Consequências:**
+
 - ✅ Alta disponibilidade: dois providers externos antes de fallback local
 - ✅ Resiliente a falhas temporárias: 5 minutos no secundário permite recuperação
 - ✅ Transparente: cliente não percebe qual provider foi usado
@@ -244,6 +254,7 @@ Request → ProviderSelector
 - ⚠️ Latência adicional: primeira requisição após falha tenta dois providers
 
 **Configuração (application.yml):**
+
 ```yaml
 geolocation:
   providers:
