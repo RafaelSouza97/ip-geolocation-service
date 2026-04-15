@@ -79,7 +79,6 @@ public class IpApiClient implements GeolocationProvider {
                 response.timezone(), response.isp()));
     }
 
-    
     @JsonIgnoreProperties(ignoreUnknown = true)
     record IpApiResponse(String status, String message, String country, String countryCode,
             String region, String regionName, String city, double lat, double lon, String timezone,

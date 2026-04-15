@@ -11,13 +11,11 @@ import lombok.experimental.UtilityClass;
 @UtilityClass
 public class GeolocationInfoMapper {
 
-    
     public record ApiResponseData(String ip, String countryCode, String countryName,
             String regionCode, String regionName, String city, Double latitude, Double longitude,
             String timezone, String isp) {
     }
 
-    
     public GeolocationInfo fromApiResponse(ApiResponseData data) {
         return new GeolocationInfo(data.ip(), new Country(data.countryCode(), data.countryName()),
                 new Region(data.regionCode() != null ? data.regionCode() : "",

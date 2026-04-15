@@ -74,18 +74,15 @@ public class ProviderSelector implements GeolocationProvider {
         }
     }
 
-    
     public String getActiveProviderName() {
         return currentState.get().activeProvider().name();
     }
 
-    
     public boolean isInFailover() {
         ProviderState state = currentState.get();
         return state.isInFailover() && !state.hasFailoverExpired(failoverDuration);
     }
 
-    
     public void reset() {
         currentState.set(new ProviderState(ProviderType.PRIMARY, null));
         log.info("ProviderSelector reset to primary provider");
@@ -101,8 +98,9 @@ public class ProviderSelector implements GeolocationProvider {
         }
 
         boolean hasFailoverExpired(Duration failoverDuration) {
-            if (failoverStartTime == null)
+            if (failoverStartTime == null) {
                 return true;
+            }
             return Instant.now().isAfter(failoverStartTime.plus(failoverDuration));
         }
     }

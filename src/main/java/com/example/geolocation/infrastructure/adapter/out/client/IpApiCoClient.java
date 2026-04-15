@@ -79,7 +79,6 @@ public class IpApiCoClient implements GeolocationProvider {
                 response.longitude(), response.timezone(), response.org()));
     }
 
-    
     @JsonIgnoreProperties(ignoreUnknown = true)
     record IpApiCoResponse(String ip, String city, String region,
             @JsonProperty("region_code") String regionCode,
