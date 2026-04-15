@@ -11,9 +11,7 @@ public record GeolocationProperties(
     CacheProperties cache,
     FallbackProperties fallback
 ) {
-    /**
-     * Configuração dos provedores de geolocalização.
-     */
+    
     public record ProviderProperties(
         ApiProperties primary,
         ApiProperties secondary,
@@ -34,9 +32,7 @@ public record GeolocationProperties(
         }
     }
 
-    /**
-     * Configuração de um provedor de API.
-     */
+    
     public record ApiProperties(
         String name,
         String url,
@@ -68,8 +64,6 @@ public record GeolocationProperties(
             if (countryName == null) countryName = "Brazil";
         }
     }
-
-    // Compatibilidade - método legado para IpApiClient existente
     public ApiProperties api() {
         return providers != null ? providers.primary() : new ApiProperties(
             ApiConstants.PRIMARY_PROVIDER_NAME,
@@ -78,3 +72,4 @@ public record GeolocationProperties(
         );
     }
 }
+

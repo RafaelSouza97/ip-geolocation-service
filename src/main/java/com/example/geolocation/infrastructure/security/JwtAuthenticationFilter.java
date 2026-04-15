@@ -18,10 +18,6 @@ import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
 
-/**
- * Filtro de autenticação JWT.
- * Intercepta requisições e valida o token Bearer.
- */
 @Slf4j
 @Component
 @RequiredArgsConstructor
@@ -39,7 +35,6 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         
         final String authHeader = request.getHeader(HttpHeaders.AUTHORIZATION);
 
-        // Se não tem header Authorization ou não começa com "Bearer ", continua sem autenticar
         if (authHeader == null || !authHeader.startsWith(HttpHeaders.BEARER_PREFIX)) {
             filterChain.doFilter(request, response);
             return;
@@ -49,7 +44,6 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             final String jwt = authHeader.substring(HttpHeaders.BEARER_PREFIX.length());
             final String username = jwtService.extractUsername(jwt);
 
-            // Se extraiu username e ainda não está autenticado
             if (username != null && SecurityContextHolder.getContext().getAuthentication() == null) {
                 UserDetails userDetails = userDetailsService.loadUserByUsername(username);
 
@@ -71,3 +65,4 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         filterChain.doFilter(request, response);
     }
 }
+

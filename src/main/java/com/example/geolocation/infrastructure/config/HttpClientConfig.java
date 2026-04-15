@@ -6,21 +6,13 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import lombok.extern.slf4j.Slf4j;
 
-/**
- * Configuração do HttpClient compartilhado entre os clientes de API externa.
- */
 @Slf4j
 @Configuration
 public class HttpClientConfig {
 
     private static final Duration DEFAULT_CONNECT_TIMEOUT = Duration.ofSeconds(5);
 
-    /**
-     * Cria um HttpClient compartilhado para otimizar conexões.
-     * 
-     * @param properties propriedades de geolocalização
-     * @return HttpClient configurado
-     */
+    
     @Bean
     public HttpClient sharedHttpClient(GeolocationProperties properties) {
         Duration timeout = properties.api() != null && properties.api().timeout() != null
@@ -33,3 +25,4 @@ public class HttpClientConfig {
                 .followRedirects(HttpClient.Redirect.NORMAL).build();
     }
 }
+

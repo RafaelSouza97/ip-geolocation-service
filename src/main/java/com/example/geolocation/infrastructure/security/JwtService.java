@@ -15,9 +15,6 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.function.Function;
 
-/**
- * Serviço para geração e validação de tokens JWT.
- */
 @Slf4j
 @Service
 public class JwtService {
@@ -32,16 +29,12 @@ public class JwtService {
         this.expiration = properties.jwt().expiration();
     }
 
-    /**
-     * Gera um token JWT para o usuário.
-     */
+    
     public String generateToken(String username) {
         return generateToken(new HashMap<>(), username);
     }
 
-    /**
-     * Gera um token JWT com claims extras.
-     */
+    
     public String generateToken(Map<String, Object> extraClaims, String username) {
         return Jwts.builder()
             .claims(extraClaims)
@@ -52,16 +45,12 @@ public class JwtService {
             .compact();
     }
 
-    /**
-     * Extrai o username do token.
-     */
+    
     public String extractUsername(String token) {
         return extractClaim(token, Claims::getSubject);
     }
 
-    /**
-     * Valida se o token é válido para o username.
-     */
+    
     public boolean isTokenValid(String token, String username) {
         try {
             final String extractedUsername = extractUsername(token);
@@ -72,9 +61,7 @@ public class JwtService {
         }
     }
 
-    /**
-     * Verifica se o token está expirado.
-     */
+    
     public boolean isTokenExpired(String token) {
         return extractExpiration(token).before(new Date());
     }
@@ -96,3 +83,4 @@ public class JwtService {
             .getPayload();
     }
 }
+

@@ -3,9 +3,6 @@ package com.example.geolocation.infrastructure.config;
 import com.example.geolocation.application.domain.exception.ErrorCode;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 
-/**
- * Propriedades de segurança JWT.
- */
 @ConfigurationProperties(prefix = "security")
 public record SecurityProperties(JwtProperties jwt, UserProperties user) {
     public record JwtProperties(String secretKey, long expiration) {
@@ -27,3 +24,4 @@ public record SecurityProperties(JwtProperties jwt, UserProperties user) {
         }
     }
 }
+
