@@ -8,17 +8,20 @@ description: "Java coding standards and conventions for ip-geolocation-service"
 ## Code Style
 
 ### Imports
+
 - Nunca use wildcard imports (`import java.util.*`)
-- Organize: java.*, javax.*, org.*, com.*, static imports
+- Organize: java._, javax._, org._, com._, static imports
 - Remova imports não utilizados
 
 ### Formatting
+
 - Indentação: 4 espaços (não tabs)
 - Limite de linha: 120 caracteres
 - Chaves na mesma linha: `if (condition) {`
 - Uma linha em branco entre métodos
 
 ### Null Safety
+
 ```java
 // ✅ Use Optional para retornos que podem ser nulos
 public Optional<GeolocationInfo> findByIp(String ip) {}
@@ -45,6 +48,7 @@ public GeolocationInfo locate(String ip) {
 ```
 
 ### Immutability
+
 ```java
 // ✅ Prefira Records para DTOs
 public record GeolocationRequest(String ip) {}
@@ -57,13 +61,14 @@ private final GeolocationCache cache;
 ```
 
 ### Logging
+
 ```java
 @Slf4j
 public class GeolocationService {
-    
+
     public GeolocationInfo locate(String ip) {
         log.debug("Looking up geolocation for IP: {}", ip);
-        
+
         try {
             var result = provider.lookup(ip);
             log.info("Geolocation found for IP {} from {}", ip, result.source());
@@ -77,12 +82,13 @@ public class GeolocationService {
 ```
 
 ### Exception Handling
+
 ```java
 // ✅ Crie exceções específicas do domínio com Lombok @Getter
 @Getter
 public class InvalidIpAddressException extends RuntimeException {
     private final String ip;
-    
+
     public InvalidIpAddressException(String ip) {
         super("Invalid IP address format: " + ip);
         this.ip = ip;
@@ -96,6 +102,7 @@ try (var client = HttpClient.newHttpClient()) {
 ```
 
 ### Regex
+
 ```java
 // ✅ Compile patterns como constantes estáticas
 private static final Pattern IP_V4_PATTERN = Pattern.compile(
@@ -109,6 +116,7 @@ public boolean isValidIp(String ip) {
 ```
 
 ### Utility Classes
+
 ```java
 // ✅ Use @UtilityClass do Lombok para classes com métodos estáticos
 @UtilityClass
@@ -125,6 +133,7 @@ public final class IpValidator {
 ```
 
 ### Enums
+
 ```java
 // ✅ Use Lombok para enums com campos
 @Getter
@@ -133,7 +142,7 @@ public enum DataSource {
     API("api"),
     CACHE("cache"),
     FALLBACK("fallback");
-    
+
     private final String value;
 }
 ```
@@ -141,6 +150,7 @@ public enum DataSource {
 ## Spring Specifics
 
 ### Dependency Injection
+
 ```java
 // ✅ Constructor injection com Lombok
 @Service
@@ -156,6 +166,7 @@ private GeolocationProvider provider; // EVITE
 ```
 
 ### Configuration
+
 ```java
 // ✅ Use @ConfigurationProperties
 @ConfigurationProperties(prefix = "geolocation")
@@ -170,12 +181,13 @@ public record GeolocationProperties(
 ```
 
 ### Validation
+
 ```java
 // ✅ Use @Validated no controller e @NotBlank nos parâmetros
 @RestController
 @Validated
 public class GeolocationController {
-    
+
     @GetMapping("/locate")
     public ResponseEntity<GeolocationResponse> locate(
         @RequestParam @NotBlank String ip,
@@ -191,12 +203,13 @@ public ResponseEntity<ErrorResponse> handleConstraintViolation(ConstraintViolati
 ```
 
 ### DTOs com OpenAPI
+
 ```java
 // ✅ Use @Schema para documentação Swagger
 public record LoginRequest(
     @Schema(description = "Username", example = "admin")
     @NotBlank String username,
-    
+
     @Schema(description = "Password", example = "Admin123@")
     @NotBlank String password
 ) {}

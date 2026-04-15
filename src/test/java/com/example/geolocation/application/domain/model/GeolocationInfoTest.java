@@ -1,12 +1,14 @@
 package com.example.geolocation.application.domain.model;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import java.time.Instant;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
-
-import java.time.Instant;
-
-import static org.junit.jupiter.api.Assertions.*;
 
 @DisplayName("GeolocationInfo")
 @SuppressWarnings("java:S2187")
@@ -26,17 +28,8 @@ class GeolocationInfoTest {
             var timestamp = Instant.now();
 
             // Act
-            var info = new GeolocationInfo(
-                "8.8.8.8",
-                country,
-                region,
-                "São Paulo",
-                coords,
-                "America/Sao_Paulo",
-                "Google LLC",
-                DataSource.API,
-                timestamp
-            );
+            var info = new GeolocationInfo("8.8.8.8", country, region, "São Paulo", coords,
+                    "America/Sao_Paulo", "Google LLC", DataSource.API, timestamp);
 
             // Assert
             assertEquals("8.8.8.8", info.ip());
@@ -58,16 +51,12 @@ class GeolocationInfoTest {
             var country = new Country("BR", "Brazil");
 
             // Act
-            var info = new GeolocationInfo(
-                "8.8.8.8",
-                country,
-                null,  // region
-                null,  // city
-                null,  // coordinates
-                null,  // timezone
-                null,  // isp
-                DataSource.API,
-                null   // timestamp
+            var info = new GeolocationInfo("8.8.8.8", country, null, // region
+                    null, // city
+                    null, // coordinates
+                    null, // timezone
+                    null, // isp
+                    DataSource.API, null // timestamp
             );
 
             // Assert
@@ -94,18 +83,16 @@ class GeolocationInfoTest {
             var country = new Country("BR", "Brazil");
 
             // Act & Assert
-            assertThrows(NullPointerException.class, () -> new GeolocationInfo(
-                null, country, null, null, null, null, null, DataSource.API, null
-            ));
+            assertThrows(NullPointerException.class, () -> new GeolocationInfo(null, country, null,
+                    null, null, null, null, DataSource.API, null));
         }
 
         @Test
         @DisplayName("should throw exception for null country")
         void shouldThrowExceptionForNullCountry() {
             // Act & Assert
-            assertThrows(NullPointerException.class, () -> new GeolocationInfo(
-                "8.8.8.8", null, null, null, null, null, null, DataSource.API, null
-            ));
+            assertThrows(NullPointerException.class, () -> new GeolocationInfo("8.8.8.8", null,
+                    null, null, null, null, null, DataSource.API, null));
         }
 
         @Test
@@ -115,9 +102,8 @@ class GeolocationInfoTest {
             var country = new Country("BR", "Brazil");
 
             // Act & Assert
-            assertThrows(NullPointerException.class, () -> new GeolocationInfo(
-                "8.8.8.8", country, null, null, null, null, null, null, null
-            ));
+            assertThrows(NullPointerException.class, () -> new GeolocationInfo("8.8.8.8", country,
+                    null, null, null, null, null, null, null));
         }
     }
 
@@ -130,9 +116,8 @@ class GeolocationInfoTest {
         void shouldCreateCopyWithCacheSource() {
             // Arrange
             var country = new Country("BR", "Brazil");
-            var info = new GeolocationInfo(
-                "8.8.8.8", country, null, null, null, null, null, DataSource.API, null
-            );
+            var info = new GeolocationInfo("8.8.8.8", country, null, null, null, null, null,
+                    DataSource.API, null);
 
             // Act
             var cached = info.withCacheSource();
@@ -149,12 +134,10 @@ class GeolocationInfoTest {
         void shouldIdentifyFallbackSource() {
             // Arrange
             var country = new Country("BR", "Brazil");
-            var fallbackInfo = new GeolocationInfo(
-                "8.8.8.8", country, null, null, null, null, null, DataSource.FALLBACK, null
-            );
-            var apiInfo = new GeolocationInfo(
-                "8.8.8.8", country, null, null, null, null, null, DataSource.API, null
-            );
+            var fallbackInfo = new GeolocationInfo("8.8.8.8", country, null, null, null, null, null,
+                    DataSource.FALLBACK, null);
+            var apiInfo = new GeolocationInfo("8.8.8.8", country, null, null, null, null, null,
+                    DataSource.API, null);
 
             // Assert
             assertTrue(fallbackInfo.isFallback());
@@ -172,12 +155,10 @@ class GeolocationInfoTest {
             // Arrange
             var country = new Country("BR", "Brazil");
             var timestamp = Instant.now();
-            var info1 = new GeolocationInfo(
-                "8.8.8.8", country, null, null, null, null, null, DataSource.API, timestamp
-            );
-            var info2 = new GeolocationInfo(
-                "8.8.8.8", country, null, null, null, null, null, DataSource.API, timestamp
-            );
+            var info1 = new GeolocationInfo("8.8.8.8", country, null, null, null, null, null,
+                    DataSource.API, timestamp);
+            var info2 = new GeolocationInfo("8.8.8.8", country, null, null, null, null, null,
+                    DataSource.API, timestamp);
 
             // Assert
             assertEquals(info1, info2);

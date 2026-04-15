@@ -77,17 +77,9 @@ public class IpApiClient implements GeolocationProvider {
 
     private GeolocationInfo mapToGeolocationInfo(IpApiResponse response) {
         return GeolocationInfoMapper.fromApiResponse(new GeolocationInfoMapper.ApiResponseData(
-            response.query(),
-            response.countryCode(),
-            response.country(),
-            response.region(),
-            response.regionName(),
-            response.city(),
-            response.lat(),
-            response.lon(),
-            response.timezone(),
-            response.isp()
-        ));
+                response.query(), response.countryCode(), response.country(), response.region(),
+                response.regionName(), response.city(), response.lat(), response.lon(),
+                response.timezone(), response.isp()));
     }
 
     /**

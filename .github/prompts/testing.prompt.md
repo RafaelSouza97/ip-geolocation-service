@@ -83,7 +83,7 @@ class GeolocationServiceTest {
     @Nested
     @DisplayName("when IP is private or localhost")
     class PrivateOrLocalhostIp {
-        
+
         @ParameterizedTest
         @ValueSource(strings = {"192.168.1.1", "10.0.0.1", "172.16.0.1", "127.0.0.1"})
         @DisplayName("should return fallback for private IPs without calling provider")
@@ -202,10 +202,11 @@ verify(cache, never()).get(any());
 verify(provider, never()).lookup(any());
 
 // ✅ Use assertThrows para verificar exceções
-var exception = assertThrows(InvalidIpAddressException.class, 
+var exception = assertThrows(InvalidIpAddressException.class,
     () -> service.locate(ip));
 assertEquals(ip, exception.getIp());
 ```
+
 - Testar cache hit e cache miss
 
 ## Test Data Builders

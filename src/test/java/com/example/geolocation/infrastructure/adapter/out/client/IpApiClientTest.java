@@ -1,20 +1,36 @@
 package com.example.geolocation.infrastructure.adapter.out.client;
 
+import static com.github.tomakehurst.wiremock.client.WireMock.badRequest;
+import static com.github.tomakehurst.wiremock.client.WireMock.get;
+import static com.github.tomakehurst.wiremock.client.WireMock.getRequestedFor;
+import static com.github.tomakehurst.wiremock.client.WireMock.ok;
+import static com.github.tomakehurst.wiremock.client.WireMock.okJson;
+import static com.github.tomakehurst.wiremock.client.WireMock.serverError;
+import static com.github.tomakehurst.wiremock.client.WireMock.stubFor;
+import static com.github.tomakehurst.wiremock.client.WireMock.urlEqualTo;
+import static com.github.tomakehurst.wiremock.client.WireMock.verify;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import java.net.http.HttpClient;
+import java.time.Duration;
+import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Nested;
+import org.junit.jupiter.api.Test;
 import com.example.geolocation.application.domain.exception.ExternalApiException;
 import com.example.geolocation.application.domain.model.DataSource;
 import com.example.geolocation.infrastructure.config.GeolocationProperties;
-import com.example.geolocation.infrastructure.config.GeolocationProperties.*;
+import com.example.geolocation.infrastructure.config.GeolocationProperties.ApiProperties;
+import com.example.geolocation.infrastructure.config.GeolocationProperties.CacheProperties;
+import com.example.geolocation.infrastructure.config.GeolocationProperties.FallbackProperties;
+import com.example.geolocation.infrastructure.config.GeolocationProperties.ProviderProperties;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.tomakehurst.wiremock.WireMockServer;
 import com.github.tomakehurst.wiremock.client.WireMock;
 import com.github.tomakehurst.wiremock.core.WireMockConfiguration;
-import org.junit.jupiter.api.*;
-
-import java.net.http.HttpClient;
-import java.time.Duration;
-
-import static com.github.tomakehurst.wiremock.client.WireMock.*;
-import static org.junit.jupiter.api.Assertions.*;
 
 @DisplayName("IpApiClient")
 @SuppressWarnings("java:S2187")
@@ -40,27 +56,21 @@ class IpApiClientTest {
         var primary = new ApiProperties("ip-api.com", baseUrl, timeout);
         var secondary = new ApiProperties("ipapi.co", "https://ipapi.co", timeout);
         var providers = new ProviderProperties(primary, secondary, Duration.ofMinutes(5));
-        return new GeolocationProperties(
-            providers,
-            new CacheProperties(Duration.ofHours(24), 10000),
-            new FallbackProperties("BR", "Brazil")
-        );
+        return new GeolocationProperties(providers,
+                new CacheProperties(Duration.ofHours(24), 10000),
+                new FallbackProperties("BR", "Brazil"));
     }
 
     @BeforeEach
     void setUp() {
         wireMockServer.resetAll();
         objectMapper = new ObjectMapper();
-        
-        var properties = createProperties(
-            "http://localhost:" + wireMockServer.port(),
-            Duration.ofSeconds(5)
-        );
-        
-        var httpClient = HttpClient.newBuilder()
-            .connectTimeout(Duration.ofSeconds(5))
-            .build();
-        
+
+        var properties = createProperties("http://localhost:" + wireMockServer.port(),
+                Duration.ofSeconds(5));
+
+        var httpClient = HttpClient.newBuilder().connectTimeout(Duration.ofSeconds(5)).build();
+
         client = new IpApiClient(properties, objectMapper, httpClient);
     }
 
@@ -73,8 +83,7 @@ class IpApiClientTest {
         void shouldParseAndReturnGeolocationInfo() {
             // Arrange
             var ip = "8.8.8.8";
-            stubFor(get(urlEqualTo("/" + ip))
-                .willReturn(okJson("""
+            stubFor(get(urlEqualTo("/" + ip)).willReturn(okJson("""
                     {
                         "status": "success",
                         "country": "United States",
@@ -112,8 +121,7 @@ class IpApiClientTest {
         void shouldHandleMinimalResponse() {
             // Arrange
             var ip = "1.1.1.1";
-            stubFor(get(urlEqualTo("/" + ip))
-                .willReturn(okJson("""
+            stubFor(get(urlEqualTo("/" + ip)).willReturn(okJson("""
                     {
                         "status": "success",
                         "country": "Australia",
@@ -147,8 +155,7 @@ class IpApiClientTest {
         void shouldThrowExceptionWhenStatusIsFail() {
             // Arrange
             var ip = "invalid";
-            stubFor(get(urlEqualTo("/" + ip))
-                .willReturn(okJson("""
+            stubFor(get(urlEqualTo("/" + ip)).willReturn(okJson("""
                     {
                         "status": "fail",
                         "message": "invalid query",
@@ -157,8 +164,7 @@ class IpApiClientTest {
                     """)));
 
             // Act & Assert
-            var exception = assertThrows(ExternalApiException.class, 
-                () -> client.lookup(ip));
+            var exception = assertThrows(ExternalApiException.class, () -> client.lookup(ip));
             assertTrue(exception.getMessage().contains("invalid query"));
         }
 
@@ -168,11 +174,10 @@ class IpApiClientTest {
             // Arrange
             var ip = "8.8.8.8";
             stubFor(get(urlEqualTo("/" + ip))
-                .willReturn(serverError().withBody("Internal Server Error")));
+                    .willReturn(serverError().withBody("Internal Server Error")));
 
             // Act & Assert
-            var exception = assertThrows(ExternalApiException.class, 
-                () -> client.lookup(ip));
+            var exception = assertThrows(ExternalApiException.class, () -> client.lookup(ip));
             assertTrue(exception.getMessage().contains("HTTP 500"));
         }
 
@@ -181,12 +186,10 @@ class IpApiClientTest {
         void shouldThrowExceptionOnHttp400() {
             // Arrange
             var ip = "bad-request";
-            stubFor(get(urlEqualTo("/" + ip))
-                .willReturn(badRequest().withBody("Bad Request")));
+            stubFor(get(urlEqualTo("/" + ip)).willReturn(badRequest().withBody("Bad Request")));
 
             // Act & Assert
-            var exception = assertThrows(ExternalApiException.class, 
-                () -> client.lookup(ip));
+            var exception = assertThrows(ExternalApiException.class, () -> client.lookup(ip));
             assertTrue(exception.getMessage().contains("HTTP 400"));
         }
 
@@ -195,14 +198,12 @@ class IpApiClientTest {
         void shouldThrowExceptionOnConnectionError() {
             // Arrange - usar porta diferente para simular erro de conexão
             var badProperties = createProperties("http://localhost:1", Duration.ofSeconds(1));
-            var badHttpClient = HttpClient.newBuilder()
-                .connectTimeout(Duration.ofSeconds(1))
-                .build();
+            var badHttpClient =
+                    HttpClient.newBuilder().connectTimeout(Duration.ofSeconds(1)).build();
             var badClient = new IpApiClient(badProperties, objectMapper, badHttpClient);
 
             // Act & Assert
-            assertThrows(ExternalApiException.class, 
-                () -> badClient.lookup("8.8.8.8"));
+            assertThrows(ExternalApiException.class, () -> badClient.lookup("8.8.8.8"));
         }
 
         @Test
@@ -210,12 +211,10 @@ class IpApiClientTest {
         void shouldThrowExceptionOnInvalidJson() {
             // Arrange
             var ip = "8.8.8.8";
-            stubFor(get(urlEqualTo("/" + ip))
-                .willReturn(ok("not valid json {")));
+            stubFor(get(urlEqualTo("/" + ip)).willReturn(ok("not valid json {")));
 
             // Act & Assert
-            assertThrows(ExternalApiException.class, 
-                () -> client.lookup(ip));
+            assertThrows(ExternalApiException.class, () -> client.lookup(ip));
         }
     }
 
@@ -228,8 +227,7 @@ class IpApiClientTest {
         void shouldMakeGetRequestToCorrectUrl() {
             // Arrange
             var ip = "8.8.8.8";
-            stubFor(get(urlEqualTo("/" + ip))
-                .willReturn(okJson("""
+            stubFor(get(urlEqualTo("/" + ip)).willReturn(okJson("""
                     {
                         "status": "success",
                         "country": "United States",

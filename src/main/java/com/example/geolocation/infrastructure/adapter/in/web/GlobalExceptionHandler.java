@@ -1,7 +1,6 @@
 package com.example.geolocation.infrastructure.adapter.in.web;
 
 import java.util.stream.Collectors;
-import jakarta.validation.ConstraintViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.MethodArgumentNotValidException;
@@ -17,6 +16,7 @@ import com.example.geolocation.application.domain.exception.InvalidPlatformExcep
 import com.example.geolocation.application.domain.exception.MissingPlatformHeaderException;
 import com.example.geolocation.application.domain.exception.PrivateIpAddressException;
 import com.example.geolocation.infrastructure.adapter.in.web.dto.ErrorResponse;
+import jakarta.validation.ConstraintViolationException;
 import lombok.extern.slf4j.Slf4j;
 
 /**

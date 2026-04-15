@@ -6,6 +6,7 @@ description: "Use when: writing Java code, Spring Boot configuration, creating s
 # Java & Spring Boot Best Practices
 
 ## Java 21+ Features
+
 - Use **Records** para DTOs e Value Objects (imutáveis, compactos)
 - Use **Pattern Matching** com `instanceof` e `switch` expressions
 - Use **Sealed Classes** para hierarquias de tipos fechadas
@@ -13,6 +14,7 @@ description: "Use when: writing Java code, Spring Boot configuration, creating s
 - Use **Text Blocks** (`"""`) para strings multiline (JSON, SQL)
 
 ## Spring Boot 3.x Conventions
+
 - Use **constructor injection** (não @Autowired em fields)
 - Prefira `@RequiredArgsConstructor` com `@NonNull` do Lombok para injeção
 - Configure beans com `@Configuration` + `@Bean` ao invés de `@Component` para dependências externas
@@ -22,6 +24,7 @@ description: "Use when: writing Java code, Spring Boot configuration, creating s
 - Use `@Schema` em DTOs para documentação Swagger/OpenAPI
 
 ## Naming Conventions
+
 ```java
 // Classes: PascalCase
 public class GeolocationService {}
@@ -40,12 +43,14 @@ com.example.geolocation.application.service
 ```
 
 ## Exception Handling
+
 - Crie exceções de domínio específicas (ex: `InvalidIpAddressException`)
 - Use `@RestControllerAdvice` para tratamento global
 - Nunca exponha stack traces para o cliente
 - Log exceções com contexto: IP, timestamp, correlation ID
 
 ## Lombok Usage
+
 - `@RequiredArgsConstructor` - injeção de dependências
 - `@NonNull` - validação automática de null em parâmetros de construtor
 - `@Getter` - getters em exceções e enums com campos
@@ -56,12 +61,14 @@ com.example.geolocation.application.service
 - Prefira Records ao invés de `@Value` para DTOs imutáveis
 
 ## HTTP Client Best Practices
+
 - Configure timeouts explícitos (connect, read)
 - Use circuit breaker pattern (Resilience4j)
 - Implemente retry com exponential backoff
 - Log requests/responses em DEBUG level
 
 ## Performance
+
 - Compile Regex patterns como `static final`
 - Use cache para dados que mudam raramente
 - Configure pool de conexões adequadamente

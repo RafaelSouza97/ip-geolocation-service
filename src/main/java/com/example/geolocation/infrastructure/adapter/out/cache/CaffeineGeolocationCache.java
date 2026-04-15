@@ -1,13 +1,12 @@
 package com.example.geolocation.infrastructure.adapter.out.cache;
 
+import java.util.Optional;
+import org.springframework.stereotype.Component;
 import com.example.geolocation.application.domain.model.GeolocationInfo;
 import com.example.geolocation.application.port.out.GeolocationCache;
 import com.github.benmanes.caffeine.cache.Cache;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.stereotype.Component;
-
-import java.util.Optional;
 
 /**
  * Implementação de cache usando Caffeine.

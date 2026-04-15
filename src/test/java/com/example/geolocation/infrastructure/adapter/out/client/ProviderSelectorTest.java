@@ -1,5 +1,23 @@
 package com.example.geolocation.infrastructure.adapter.out.client;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.Mockito.reset;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoInteractions;
+import static org.mockito.Mockito.when;
+import java.time.Duration;
+import java.time.Instant;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Nested;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
 import com.example.geolocation.application.domain.exception.ExternalApiException;
 import com.example.geolocation.application.domain.model.Coordinates;
 import com.example.geolocation.application.domain.model.Country;
@@ -8,18 +26,10 @@ import com.example.geolocation.application.domain.model.GeolocationInfo;
 import com.example.geolocation.application.domain.model.Region;
 import com.example.geolocation.application.port.out.GeolocationProvider;
 import com.example.geolocation.infrastructure.config.GeolocationProperties;
-import com.example.geolocation.infrastructure.config.GeolocationProperties.*;
-import org.junit.jupiter.api.*;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.Mock;
-import org.mockito.junit.jupiter.MockitoExtension;
-
-import java.time.Duration;
-import java.time.Instant;
-
-import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.Mockito.*;
+import com.example.geolocation.infrastructure.config.GeolocationProperties.ApiProperties;
+import com.example.geolocation.infrastructure.config.GeolocationProperties.CacheProperties;
+import com.example.geolocation.infrastructure.config.GeolocationProperties.FallbackProperties;
+import com.example.geolocation.infrastructure.config.GeolocationProperties.ProviderProperties;
 
 @DisplayName("ProviderSelector")
 @ExtendWith(MockitoExtension.class)
@@ -38,30 +48,25 @@ class ProviderSelectorTest {
 
     @BeforeEach
     void setUp() {
-        var primary = new ApiProperties("ip-api.com", "http://ip-api.com/json", Duration.ofSeconds(5));
+        var primary =
+                new ApiProperties("ip-api.com", "http://ip-api.com/json", Duration.ofSeconds(5));
         var secondary = new ApiProperties("ipapi.co", "https://ipapi.co", Duration.ofSeconds(5));
-        var providers = new ProviderProperties(primary, secondary, Duration.ofMillis(100)); // Short duration for tests
-        var properties = new GeolocationProperties(
-            providers,
-            new CacheProperties(Duration.ofHours(24), 10000),
-            new FallbackProperties("BR", "Brazil")
-        );
+        var providers = new ProviderProperties(primary, secondary, Duration.ofMillis(100)); // Short
+                                                                                            // duration
+                                                                                            // for
+                                                                                            // tests
+        var properties = new GeolocationProperties(providers,
+                new CacheProperties(Duration.ofHours(24), 10000),
+                new FallbackProperties("BR", "Brazil"));
 
         selector = new ProviderSelector(primaryProvider, secondaryProvider, properties);
     }
 
     private GeolocationInfo createMockResponse(String ip, DataSource source) {
-        return new GeolocationInfo(
-            ip,
-            new Country("US", "United States"),
-            new Region("CA", "California"),
-            "Mountain View",
-            new Coordinates(37.4056, -122.0775),
-            "America/Los_Angeles",
-            "Google LLC",
-            source,
-            Instant.now()
-        );
+        return new GeolocationInfo(ip, new Country("US", "United States"),
+                new Region("CA", "California"), "Mountain View",
+                new Coordinates(37.4056, -122.0775), "America/Los_Angeles", "Google LLC", source,
+                Instant.now());
     }
 
     @Nested
@@ -88,7 +93,8 @@ class ProviderSelectorTest {
         @DisplayName("should not be in failover mode")
         void shouldNotBeInFailoverMode() {
             // Arrange
-            when(primaryProvider.lookup(TEST_IP)).thenReturn(createMockResponse(TEST_IP, DataSource.API));
+            when(primaryProvider.lookup(TEST_IP))
+                    .thenReturn(createMockResponse(TEST_IP, DataSource.API));
 
             // Act
             selector.lookup(TEST_IP);
@@ -108,7 +114,7 @@ class ProviderSelectorTest {
         void shouldFallbackToSecondary() {
             // Arrange
             when(primaryProvider.lookup(TEST_IP))
-                .thenThrow(new ExternalApiException("ip-api.com", "Connection timeout"));
+                    .thenThrow(new ExternalApiException("ip-api.com", "Connection timeout"));
             var expected = createMockResponse(TEST_IP, DataSource.API);
             when(secondaryProvider.lookup(TEST_IP)).thenReturn(expected);
 
@@ -126,9 +132,9 @@ class ProviderSelectorTest {
         void shouldSwitchToFailoverMode() {
             // Arrange
             when(primaryProvider.lookup(TEST_IP))
-                .thenThrow(new ExternalApiException("ip-api.com", "Connection timeout"));
+                    .thenThrow(new ExternalApiException("ip-api.com", "Connection timeout"));
             when(secondaryProvider.lookup(TEST_IP))
-                .thenReturn(createMockResponse(TEST_IP, DataSource.API));
+                    .thenReturn(createMockResponse(TEST_IP, DataSource.API));
 
             // Act
             selector.lookup(TEST_IP);
@@ -143,18 +149,18 @@ class ProviderSelectorTest {
         void shouldContinueUsingSecondaryDuringFailover() {
             // Arrange
             when(primaryProvider.lookup(anyString()))
-                .thenThrow(new ExternalApiException("ip-api.com", "Connection timeout"));
+                    .thenThrow(new ExternalApiException("ip-api.com", "Connection timeout"));
             when(secondaryProvider.lookup(anyString()))
-                .thenReturn(createMockResponse(TEST_IP, DataSource.API));
+                    .thenReturn(createMockResponse(TEST_IP, DataSource.API));
 
             // Act - first call triggers failover
             selector.lookup(TEST_IP);
-            
+
             // Reset mocks to track subsequent calls
             reset(primaryProvider, secondaryProvider);
             when(secondaryProvider.lookup(anyString()))
-                .thenReturn(createMockResponse("1.1.1.1", DataSource.API));
-            
+                    .thenReturn(createMockResponse("1.1.1.1", DataSource.API));
+
             // Act - second call should go directly to secondary
             selector.lookup("1.1.1.1");
 
@@ -173,13 +179,13 @@ class ProviderSelectorTest {
         void shouldThrowExceptionWhenBothFail() {
             // Arrange
             when(primaryProvider.lookup(TEST_IP))
-                .thenThrow(new ExternalApiException("ip-api.com", "Connection timeout"));
+                    .thenThrow(new ExternalApiException("ip-api.com", "Connection timeout"));
             when(secondaryProvider.lookup(TEST_IP))
-                .thenThrow(new ExternalApiException("ipapi.co", "Rate limit exceeded"));
+                    .thenThrow(new ExternalApiException("ipapi.co", "Rate limit exceeded"));
 
             // Act & Assert
-            var exception = assertThrows(ExternalApiException.class, 
-                () -> selector.lookup(TEST_IP));
+            var exception =
+                    assertThrows(ExternalApiException.class, () -> selector.lookup(TEST_IP));
             assertTrue(exception.getMessage().contains("Both providers failed"));
         }
     }
@@ -193,21 +199,21 @@ class ProviderSelectorTest {
         void shouldResetToPrimaryAfterFailoverExpires() throws InterruptedException {
             // Arrange - trigger failover first
             when(primaryProvider.lookup(TEST_IP))
-                .thenThrow(new ExternalApiException("ip-api.com", "Timeout"));
+                    .thenThrow(new ExternalApiException("ip-api.com", "Timeout"));
             when(secondaryProvider.lookup(TEST_IP))
-                .thenReturn(createMockResponse(TEST_IP, DataSource.API));
-            
+                    .thenReturn(createMockResponse(TEST_IP, DataSource.API));
+
             selector.lookup(TEST_IP);
             assertTrue(selector.isInFailover());
-            
+
             // Wait for failover to expire (100ms configured in setUp)
             Thread.sleep(150);
-            
+
             // Reset mocks
             reset(primaryProvider, secondaryProvider);
             when(primaryProvider.lookup(TEST_IP))
-                .thenReturn(createMockResponse(TEST_IP, DataSource.API));
-            
+                    .thenReturn(createMockResponse(TEST_IP, DataSource.API));
+
             // Act
             selector.lookup(TEST_IP);
 
@@ -227,10 +233,10 @@ class ProviderSelectorTest {
         void shouldResetToPrimary() {
             // Arrange - trigger failover first
             when(primaryProvider.lookup(TEST_IP))
-                .thenThrow(new ExternalApiException("ip-api.com", "Timeout"));
+                    .thenThrow(new ExternalApiException("ip-api.com", "Timeout"));
             when(secondaryProvider.lookup(TEST_IP))
-                .thenReturn(createMockResponse(TEST_IP, DataSource.API));
-            
+                    .thenReturn(createMockResponse(TEST_IP, DataSource.API));
+
             selector.lookup(TEST_IP);
             assertTrue(selector.isInFailover());
 

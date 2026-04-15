@@ -4,9 +4,7 @@ import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
-
 import org.springframework.stereotype.Component;
-
 import com.example.geolocation.application.domain.constants.ApiConstants;
 import com.example.geolocation.application.domain.constants.HttpHeaders;
 import com.example.geolocation.application.domain.exception.ErrorCode;
@@ -17,7 +15,6 @@ import com.example.geolocation.infrastructure.config.GeolocationProperties;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.ObjectMapper;
-
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
@@ -82,17 +79,9 @@ public class IpApiCoClient implements GeolocationProvider {
 
     private GeolocationInfo mapToGeolocationInfo(IpApiCoResponse response) {
         return GeolocationInfoMapper.fromApiResponse(new GeolocationInfoMapper.ApiResponseData(
-            response.ip(),
-            response.countryCode(),
-            response.countryName(),
-            response.regionCode(),
-            response.region(),
-            response.city(),
-            response.latitude(),
-            response.longitude(),
-            response.timezone(),
-            response.org()
-        ));
+                response.ip(), response.countryCode(), response.countryName(),
+                response.regionCode(), response.region(), response.city(), response.latitude(),
+                response.longitude(), response.timezone(), response.org()));
     }
 
     /**

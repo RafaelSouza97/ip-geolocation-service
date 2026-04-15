@@ -1,12 +1,14 @@
 package com.example.geolocation.application.domain.model;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
-
-import static org.junit.jupiter.api.Assertions.*;
 
 @DisplayName("Coordinates")
 @SuppressWarnings("java:S2187")
@@ -28,13 +30,7 @@ class CoordinatesTest {
         }
 
         @ParameterizedTest
-        @CsvSource({
-            "0, 0",
-            "90, 180",
-            "-90, -180",
-            "45.5, -122.6",
-            "-33.8688, 151.2093"
-        })
+        @CsvSource({"0, 0", "90, 180", "-90, -180", "45.5, -122.6", "-33.8688, 151.2093"})
         @DisplayName("should create coordinates for various valid values")
         void shouldCreateCoordinatesForVariousValidValues(double lat, double lon) {
             // Arrange & Act
@@ -65,8 +61,8 @@ class CoordinatesTest {
         @DisplayName("should throw exception for latitude below -90")
         void shouldThrowExceptionForLatitudeBelowMinus90() {
             // Arrange & Act & Assert
-            var exception = assertThrows(IllegalArgumentException.class, 
-                () -> new Coordinates(-91, 0));
+            var exception =
+                    assertThrows(IllegalArgumentException.class, () -> new Coordinates(-91, 0));
             assertTrue(exception.getMessage().contains("Latitude"));
         }
 
@@ -74,8 +70,8 @@ class CoordinatesTest {
         @DisplayName("should throw exception for latitude above 90")
         void shouldThrowExceptionForLatitudeAbove90() {
             // Arrange & Act & Assert
-            var exception = assertThrows(IllegalArgumentException.class, 
-                () -> new Coordinates(91, 0));
+            var exception =
+                    assertThrows(IllegalArgumentException.class, () -> new Coordinates(91, 0));
             assertTrue(exception.getMessage().contains("Latitude"));
         }
 
@@ -83,8 +79,8 @@ class CoordinatesTest {
         @DisplayName("should throw exception for longitude below -180")
         void shouldThrowExceptionForLongitudeBelowMinus180() {
             // Arrange & Act & Assert
-            var exception = assertThrows(IllegalArgumentException.class, 
-                () -> new Coordinates(0, -181));
+            var exception =
+                    assertThrows(IllegalArgumentException.class, () -> new Coordinates(0, -181));
             assertTrue(exception.getMessage().contains("Longitude"));
         }
 
@@ -92,8 +88,8 @@ class CoordinatesTest {
         @DisplayName("should throw exception for longitude above 180")
         void shouldThrowExceptionForLongitudeAbove180() {
             // Arrange & Act & Assert
-            var exception = assertThrows(IllegalArgumentException.class, 
-                () -> new Coordinates(0, 181));
+            var exception =
+                    assertThrows(IllegalArgumentException.class, () -> new Coordinates(0, 181));
             assertTrue(exception.getMessage().contains("Longitude"));
         }
     }

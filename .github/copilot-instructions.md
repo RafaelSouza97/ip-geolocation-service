@@ -15,6 +15,7 @@ Este é um microserviço REST de geolocalização que identifica informações g
 ## Convenções de Código
 
 ### Estrutura de Pacotes
+
 ```
 com.example.geolocation.application.domain.model    → Entidades e Value Objects
 com.example.geolocation.application.domain.exception → Exceções de domínio
@@ -29,11 +30,13 @@ com.example.geolocation.infrastructure.validation   → Validators
 ```
 
 ### Regras de Dependência
+
 - `application` NUNCA depende de `infrastructure`
 - Use interfaces (ports) para abstrair dependências externas
 - Controllers usam ports.in, adapters implementam ports.out
 
 ### Naming
+
 - Use `*UseCase` para input ports
 - Use `*Provider`, `*Cache` para output ports
 - Use `*Controller` para REST controllers
@@ -41,6 +44,7 @@ com.example.geolocation.infrastructure.validation   → Validators
 - Use `*Response`, `*Request` para DTOs
 
 ### Testes
+
 - Nome: `*Test.java` para unit, `*IT.java` para integration
 - Use `@DisplayName` na classe e métodos de teste
 - Use `@Nested` para agrupar testes relacionados
@@ -49,12 +53,14 @@ com.example.geolocation.infrastructure.validation   → Validators
 - Use WireMock para testar HTTP clients
 
 ### Lombok Annotations
+
 - `@RequiredArgsConstructor` + `@NonNull` para injeção com validação
 - `@Getter` para exceções e enums com campos
 - `@UtilityClass` para classes utilitárias estáticas
 - `@Slf4j` para logging
 
 ### Spring Annotations
+
 - `@Validated` em controllers para Bean Validation
 - `@NotBlank` para parâmetros obrigatórios
 - `@Schema` em DTOs para documentação Swagger
@@ -62,12 +68,13 @@ com.example.geolocation.infrastructure.validation   → Validators
 ## Arquivos Importantes
 
 - `docs/ARCHITECTURE.md` - Decisões arquiteturais
-- `docs/STRATEGY.md` - Estratégias de implementação  
+- `docs/STRATEGY.md` - Estratégias de implementação
 - `docs/IMPLEMENTATION-PLAN.md` - Checklist de tarefas
 
 ## Referências
 
 Consulte os prompts em `.github/prompts/` para boas práticas específicas:
+
 - `java-spring-best-practices.prompt.md`
 - `clean-architecture.prompt.md`
 - `testing.prompt.md`

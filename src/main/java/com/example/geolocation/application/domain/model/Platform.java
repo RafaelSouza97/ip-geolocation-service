@@ -4,7 +4,6 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.Set;
 import java.util.stream.Collectors;
-
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 
@@ -15,19 +14,16 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public enum Platform {
 
-    IOS("iOS"),
-    ANDROID("Android"),
-    WEB("Web");
+    IOS("iOS"), ANDROID("Android"), WEB("Web");
 
     private final String value;
 
     // Cache dos valores válidos (calculado uma única vez)
     private static final Set<String> VALID_VALUES_SET = Collections.unmodifiableSet(
-        Arrays.stream(values()).map(Platform::getValue).collect(Collectors.toSet())
-    );
+            Arrays.stream(values()).map(Platform::getValue).collect(Collectors.toSet()));
 
     private static final String VALID_VALUES_STRING =
-        Arrays.stream(values()).map(Platform::getValue).collect(Collectors.joining(", "));
+            Arrays.stream(values()).map(Platform::getValue).collect(Collectors.joining(", "));
 
     @Override
     public String toString() {
@@ -55,9 +51,7 @@ public enum Platform {
      * @throws IllegalArgumentException se o valor não for válido
      */
     public static Platform fromValue(String value) {
-        return Arrays.stream(values())
-                .filter(p -> p.getValue().equals(value))
-                .findFirst()
+        return Arrays.stream(values()).filter(p -> p.getValue().equals(value)).findFirst()
                 .orElseThrow(() -> new IllegalArgumentException(
                         com.example.geolocation.application.domain.exception.ErrorCode.INVALID_PLATFORM_SIMPLE
                                 .format(value)));

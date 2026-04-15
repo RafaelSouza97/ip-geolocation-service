@@ -1,13 +1,14 @@
 package com.example.geolocation.application.domain.model;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
 import org.junit.jupiter.params.provider.NullAndEmptySource;
-
-import static org.junit.jupiter.api.Assertions.*;
 
 @DisplayName("Country")
 @SuppressWarnings("java:S2187")
@@ -39,12 +40,7 @@ class CountryTest {
         }
 
         @ParameterizedTest
-        @CsvSource({
-            "US, United States",
-            "BR, Brazil",
-            "JP, Japan",
-            "DE, Germany"
-        })
+        @CsvSource({"US, United States", "BR, Brazil", "JP, Japan", "DE, Germany"})
         @DisplayName("should create country for various codes")
         void shouldCreateCountryForVariousCodes(String code, String name) {
             // Arrange & Act

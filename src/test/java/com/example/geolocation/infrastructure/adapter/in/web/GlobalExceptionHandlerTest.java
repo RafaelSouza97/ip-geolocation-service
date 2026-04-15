@@ -1,10 +1,10 @@
 package com.example.geolocation.infrastructure.adapter.in.web;
 
-import com.example.geolocation.application.domain.exception.InvalidIpAddressException;
-import com.example.geolocation.application.domain.exception.PrivateIpAddressException;
-import com.example.geolocation.application.port.in.GeolocationUseCase;
-import com.example.geolocation.infrastructure.config.SecurityProperties;
-import com.example.geolocation.infrastructure.security.JwtService;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.Mockito.when;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -13,11 +13,11 @@ import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMock
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.web.servlet.MockMvc;
-
-import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.Mockito.when;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+import com.example.geolocation.application.domain.exception.InvalidIpAddressException;
+import com.example.geolocation.application.domain.exception.PrivateIpAddressException;
+import com.example.geolocation.application.port.in.GeolocationUseCase;
+import com.example.geolocation.infrastructure.config.SecurityProperties;
+import com.example.geolocation.infrastructure.security.JwtService;
 
 @WebMvcTest(GeolocationController.class)
 @AutoConfigureMockMvc(addFilters = false)
@@ -49,15 +49,14 @@ class GlobalExceptionHandlerTest {
         void shouldReturn400WithInvalidIpFormatCode() throws Exception {
             // Arrange
             when(geolocationUseCase.locate(anyString()))
-                .thenThrow(new InvalidIpAddressException("invalid-ip"));
+                    .thenThrow(new InvalidIpAddressException("invalid-ip"));
 
             // Act & Assert
-            mockMvc.perform(get(LOCATE_URL)
-                    .param("ip", "invalid-ip")
-                    .header(PLATFORM_HEADER, "Web"))
-                .andExpect(status().isBadRequest())
-                .andExpect(jsonPath("$.code").value("INVALID_IP_FORMAT"))
-                .andExpect(jsonPath("$.message").value("Invalid IP address format: invalid-ip"));
+            mockMvc.perform(
+                    get(LOCATE_URL).param("ip", "invalid-ip").header(PLATFORM_HEADER, "Web"))
+                    .andExpect(status().isBadRequest())
+                    .andExpect(jsonPath("$.code").value("INVALID_IP_FORMAT")).andExpect(
+                            jsonPath("$.message").value("Invalid IP address format: invalid-ip"));
         }
     }
 
@@ -70,15 +69,15 @@ class GlobalExceptionHandlerTest {
         void shouldReturn400WithPrivateIpAddressCode() throws Exception {
             // Arrange
             when(geolocationUseCase.locate(anyString()))
-                .thenThrow(new PrivateIpAddressException("192.168.1.1"));
+                    .thenThrow(new PrivateIpAddressException("192.168.1.1"));
 
             // Act & Assert
-            mockMvc.perform(get(LOCATE_URL)
-                    .param("ip", "192.168.1.1")
-                    .header(PLATFORM_HEADER, "Web"))
-                .andExpect(status().isBadRequest())
-                .andExpect(jsonPath("$.code").value("PRIVATE_IP_ADDRESS"))
-                .andExpect(jsonPath("$.message").value("Private or reserved IP address: 192.168.1.1"));
+            mockMvc.perform(
+                    get(LOCATE_URL).param("ip", "192.168.1.1").header(PLATFORM_HEADER, "Web"))
+                    .andExpect(status().isBadRequest())
+                    .andExpect(jsonPath("$.code").value("PRIVATE_IP_ADDRESS"))
+                    .andExpect(jsonPath("$.message")
+                            .value("Private or reserved IP address: 192.168.1.1"));
         }
     }
 
@@ -91,15 +90,13 @@ class GlobalExceptionHandlerTest {
         void shouldReturn500ForUnexpectedExceptions() throws Exception {
             // Arrange
             when(geolocationUseCase.locate(anyString()))
-                .thenThrow(new RuntimeException("Unexpected error"));
+                    .thenThrow(new RuntimeException("Unexpected error"));
 
             // Act & Assert
-            mockMvc.perform(get(LOCATE_URL)
-                    .param("ip", "8.8.8.8")
-                    .header(PLATFORM_HEADER, "Web"))
-                .andExpect(status().isInternalServerError())
-                .andExpect(jsonPath("$.code").value("INTERNAL_ERROR"))
-                .andExpect(jsonPath("$.message").value("An unexpected error occurred"));
+            mockMvc.perform(get(LOCATE_URL).param("ip", "8.8.8.8").header(PLATFORM_HEADER, "Web"))
+                    .andExpect(status().isInternalServerError())
+                    .andExpect(jsonPath("$.code").value("INTERNAL_ERROR"))
+                    .andExpect(jsonPath("$.message").value("An unexpected error occurred"));
         }
 
         @Test
@@ -107,16 +104,14 @@ class GlobalExceptionHandlerTest {
         void shouldNotExposeInternalErrorDetails() throws Exception {
             // Arrange
             when(geolocationUseCase.locate(anyString()))
-                .thenThrow(new NullPointerException("Sensitive internal info"));
+                    .thenThrow(new NullPointerException("Sensitive internal info"));
 
             // Act & Assert
-            mockMvc.perform(get(LOCATE_URL)
-                    .param("ip", "8.8.8.8")
-                    .header(PLATFORM_HEADER, "Web"))
-                .andExpect(status().isInternalServerError())
-                .andExpect(jsonPath("$.message").value("An unexpected error occurred"))
-                .andExpect(jsonPath("$.message").value(org.hamcrest.Matchers.not(
-                    org.hamcrest.Matchers.containsString("Sensitive"))));
+            mockMvc.perform(get(LOCATE_URL).param("ip", "8.8.8.8").header(PLATFORM_HEADER, "Web"))
+                    .andExpect(status().isInternalServerError())
+                    .andExpect(jsonPath("$.message").value("An unexpected error occurred"))
+                    .andExpect(jsonPath("$.message").value(org.hamcrest.Matchers
+                            .not(org.hamcrest.Matchers.containsString("Sensitive"))));
         }
     }
 }

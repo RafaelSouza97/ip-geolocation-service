@@ -31,40 +31,33 @@ import org.springframework.web.bind.annotation.*;
 @Tag(name = "Geolocation", description = "API de geolocalização por IP")
 @SecurityRequirement(name = "bearerAuth")
 public class GeolocationController {
-    
+
     private final GeolocationUseCase geolocationUseCase;
 
-    @Operation(
-        summary = "Localiza informações geográficas de um IP",
-        description = "Retorna informações de geolocalização (país, região, cidade, coordenadas) para o IP informado"
-    )
-    @ApiResponse(
-        responseCode = "200",
-        description = "Geolocalização encontrada com sucesso",
-        content = @Content(schema = @Schema(implementation = GeolocationResponse.class))
-    )
-    @ApiResponse(
-        responseCode = "400",
-        description = "IP inválido, header ausente ou plataforma inválida"
-    )
+    @Operation(summary = "Localiza informações geográficas de um IP",
+            description = "Retorna informações de geolocalização (país, região, cidade, coordenadas) para o IP informado")
+    @ApiResponse(responseCode = "200", description = "Geolocalização encontrada com sucesso",
+            content = @Content(schema = @Schema(implementation = GeolocationResponse.class)))
+    @ApiResponse(responseCode = "400",
+            description = "IP inválido, header ausente ou plataforma inválida")
     @GetMapping("/locate")
     public ResponseEntity<GeolocationResponse> locate(
-            @Parameter(description = "Endereço IP (IPv4 ou IPv6)", example = "8.8.8.8", required = true)
-            @RequestParam @NotBlank(message = "IP is required") String ip,
-            
-            @Parameter(description = "Plataforma do dispositivo", example = "Web", required = true)
-            @RequestHeader(value = HttpHeaders.DEVICE_PLATFORM, required = false) String platform
-    ) {
+            @Parameter(description = "Endereço IP (IPv4 ou IPv6)", example = "8.8.8.8",
+                    required = true) @RequestParam @NotBlank(message = "IP is required") String ip,
+
+            @Parameter(description = "Plataforma do dispositivo", example = "Web",
+                    required = true) @RequestHeader(value = HttpHeaders.DEVICE_PLATFORM,
+                            required = false) String platform) {
         log.debug("Received locate request for IP: {} from platform: {}", ip, platform);
-        
+
         // Validar header de plataforma
         validatePlatform(platform);
-        
+
         // Executar caso de uso
         var result = geolocationUseCase.locate(ip);
-        
+
         log.info("Geolocation for IP {} returned from {}", ip, result.sourceValue());
-        
+
         return ResponseEntity.ok(GeolocationResponse.fromDomain(result));
     }
 
@@ -72,7 +65,7 @@ public class GeolocationController {
         if (platform == null || platform.isBlank()) {
             throw new MissingPlatformHeaderException();
         }
-        
+
         if (!Platform.isValid(platform)) {
             throw new InvalidPlatformException(platform);
         }

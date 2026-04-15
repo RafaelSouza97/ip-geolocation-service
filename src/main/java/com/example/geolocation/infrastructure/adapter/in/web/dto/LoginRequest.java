@@ -6,11 +6,9 @@ import jakarta.validation.constraints.NotBlank;
 
 @Schema(description = "Requisição de autenticação")
 public record LoginRequest(
-        @Schema(description = "Nome de usuário", example = "admin")
-        @NotBlank(message = ErrorCode.Validation.USERNAME_REQUIRED)
-        String username,
+                @Schema(description = "Nome de usuário", example = "admin") @NotBlank(
+                                message = ErrorCode.Validation.USERNAME_REQUIRED) String username,
 
-        @Schema(description = "Senha do usuário", example = "Admin123@")
-        @NotBlank(message = ErrorCode.Validation.PASSWORD_REQUIRED)
-        String password
-) {}
+                @Schema(description = "Senha do usuário", example = "Admin123@") @NotBlank(
+                                message = ErrorCode.Validation.PASSWORD_REQUIRED) String password) {
+}
