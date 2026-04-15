@@ -244,10 +244,10 @@ Este documento organiza todas as tarefas necessárias para implementar o ip-geol
 - [x] docker-compose.yml
 - [x] .dockerignore
 
-### 7.2 Azure Deploy
+### 7.2 Deploy
 
-- [ ] Configurar Azure Container Apps
-- [ ] CI/CD com GitHub Actions
+- [x] Configurar Render.com
+- [x] CI/CD com GitHub Actions
 
 ---
 
@@ -294,11 +294,11 @@ Este documento organiza todas as tarefas necessárias para implementar o ip-geol
 
 ### Diferencial
 
-- [ ] Aplicação hospedada
+- [x] Aplicação hospedada
 - [x] Dockerfile
 - [x] docker-compose.yml
-- [ ] Swagger/OpenAPI annotations
-- [ ] GitHub Actions
+- [x] Swagger/OpenAPI annotations
+- [x] GitHub Actions
 - [x] Collection Insomnia
 
 ---

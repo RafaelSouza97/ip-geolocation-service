@@ -20,89 +20,91 @@ O **ip-geolocation-service** é um microserviço REST que identifica informaçõ
 | Testes           | JUnit 5 + Mockito + WireMock | -      | Stack padrão (317 testes)                                |
 | Mutation Testing | PITest                       | 1.15.x | 89% mutation coverage                                    |
 | Containers       | Docker + Docker Compose      | -      | Portabilidade                                            |
-| Cloud            | Azure Container Apps         | -      | Serverless containers                                    |
+| Cloud            | Render.com                   | -      | Free tier, deploy automático                             |
 
 ## Diagrama de Arquitetura
 
 ```
 ┌─────────────────────────────────────────────────────────────────────────┐
-│                              INFRASTRUCTURE                              │
-│  ┌─────────────────────────────────────────────────────────────────────┐│
-│  │                         adapter/in/web                               ││
-│  │  ┌─────────────────────┐  ┌────────────────────┐                    ││
-│  │  │ GeolocationController│  │ GlobalExceptionHandler│                 ││
-│  │  └─────────┬───────────┘  └────────────────────┘                    ││
-│  │            │                                                         ││
-│  │            │ (implements)                                            ││
-│  └────────────┼─────────────────────────────────────────────────────────┘│
-│               │                                                          │
-│  ┌────────────▼─────────────────────────────────────────────────────────┐│
-│  │                          APPLICATION                                  ││
-│  │  ┌───────────────────────────────────────────────────────────────┐   ││
-│  │  │                        port/in                                 │   ││
-│  │  │  ┌──────────────────────────────────────────────────────────┐ │   ││
-│  │  │  │ <<interface>> GeolocationUseCase                         │ │   ││
-│  │  │  │ + locate(ip: String): GeolocationInfo                    │ │   ││
-│  │  │  └──────────────────────────────────────────────────────────┘ │   ││
-│  │  └───────────────────────────────────────────────────────────────┘   ││
-│  │                              │                                        ││
-│  │                              │ (implements)                           ││
-│  │                              ▼                                        ││
-│  │  ┌───────────────────────────────────────────────────────────────┐   ││
-│  │  │                         service                                │   ││
-│  │  │  ┌──────────────────────────────────────────────────────────┐ │   ││
-│  │  │  │ GeolocationService                                       │ │   ││
-│  │  │  │ - cache: GeolocationCache                                │ │   ││
-│  │  │  │ - provider: GeolocationProvider                          │ │   ││
-│  │  │  │ + locate(ip: String): GeolocationInfo                    │ │   ││
-│  │  │  └──────────────────────────────────────────────────────────┘ │   ││
-│  │  └───────────────────────────────────────────────────────────────┘   ││
-│  │                    │                     │                            ││
-│  │       (uses)       │                     │       (uses)               ││
-│  │                    ▼                     ▼                            ││
-│  │  ┌───────────────────────────────────────────────────────────────┐   ││
-│  │  │                        port/out                                │   ││
-│  │  │  ┌────────────────────────┐  ┌─────────────────────────────┐  │   ││
-│  │  │  │<<interface>>           │  │<<interface>>                 │  │   ││
-│  │  │  │GeolocationCache        │  │GeolocationProvider           │  │   ││
-│  │  │  │+ get(ip): Optional<>   │  │+ lookup(ip): GeolocationInfo │  │   ││
-│  │  │  │+ put(ip, info): void   │  │                              │  │   ││
-│  │  │  └────────────────────────┘  └─────────────────────────────┘  │   ││
-│  │  └───────────────────────────────────────────────────────────────┘   ││
-│  │                                                                       ││
-│  │  ┌───────────────────────────────────────────────────────────────┐   ││
-│  │  │                      domain/model                              │   ││
-│  │  │  ┌─────────────────┐  ┌──────────────┐  ┌───────────────────┐ │   ││
-│  │  │  │ GeolocationInfo │  │ Country      │  │ Coordinates       │ │   ││
-│  │  │  │ (Record)        │  │ (Record)     │  │ (Record)          │ │   ││
-│  │  │  └─────────────────┘  └──────────────┘  └───────────────────┘ │   ││
-│  │  └───────────────────────────────────────────────────────────────┘   ││
-│  └───────────────────────────────────────────────────────────────────────┘│
-│                    │                     │                                │
-│       (implements) │                     │ (implements)                   │
-│                    ▼                     ▼                                │
-│  ┌─────────────────────────────────────────────────────────────────────┐ │
-│  │                        adapter/out                                   │ │
-│  │  ┌────────────────────────────────┐  ┌────────────────────────────┐ │ │
-│  │  │ CaffeineGeolocationCache       │  │ ProviderSelector (@Primary)  │ │ │
-│  │  │ - cache: Cache<String, Info>   │  │ - primary: IpApiClient       │ │ │
-│  │  │ + get(ip): Optional<>          │  │ - secondary: IpApiCoClient   │ │ │
-│  │  │ + put(ip, info): void          │  │ + lookup(ip): Info           │ │ │
-│  │  └────────────────────────────────┘  └──────────────┬─────────────┘ │ │
-│  │                                            ┌────────┴────────┐        │ │
-│  │                                            │                 │        │ │
-│  │                                      ┌─────▼─────┐    ┌──────▼─────┐  │ │
-│  │                                      │IpApiClient│    │IpApiCoClient│ │ │
-│  │                                      └─────┬─────┘    └──────┬─────┘  │ │
-│  └────────────────────────────────────────────┼─────────────────┼────────┘ │
-│                                               │                 │          │
-└───────────────────────────────────────────────┼─────────────────┼──────────┘
-                                                │                 │
-                                                ▼                 ▼
-                                      ┌──────────────────┐ ┌──────────────┐
-                                      │   ip-api.com     │ │   ipapi.co   │
-                                      │   (Primary)      │ │  (Secondary) │
-                                      └──────────────────┘ └──────────────┘
+│                              INFRASTRUCTURE                             │
+│                                                                         │
+│  ┌───────────────────────────────────────────────────────────────────┐  │
+│  │                         adapter/in/web                            │  │
+│  │  ┌──────────────────────┐  ┌────────────────────────┐             │  │
+│  │  │ GeolocationController│  │ GlobalExceptionHandler │             │  │
+│  │  └──────────┬───────────┘  └────────────────────────┘             │  │
+│  │             │                                                     │  │
+│  │             │ (implements)                                        │  │
+│  └─────────────┼─────────────────────────────────────────────────────┘  │
+│                │                                                        │
+│  ┌─────────────▼─────────────────────────────────────────────────────┐  │
+│  │                          APPLICATION                              │  │
+│  │                                                                   │  │
+│  │  ┌─────────────────────────────────────────────────────────────┐  │  │
+│  │  │                        port/in                              │  │  │
+│  │  │  ┌───────────────────────────────────────────────────────┐  │  │  │
+│  │  │  │ <<interface>> GeolocationUseCase                      │  │  │  │
+│  │  │  │ + locate(ip: String): GeolocationInfo                 │  │  │  │
+│  │  │  └───────────────────────────────────────────────────────┘  │  │  │
+│  │  └─────────────────────────────────────────────────────────────┘  │  │
+│  │                              │                                    │  │
+│  │                              │ (implements)                       │  │
+│  │                              ▼                                    │  │
+│  │  ┌─────────────────────────────────────────────────────────────┐  │  │
+│  │  │                         service                             │  │  │
+│  │  │  ┌───────────────────────────────────────────────────────┐  │  │  │
+│  │  │  │ GeolocationService                                    │  │  │  │
+│  │  │  │ - cache: GeolocationCache                             │  │  │  │
+│  │  │  │ - provider: GeolocationProvider                       │  │  │  │
+│  │  │  │ + locate(ip: String): GeolocationInfo                 │  │  │  │
+│  │  │  └───────────────────────────────────────────────────────┘  │  │  │
+│  │  └─────────────────────────────────────────────────────────────┘  │  │
+│  │                    │                     │                        │  │
+│  │       (uses)       │                     │       (uses)           │  │
+│  │                    ▼                     ▼                        │  │
+│  │  ┌─────────────────────────────────────────────────────────────┐  │  │
+│  │  │                        port/out                             │  │  │
+│  │  │  ┌─────────────────────────┐  ┌──────────────────────────┐  │  │  │
+│  │  │  │ <<interface>>           │  │ <<interface>>            │  │  │  │
+│  │  │  │ GeolocationCache        │  │ GeolocationProvider      │  │  │  │
+│  │  │  │ + get(ip): Optional<>   │  │ + lookup(ip): GeoInfo    │  │  │  │
+│  │  │  │ + put(ip, info): void   │  │                          │  │  │  │
+│  │  │  └─────────────────────────┘  └──────────────────────────┘  │  │  │
+│  │  └─────────────────────────────────────────────────────────────┘  │  │
+│  │                                                                   │  │
+│  │  ┌─────────────────────────────────────────────────────────────┐  │  │
+│  │  │                      domain/model                           │  │  │
+│  │  │  ┌─────────────────┐ ┌────────────┐ ┌────────────────────┐  │  │  │
+│  │  │  │ GeolocationInfo │ │ Country    │ │ Coordinates        │  │  │  │
+│  │  │  │ (Record)        │ │ (Record)   │ │ (Record)           │  │  │  │
+│  │  │  └─────────────────┘ └────────────┘ └────────────────────┘  │  │  │
+│  │  └─────────────────────────────────────────────────────────────┘  │  │
+│  └───────────────────────────────────────────────────────────────────┘  │
+│                    │                     │                              │
+│       (implements) │                     │ (implements)                 │
+│                    ▼                     ▼                              │
+│  ┌───────────────────────────────────────────────────────────────────┐  │
+│  │                        adapter/out                                │  │
+│  │  ┌────────────────────────────┐  ┌─────────────────────────────┐  │  │
+│  │  │ CaffeineGeolocationCache   │  │ ProviderSelector (@Primary) │  │  │
+│  │  │ - cache: Cache<String,Info>│  │ - primary: IpApiClient      │  │  │
+│  │  │ + get(ip): Optional<>      │  │ - secondary: IpApiCoClient  │  │  │
+│  │  │ + put(ip, info): void      │  │ + lookup(ip): GeoInfo       │  │  │
+│  │  └────────────────────────────┘  └──────────────┬──────────────┘  │  │
+│  │                                        ┌────────┴────────┐        │  │
+│  │                                        │                 │        │  │
+│  │                                  ┌─────▼─────┐    ┌──────▼──────┐ │  │
+│  │                                  │IpApiClient│    │IpApiCoClient│ │  │
+│  │                                  └─────┬─────┘    └──────┬──────┘ │  │
+│  └────────────────────────────────────────┼─────────────────┼────────┘  │
+│                                           │                 │           │
+└───────────────────────────────────────────┼─────────────────┼───────────┘
+                                            │                 │
+                                            ▼                 ▼
+                                   ┌──────────────┐  ┌──────────────┐
+                                   │  ip-api.com  │  │   ipapi.co   │
+                                   │  (Primary)   │  │  (Secondary) │
+                                   └──────────────┘  └──────────────┘
 ```
 
 ## Fluxo de Requisição
@@ -198,23 +200,24 @@ O **ip-geolocation-service** é um microserviço REST que identifica informaçõ
 ```
 ┌─────────────────────────────────────────────────────────────────┐
 │                      ProviderSelector                           │
-│  ┌─────────────────────────────────────────────────────────────┐│
-│  │ State: PRIMARY | SECONDARY                                  ││
-│  │ failoverUntil: Instant                                      ││
-│  │                                                             ││
-│  │ tryWithFailover(ip):                                        ││
-│  │   1. Check if failover expired → reset to PRIMARY           ││
-│  │   2. Try current provider                                   ││
-│  │   3. If fails and state=PRIMARY → switch to SECONDARY (5m)  ││
-│  │   4. If both fail → throw exception                         ││
-│  └─────────────────────────────────────────────────────────────┘│
+│                                                                 │
+│  ┌───────────────────────────────────────────────────────────┐  │
+│  │ State: PRIMARY | SECONDARY                                │  │
+│  │ failoverUntil: Instant                                    │  │
+│  │                                                           │  │
+│  │ tryWithFailover(ip):                                      │  │
+│  │   1. Check if failover expired → reset to PRIMARY         │  │
+│  │   2. Try current provider                                 │  │
+│  │   3. If fails and state=PRIMARY → switch to SECONDARY(5m) │  │
+│  │   4. If both fail → throw exception                       │  │
+│  └───────────────────────────────────────────────────────────┘  │
 │                         │                                       │
 │         ┌───────────────┼───────────────┐                       │
 │         ▼               ▼               ▼                       │
-│  ┌─────────────┐ ┌─────────────┐ ┌─────────────────────────┐   │
-│  │ IpApiClient │ │IpApiCoClient│ │ GeolocationService      │   │
-│  │ (PRIMARY)   │ │ (SECONDARY) │ │ (handles local fallback)│   │
-│  └──────┬──────┘ └──────┬──────┘ └─────────────────────────┘   │
+│  ┌─────────────┐ ┌─────────────┐ ┌─────────────────────────┐    │
+│  │ IpApiClient │ │IpApiCoClient│ │ GeolocationService      │    │
+│  │ (PRIMARY)   │ │ (SECONDARY) │ │ (handles local fallback)│    │
+│  └──────┬──────┘ └──────┬──────┘ └─────────────────────────┘    │
 │         │               │                                       │
 └─────────┼───────────────┼───────────────────────────────────────┘
           ▼               ▼
@@ -277,7 +280,6 @@ geolocation:
 4. **Não expor detalhes internos:** Erros de API externa não vazam para o cliente
 5. **Validação de entrada:** Regex para IPs, whitelist para platforms
 6. **IPs privados rejeitados:** Não consultar API externa para IPs de rede local
-7. **Rate limiting:** (Diferencial) Limitar requisições por cliente
 
 ### Fluxo de Autenticação
 
@@ -302,4 +304,3 @@ geolocation:
 - **Health check:** `/actuator/health`
 - **Métricas:** `/actuator/metrics`
 - **Logs estruturados:** JSON em produção
-- **Tracing:** (Diferencial) Correlation ID nos headers

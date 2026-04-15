@@ -12,10 +12,10 @@ Microserviço REST de geolocalização que identifica o país e informações ge
 
 🌐 **Produção:** https://ip-geolocation-service-cn07.onrender.com
 
-| Ambiente | URL | Observação |
-|----------|-----|------------|
+| Ambiente   | URL                                              | Observação             |
+| ---------- | ------------------------------------------------ | ---------------------- |
 | Production | https://ip-geolocation-service-cn07.onrender.com | Render.com (free tier) |
-| Local | http://localhost:8080 | Development |
+| Local      | http://localhost:8080                            | Development            |
 
 > ⚠️ O plano gratuito do Render "dorme" após 15 min de inatividade. O primeiro request pode levar ~30s.
 
@@ -342,10 +342,10 @@ O arquivo `insomnia-collection.json` contém uma coleção completa para testar 
 
 ### Environments Disponíveis
 
-| Environment | URL | Cor |
-|-------------|-----|-----|
-| **Local** | `http://localhost:8080` | 🟢 Verde |
-| **Production (Render)** | `https://ip-geolocation-service-cn07.onrender.com` | 🔴 Vermelho |
+| Environment             | URL                                                | Cor          |
+| ----------------------- | -------------------------------------------------- | ------------ |
+| **Local**               | `http://localhost:8080`                            | 🟢 Verde     |
+| **Production (Render)** | `https://ip-geolocation-service-cn07.onrender.com` | 🔴 Vermelho  |
 
 ### Estrutura da Collection
 

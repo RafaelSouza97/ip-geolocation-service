@@ -383,15 +383,17 @@ geolocation:
 
 ---
 
-## 7. Estratégia de Deploy (Azure)
+## 7. Estratégia de Deploy (Render.com)
 
-### Opções Avaliadas
+### Plataforma Escolhida: Render.com
 
-| Opção                  | Prós                   | Contras         | Escolha         |
-| ---------------------- | ---------------------- | --------------- | --------------- |
-| Azure Container Apps   | Serverless, auto-scale | Menos controle  | ✅ Recomendado  |
-| Azure App Service      | Simples, managed       | Custo fixo      | Alternativa     |
-| Azure Kubernetes (AKS) | Flexível               | Complexo demais | Não recomendado |
+**Justificativa:**
+
+- ✅ Plano gratuito suficiente para demonstração
+- ✅ Deploy automático via GitHub
+- ✅ HTTPS automático
+- ✅ Configuração simples (render.yaml)
+- ⚠️ Cold start após 15 min de inatividade (~30s)
 
 ### Dockerfile
 
@@ -406,19 +408,12 @@ ENTRYPOINT ["java", "-jar", "app.jar"]
 ### Health Checks
 
 ```yaml
-# Azure Container Apps
-resources:
-  containers:
-    - name: ip-geolocation-service
-      probes:
-        - type: Liveness
-          httpGet:
-            path: /actuator/health/liveness
-            port: 8080
-        - type: Readiness
-          httpGet:
-            path: /actuator/health/readiness
-            port: 8080
+# render.yaml
+services:
+  - type: web
+    name: ip-geolocation-service
+    runtime: docker
+    healthCheckPath: /actuator/health
 ```
 
 ---
