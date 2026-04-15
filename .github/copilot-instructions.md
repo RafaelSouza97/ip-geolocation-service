@@ -65,6 +65,15 @@ com.example.geolocation.infrastructure.validation   → Validators
 - `@NotBlank` para parâmetros obrigatórios
 - `@Schema` em DTOs para documentação Swagger
 
+### Swagger/OpenAPI Annotations
+
+- `@Tag` na classe controller para agrupar endpoints
+- `@SecurityRequirement(name = "bearerAuth")` em endpoints protegidos
+- `@Operation` com `summary` e `description` em cada endpoint
+- `@ApiResponse` para cada status code (200, 400, 401, 403)
+- `@Parameter` com `description` e `example` em parâmetros
+- Sempre documente `ErrorResponse` em respostas 4xx
+
 ### Princípio: Corrigir na Origem
 
 **NUNCA use `@SuppressWarnings` para mascarar problemas.** Sempre corrija a causa raiz:

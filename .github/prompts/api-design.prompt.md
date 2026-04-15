@@ -152,23 +152,92 @@ public ResponseEntity<GeolocationResponse> locate(...) {
 
 ## Documentation (OpenAPI/Swagger)
 
+### Controller-Level Annotations
+
+```java
+@Tag(name = "Geolocation", description = "API de geolocalização por IP")
+@SecurityRequirement(name = "bearerAuth")  // Aplica segurança a todos endpoints
+public class GeolocationController {
+    // ...
+}
+```
+
+### Endpoint Documentation
+
 ```java
 @Operation(
     summary = "Locate IP geolocation",
-    description = "Returns geographic information for the given IP address"
+    description = "Returns geographic information for the given IP address. "
+            + "If IP is private/localhost or external API fails, returns fallback with Brazil data."
 )
-@ApiResponses({
-    @ApiResponse(responseCode = "200", description = "Geolocation found"),
-    @ApiResponse(responseCode = "400", description = "Invalid request",
+@ApiResponse(responseCode = "200", description = "Geolocation found",
+        content = @Content(schema = @Schema(implementation = GeolocationResponse.class)))
+@ApiResponse(responseCode = "400", description = "Invalid IP, missing header or invalid platform",
         content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
-})
+@ApiResponse(responseCode = "401", description = "JWT token missing or invalid")
+@ApiResponse(responseCode = "403", description = "Access denied")
 @GetMapping("/locate")
 public ResponseEntity<GeolocationResponse> locate(
-    @Parameter(description = "IPv4 or IPv6 address", example = "8.8.8.8")
+    @Parameter(description = "IPv4 or IPv6 address", example = "8.8.8.8", required = true)
     @RequestParam String ip,
-    @Parameter(description = "Client platform", example = "Web")
+
+    @Parameter(description = "Client platform", example = "Web", required = true)
     @RequestHeader("x-device-platform") String platform) {
     // ...
+}
+```
+
+### Auth Endpoint (sem @SecurityRequirement)
+
+```java
+@Tag(name = "Authentication", description = "API de autenticação JWT")
+// NÃO usar @SecurityRequirement aqui - endpoint público
+public class AuthController {
+
+    @Operation(summary = "Autenticar usuário",
+            description = "Autentica o usuário com username/password e retorna um token JWT")
+    @ApiResponse(responseCode = "200", description = "Autenticação bem-sucedida",
+            content = @Content(schema = @Schema(implementation = LoginResponse.class)))
+    @ApiResponse(responseCode = "400", description = "Dados de entrada inválidos",
+            content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
+    @ApiResponse(responseCode = "401", description = "Credenciais inválidas")
+    @PostMapping("/login")
+    public ResponseEntity<LoginResponse> login(@Valid @RequestBody LoginRequest request) {
+        // ...
+    }
+}
+```
+
+### OpenAPI Config
+
+```java
+@Configuration
+@SecurityScheme(
+        name = "bearerAuth",
+        type = SecuritySchemeType.HTTP,
+        scheme = "bearer",
+        bearerFormat = "JWT",
+        description = "Token JWT obtido via POST /auth/login"
+)
+public class OpenApiConfig {
+
+    @Bean
+    public OpenAPI customOpenAPI() {
+        return new OpenAPI()
+                .info(new Info()
+                        .title("IP Geolocation Service API")
+                        .version("1.0.0")
+                        .description("""
+                                Descrição detalhada da API.
+
+                                ## Autenticação
+                                1. POST /auth/login com username/password
+                                2. Copie o token JWT
+                                3. Clique em Authorize e cole o token
+                                """)
+                        .contact(new Contact().name("Dev").email("dev@example.com"))
+                        .license(new License().name("MIT")));
+    }
 }
 ```
 
