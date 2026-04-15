@@ -68,7 +68,6 @@ public class GeolocationService implements GeolocationUseCase {
         }
     }
 
-    
     private GeolocationInfo createFallback(String ip) {
         var fallbackProps = properties.fallback();
         return new GeolocationInfo(ip,
