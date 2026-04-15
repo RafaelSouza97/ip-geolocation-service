@@ -1,6 +1,6 @@
 # ip-geolocation-service
 
-![CI/CD](https://github.com/seu-usuario/ip-geolocation-service/actions/workflows/ci.yml/badge.svg)
+![CI/CD](https://github.com/RafaelSouza97/ip-geolocation-service/actions/workflows/ci.yml/badge.svg)
 ![Java](https://img.shields.io/badge/Java-21-orange)
 ![Spring Boot](https://img.shields.io/badge/Spring%20Boot-3.3.5-brightgreen)
 ![Coverage](https://img.shields.io/badge/Coverage-99%25-brightgreen)
@@ -8,11 +8,22 @@
 
 Microserviço REST de geolocalização que identifica o país e informações geográficas a partir de um endereço IP.
 
+## Demo
+
+🌐 **Produção:** https://ip-geolocation-service-cn07.onrender.com
+
+| Ambiente | URL | Observação |
+|----------|-----|------------|
+| Production | https://ip-geolocation-service-cn07.onrender.com | Render.com (free tier) |
+| Local | http://localhost:8080 | Development |
+
+> ⚠️ O plano gratuito do Render "dorme" após 15 min de inatividade. O primeiro request pode levar ~30s.
+
 ## Status do Projeto
 
 ✅ **MVP Concluído** (317 testes passando, 99% cobertura, 89% mutation coverage)
 
-🚀 **CI/CD Configurado** - GitHub Actions com deploy automático
+🚀 **CI/CD Configurado** - GitHub Actions com deploy automático no Render
 
 ## Tecnologias
 
@@ -64,7 +75,7 @@ docker --version  # (opcional)
 
 ```bash
 # Clonar o repositório
-git clone https://github.com/seu-usuario/ip-geolocation-service.git
+git clone https://github.com/RafaelSouza97/ip-geolocation-service.git
 cd ip-geolocation-service
 
 # Instalar dependências e compilar
@@ -306,6 +317,8 @@ mvn clean verify -B
 
 ## Deploy (Render.com)
 
+🌐 **URL de Produção:** https://ip-geolocation-service-cn07.onrender.com
+
 1. Acesse [render.com](https://render.com) e faça login com GitHub
 2. Clique em **"New +"** → **"Web Service"**
 3. Conecte o repositório `ip-geolocation-service`
@@ -324,7 +337,15 @@ O arquivo `insomnia-collection.json` contém uma coleção completa para testar 
 1. Abra o Insomnia
 2. Vá em **Application** → **Preferences** → **Data** → **Import Data**
 3. Selecione o arquivo `insomnia-collection.json`
-4. Configure a variável `jwt_token` no environment após fazer login
+4. Selecione o environment desejado (Local ou Production)
+5. Faça login para obter o JWT token e copie para a variável `jwt_token`
+
+### Environments Disponíveis
+
+| Environment | URL | Cor |
+|-------------|-----|-----|
+| **Local** | `http://localhost:8080` | 🟢 Verde |
+| **Production (Render)** | `https://ip-geolocation-service-cn07.onrender.com` | 🔴 Vermelho |
 
 ### Estrutura da Collection
 

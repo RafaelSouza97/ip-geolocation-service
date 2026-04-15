@@ -59,7 +59,7 @@ openssl rand -base64 64
 2. Aguarde o build (~3-5 minutos)
 3. Sua aplicação estará disponível em:
    ```
-   https://ip-geolocation-service.onrender.com
+   https://ip-geolocation-service-cn07.onrender.com
    ```
 
 ---
@@ -93,17 +93,19 @@ Pronto! Agora a cada push na `main`, o pipeline:
 
 ## Testar o Deploy
 
+🌐 **URL de Produção:** https://ip-geolocation-service-cn07.onrender.com
+
 ```bash
 # Health check
-curl https://ip-geolocation-service.onrender.com/actuator/health
+curl https://ip-geolocation-service-cn07.onrender.com/actuator/health
 
 # Login (obter token)
-curl -X POST https://ip-geolocation-service.onrender.com/auth/login \
+curl -X POST https://ip-geolocation-service-cn07.onrender.com/auth/login \
   -H "Content-Type: application/json" \
   -d '{"username":"admin","password":"Admin123@"}'
 
 # Geolocalização (substitua SEU_TOKEN)
-curl "https://ip-geolocation-service.onrender.com/api/geolocation/v1/locate?ip=8.8.8.8" \
+curl "https://ip-geolocation-service-cn07.onrender.com/api/geolocation/v1/locate?ip=8.8.8.8" \
   -H "Authorization: Bearer SEU_TOKEN" \
   -H "x-device-platform: Web"
 ```
@@ -188,7 +190,7 @@ SPRING_PROFILES_ACTIVE=prod
 
 1. Clique em **"Create Web Service"**
 2. Aguarde o build (~3-5 minutos)
-3. Sua aplicação estará disponível em `https://ip-geolocation-service.onrender.com`
+3. Sua aplicação estará disponível em `https://ip-geolocation-service-cn07.onrender.com`
 
 #### 1.5 Configurar Deploy Automático (Webhook)
 
