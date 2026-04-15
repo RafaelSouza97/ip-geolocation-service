@@ -270,6 +270,176 @@ mvn test pitest:mutationCoverage
 - [Estratégias](docs/STRATEGY.md) - Detalhes de implementação
 - [Plano](docs/IMPLEMENTATION-PLAN.md) - Tarefas e checklist
 
+## Insomnia Collection
+
+O arquivo `insomnia-collection.json` contém uma coleção completa para testar todos os endpoints da API.
+
+### Importar no Insomnia
+
+1. Abra o Insomnia
+2. Vá em **Application** → **Preferences** → **Data** → **Import Data**
+3. Selecione o arquivo `insomnia-collection.json`
+4. Configure a variável `jwt_token` no environment após fazer login
+
+### Estrutura da Collection
+
+```
+📁 IP Geolocation Service
+├── 📁 Authentication
+│   └── POST Login (Get JWT Token)
+│
+├── 📁 Geolocation
+│   ├── GET Locate Valid IP (Google DNS)
+│   ├── GET Locate Brazil IP
+│   ├── GET Locate Private IP (Fallback)
+│   ├── GET Locate Invalid IP (Error 400)
+│   ├── GET Missing Platform Header (Error 400)
+│   └── GET No Auth (Error 403)
+│
+├── 📁 Health & Metrics
+│   ├── GET Health Check
+│   ├── GET Application Info
+│   └── GET Swagger UI
+│
+├── 📁 IPv4 vs IPv6
+│   ├── GET IPv4 - Google DNS
+│   ├── GET IPv6 - Google DNS
+│   ├── GET IPv4 - Cloudflare DNS
+│   └── GET IPv6 - Cloudflare DNS
+│
+├── 📁 Brazil Regions
+│   ├── 📁 IPv4
+│   │   ├── Sul - RS (Porto Alegre)
+│   │   ├── Sul - PR (Curitiba)
+│   │   ├── Sudeste - SP (Capital)
+│   │   ├── Sudeste - RJ (Capital)
+│   │   ├── Sudeste - MG (Belo Horizonte)
+│   │   ├── Centro-Oeste - DF (Brasília)
+│   │   ├── Nordeste - BA (Salvador)
+│   │   ├── Nordeste - PE (Recife)
+│   │   ├── Norte - AM (Manaus)
+│   │   └── Norte - PA (Belém)
+│   │
+│   └── 📁 IPv6
+│       ├── Sul - RS (Porto Alegre)
+│       ├── Sul - PR (Curitiba)
+│       ├── Sudeste - SP (Capital)
+│       ├── Sudeste - RJ (Capital)
+│       ├── Sudeste - MG (Belo Horizonte)
+│       ├── Centro-Oeste - DF (Brasília)
+│       ├── Nordeste - BA (Feira de Santana)
+│       ├── Nordeste - PE (Petrolina)
+│       ├── Norte - AM (Manaus)
+│       └── Norte - PA (Redenção)
+│
+└── 📁 World Continents
+    ├── 📁 IPv4
+    │   ├── América do Norte - EUA
+    │   ├── América do Norte - Canadá
+    │   ├── América do Sul - Chile
+    │   ├── América do Sul - Argentina
+    │   ├── Europa - Alemanha
+    │   ├── Europa - Reino Unido
+    │   ├── Ásia - Japão
+    │   ├── Ásia - China
+    │   ├── Ásia - Índia
+    │   ├── África - África do Sul
+    │   ├── África - Nigéria
+    │   ├── Oceania - Austrália
+    │   └── Oceania - Nova Zelândia
+    │
+    └── 📁 IPv6
+        ├── América do Norte - EUA
+        ├── América do Norte - Canadá
+        ├── América do Sul - Chile
+        ├── América do Sul - Argentina
+        ├── Europa - Alemanha
+        ├── Europa - Reino Unido
+        ├── Ásia - Japão
+        ├── Ásia - China
+        ├── Ásia - Índia
+        ├── África - África do Sul
+        ├── África - Nigéria
+        ├── Oceania - Austrália
+        └── Oceania - Nova Zelândia
+```
+
+### IPs de Teste por Região
+
+#### Brasil (IPv4) - Universidades Federais
+
+| Região       | Estado              | IP            | Universidade |
+| ------------ | ------------------- | ------------- | ------------ |
+| Sul          | RS (Porto Alegre)   | 143.54.0.1    | UFRGS        |
+| Sul          | PR (Curitiba)       | 200.17.209.1  | UFPR         |
+| Sudeste      | SP (Capital)        | 143.107.45.1  | USP          |
+| Sudeste      | RJ (Capital)        | 146.164.0.1   | UFRJ         |
+| Sudeste      | MG (Belo Horizonte) | 150.164.0.1   | UFMG         |
+| Centro-Oeste | DF (Brasília)       | 164.41.0.1    | UnB          |
+| Nordeste     | BA (Salvador)       | 200.128.51.1  | UFBA         |
+| Nordeste     | PE (Recife)         | 150.161.0.1   | UFPE         |
+| Norte        | AM (Manaus)         | 200.129.163.1 | UFAM         |
+| Norte        | PA (Belém)          | 200.239.64.1  | UFPA         |
+
+#### Brasil (IPv6)
+
+| Região       | Estado                | IP                  | ISP/Rede      |
+| ------------ | --------------------- | ------------------- | ------------- |
+| Sul          | RS (Porto Alegre)     | 2801:80::1          | POP-RS        |
+| Sul          | PR (Curitiba)         | 2804:7f4::1         | Copel Telecom |
+| Sudeste      | SP (Capital)          | 2804:14c:87:9d00::1 | Vivo          |
+| Sudeste      | RJ (Capital)          | 2804:388:1::1       | -             |
+| Sudeste      | MG (Belo Horizonte)   | 2804:d45::1         | -             |
+| Centro-Oeste | DF (Brasília)         | 2804:d50::1         | -             |
+| Nordeste     | BA (Feira de Santana) | 2804:46c::1         | -             |
+| Nordeste     | PE (Petrolina)        | 2804:2d4::1         | -             |
+| Norte        | AM (Manaus)           | 2804:214:1::1       | -             |
+| Norte        | PA (Redenção)         | 2804:3e4::1         | -             |
+
+#### Mundo (IPv4)
+
+| Continente       | País          | IP              | Cidade       |
+| ---------------- | ------------- | --------------- | ------------ |
+| América do Norte | EUA           | 8.8.8.8         | Ashburn      |
+| América do Norte | Canadá        | 99.79.0.1       | Toronto      |
+| América do Sul   | Chile         | 200.29.0.1      | Santiago     |
+| América do Sul   | Argentina     | 200.45.191.35   | Resistencia  |
+| Europa           | Alemanha      | 85.214.132.117  | Berlin       |
+| Europa           | Reino Unido   | 194.168.0.1     | Birmingham   |
+| Ásia             | Japão         | 210.152.135.178 | Kitakyushu   |
+| Ásia             | China         | 114.114.114.114 | Jinan        |
+| Ásia             | Índia         | 49.44.65.170    | Navi Mumbai  |
+| África           | África do Sul | 154.0.0.1       | Johannesburg |
+| África           | Nigéria       | 41.58.0.1       | Lagos        |
+| Oceania          | Austrália     | 1.128.0.1       | Brisbane     |
+| Oceania          | Nova Zelândia | 203.97.0.1      | Auckland     |
+
+#### Mundo (IPv6)
+
+| Continente       | País          | IP                | Cidade       |
+| ---------------- | ------------- | ----------------- | ------------ |
+| América do Norte | EUA           | 2607:f8b0:4004::1 | Washington   |
+| América do Norte | Canadá        | 2607:fea8::1      | Toronto      |
+| América do Sul   | Chile         | 2800:300:6291::1  | Santiago     |
+| América do Sul   | Argentina     | 2800:810:408::1   | Buenos Aires |
+| Europa           | Alemanha      | 2a01:4f8:0:1::1   | Nuremberg    |
+| Europa           | Reino Unido   | 2a00:86c0:0:0::1  | London       |
+| Ásia             | Japão         | 2001:218:0:0::1   | Chiyoda City |
+| Ásia             | China         | 240e:0:0:0::1     | Shenzhen     |
+| Ásia             | Índia         | 2405:200:0:0::1   | Navi Mumbai  |
+| África           | África do Sul | 2001:4200::1      | Cape Town    |
+| África           | Nigéria       | 2c0f:f5c0::1      | Lagos        |
+| Oceania          | Austrália     | 2001:388::1       | Sydney       |
+| Oceania          | Nova Zelândia | 2001:df0::1       | Auckland     |
+
+### Variáveis de Environment
+
+| Variável      | Valor Padrão            | Descrição            |
+| ------------- | ----------------------- | -------------------- |
+| `base_url`    | `http://localhost:8080` | URL base da API      |
+| `api_version` | `v1`                    | Versão da API        |
+| `jwt_token`   | (vazio)                 | Token JWT após login |
+
 ## Licença
 
 MIT
