@@ -1,4 +1,3 @@
-# Build stage (usado quando não há JAR pré-construído)
 FROM eclipse-temurin:21-jdk-alpine AS build
 WORKDIR /app
 COPY pom.xml .
@@ -6,28 +5,22 @@ COPY src ./src
 RUN apk add --no-cache maven && \
     mvn clean package -DskipTests
 
-# Runtime stage
 FROM eclipse-temurin:21-jre-alpine
 WORKDIR /app
 
-# Labels para metadata
 LABEL org.opencontainers.image.source="https://github.com/your-username/ip-geolocation-service"
-LABEL org.opencontainers.image.description="IP Geolocation Service - Microserviço REST"
+LABEL org.opencontainers.image.description="IP Geolocation Service - Microservico REST"
 LABEL org.opencontainers.image.licenses="MIT"
 
-# Criar usuário não-root
 RUN addgroup -g 1001 appgroup && \
     adduser -u 1001 -G appgroup -D appuser
 
-# Copiar JAR (tenta do target local primeiro, senão usa do build stage)
 COPY --from=build /app/target/*.jar app.jar
 
-# Mudar para usuário não-root
 USER appuser
 
 EXPOSE 8080
 
-# Variáveis de ambiente para produção
 ENV JAVA_OPTS="-XX:+UseContainerSupport -XX:MaxRAMPercentage=75.0"
 ENV SPRING_PROFILES_ACTIVE=prod
 

@@ -12,9 +12,6 @@ env:
   IMAGE_NAME: ${{ github.repository }}
 
 jobs:
-  # ============================================
-  # Job 1: Build e Testes
-  # ============================================
   build:
     name: Build & Test
     runs-on: ubuntu-latest
@@ -55,10 +52,6 @@ jobs:
             exit 1
           fi
           echo "✅ Cobertura OK: ${COVERAGE}%"
-
-  # ============================================
-  # Job 2: Análise de Qualidade
-  # ============================================
   quality:
     name: Quality Check
     runs-on: ubuntu-latest
@@ -89,10 +82,6 @@ jobs:
           name: pitest-report
           path: target/pit-reports/
           retention-days: 7
-
-  # ============================================
-  # Job 3: Build e Push da Imagem Docker
-  # ============================================
   docker:
     name: Docker Build & Push
     runs-on: ubuntu-latest
@@ -147,10 +136,6 @@ jobs:
           labels: ${{ steps.meta.outputs.labels }}
           cache-from: type=gha
           cache-to: type=gha,mode=max
-
-  # ============================================
-  # Job 4: Deploy (opcional - Render.com)
-  # ============================================
   deploy:
     name: Deploy to Render
     runs-on: ubuntu-latest
@@ -166,3 +151,4 @@ jobs:
           else
             echo "⚠️ RENDER_DEPLOY_HOOK_URL não configurado - pulando deploy"
           fi
+

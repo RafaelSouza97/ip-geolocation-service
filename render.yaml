@@ -1,6 +1,3 @@
-# Render Blueprint - Configuração automática de deploy
-# https://render.com/docs/blueprint-spec
-
 services:
   - type: web
     name: ip-geolocation-service
