@@ -1,0 +1,19 @@
+# Render Blueprint - Configuração automática de deploy
+# https://render.com/docs/blueprint-spec
+
+services:
+  - type: web
+    name: ip-geolocation-service
+    runtime: docker
+    dockerfilePath: ./Dockerfile
+    dockerContext: .
+    plan: free
+    region: oregon
+    healthCheckPath: /actuator/health
+    envVars:
+      - key: JWT_SECRET
+        generateValue: true
+      - key: SPRING_PROFILES_ACTIVE
+        value: prod
+      - key: JAVA_OPTS
+        value: -XX:+UseContainerSupport -XX:MaxRAMPercentage=75.0

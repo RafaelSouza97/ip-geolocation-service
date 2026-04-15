@@ -1,10 +1,18 @@
 # ip-geolocation-service
 
+![CI/CD](https://github.com/seu-usuario/ip-geolocation-service/actions/workflows/ci.yml/badge.svg)
+![Java](https://img.shields.io/badge/Java-21-orange)
+![Spring Boot](https://img.shields.io/badge/Spring%20Boot-3.3.5-brightgreen)
+![Coverage](https://img.shields.io/badge/Coverage-99%25-brightgreen)
+![License](https://img.shields.io/badge/License-MIT-blue)
+
 Microserviço REST de geolocalização que identifica o país e informações geográficas a partir de um endereço IP.
 
 ## Status do Projeto
 
 ✅ **MVP Concluído** (317 testes passando, 99% cobertura, 89% mutation coverage)
+
+🚀 **CI/CD Configurado** - GitHub Actions com deploy automático
 
 ## Tecnologias
 
@@ -15,7 +23,7 @@ Microserviço REST de geolocalização que identifica o país e informações ge
 - **Caffeine** - Cache in-memory de alta performance
 - **Maven** - Build tool
 - **Docker** - Containerização
-- **Azure Container Apps** - Deploy serverless
+- **GitHub Actions** - CI/CD automatizado
 
 ## Estrutura do Projeto
 
@@ -28,6 +36,7 @@ ip-geolocation-service/
 ├── docs/
 │   ├── ARCHITECTURE.md    # Decisões arquiteturais
 │   ├── STRATEGY.md        # Estratégias de implementação
+│   ├── DEPLOY.md          # Guia de deploy (Render.com)
 │   └── IMPLEMENTATION-PLAN.md  # Plano de tarefas
 ├── src/
 │   ├── main/java/...
@@ -269,6 +278,42 @@ mvn test pitest:mutationCoverage
 - [Arquitetura](docs/ARCHITECTURE.md) - Decisões arquiteturais e diagramas
 - [Estratégias](docs/STRATEGY.md) - Detalhes de implementação
 - [Plano](docs/IMPLEMENTATION-PLAN.md) - Tarefas e checklist
+- [Deploy](docs/DEPLOY.md) - Guia de deploy no Render.com
+
+## CI/CD
+
+O projeto possui um pipeline completo de CI/CD com GitHub Actions:
+
+```
+Push → Build → Test → Quality Check → Docker Build → Deploy
+```
+
+### Pipeline Automático
+
+| Job               | Descrição                            | Trigger                 |
+| ----------------- | ------------------------------------ | ----------------------- |
+| **Build & Test**  | Compila e executa 317 testes         | Push em qualquer branch |
+| **Quality Check** | Checkstyle + PITest mutation testing | Após Build              |
+| **Docker Build**  | Cria imagem e publica no ghcr.io     | Push na main            |
+| **Deploy**        | Deploy automático no Render          | Push na main            |
+
+### Executar Localmente
+
+```bash
+# Simular o pipeline localmente
+mvn clean verify -B
+```
+
+## Deploy (Render.com)
+
+1. Acesse [render.com](https://render.com) e faça login com GitHub
+2. Clique em **"New +"** → **"Web Service"**
+3. Conecte o repositório `ip-geolocation-service`
+4. Configure: Runtime = `Docker`, Instance = `Free`
+5. Adicione variável `JWT_SECRET` (64+ caracteres)
+6. Clique em **"Create Web Service"** → Pronto! 🚀
+
+📖 [Guia completo](docs/DEPLOY.md)
 
 ## Insomnia Collection
 

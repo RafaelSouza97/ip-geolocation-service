@@ -1,12 +1,6 @@
-# Build stage (usado quando não há JAR pré-construído)
-FROM eclipse-temurin:21-jdk-alpine AS build
-WORKDIR /app
-COPY pom.xml .
-COPY src ./src
-RUN apk add --no-cache maven && \
-    mvn clean package -DskipTests
+# Dockerfile otimizado para CI/CD
+# Usa JAR pré-construído pelo pipeline
 
-# Runtime stage
 FROM eclipse-temurin:21-jre-alpine
 WORKDIR /app
 
@@ -19,8 +13,8 @@ LABEL org.opencontainers.image.licenses="MIT"
 RUN addgroup -g 1001 appgroup && \
     adduser -u 1001 -G appgroup -D appuser
 
-# Copiar JAR (tenta do target local primeiro, senão usa do build stage)
-COPY --from=build /app/target/*.jar app.jar
+# Copiar JAR pré-construído
+COPY target/*.jar app.jar
 
 # Mudar para usuário não-root
 USER appuser

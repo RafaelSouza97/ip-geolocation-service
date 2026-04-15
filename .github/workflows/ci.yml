@@ -1,0 +1,168 @@
+name: CI/CD Pipeline
+
+on:
+  push:
+    branches: [main, develop]
+  pull_request:
+    branches: [main]
+
+env:
+  JAVA_VERSION: "21"
+  REGISTRY: ghcr.io
+  IMAGE_NAME: ${{ github.repository }}
+
+jobs:
+  # ============================================
+  # Job 1: Build e Testes
+  # ============================================
+  build:
+    name: Build & Test
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout código
+        uses: actions/checkout@v4
+
+      - name: Setup Java ${{ env.JAVA_VERSION }}
+        uses: actions/setup-java@v4
+        with:
+          java-version: ${{ env.JAVA_VERSION }}
+          distribution: "temurin"
+          cache: maven
+
+      - name: Build com Maven
+        run: mvn clean compile -B
+
+      - name: Executar testes unitários
+        run: mvn test -B
+
+      - name: Gerar relatório de cobertura (JaCoCo)
+        run: mvn jacoco:report -B
+
+      - name: Upload relatório de cobertura
+        uses: actions/upload-artifact@v4
+        with:
+          name: jacoco-report
+          path: target/site/jacoco/
+          retention-days: 7
+
+      - name: Verificar cobertura mínima (80%)
+        run: |
+          COVERAGE=$(grep -oP 'Total.*?([0-9]{1,3})%' target/site/jacoco/index.html | grep -oP '[0-9]{1,3}(?=%)' | head -1)
+          echo "Cobertura: ${COVERAGE}%"
+          if [ "$COVERAGE" -lt 80 ]; then
+            echo "❌ Cobertura abaixo de 80%"
+            exit 1
+          fi
+          echo "✅ Cobertura OK: ${COVERAGE}%"
+
+  # ============================================
+  # Job 2: Análise de Qualidade
+  # ============================================
+  quality:
+    name: Quality Check
+    runs-on: ubuntu-latest
+    needs: build
+
+    steps:
+      - name: Checkout código
+        uses: actions/checkout@v4
+
+      - name: Setup Java ${{ env.JAVA_VERSION }}
+        uses: actions/setup-java@v4
+        with:
+          java-version: ${{ env.JAVA_VERSION }}
+          distribution: "temurin"
+          cache: maven
+
+      - name: Verificar estilo de código (Checkstyle)
+        run: mvn checkstyle:check -B
+        continue-on-error: true
+
+      - name: Mutation Testing (PITest)
+        run: mvn test pitest:mutationCoverage -B -DtimeoutConstant=8000
+        continue-on-error: true
+
+      - name: Upload relatório PITest
+        uses: actions/upload-artifact@v4
+        with:
+          name: pitest-report
+          path: target/pit-reports/
+          retention-days: 7
+
+  # ============================================
+  # Job 3: Build e Push da Imagem Docker
+  # ============================================
+  docker:
+    name: Docker Build & Push
+    runs-on: ubuntu-latest
+    needs: [build, quality]
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+
+    permissions:
+      contents: read
+      packages: write
+
+    steps:
+      - name: Checkout código
+        uses: actions/checkout@v4
+
+      - name: Setup Java ${{ env.JAVA_VERSION }}
+        uses: actions/setup-java@v4
+        with:
+          java-version: ${{ env.JAVA_VERSION }}
+          distribution: "temurin"
+          cache: maven
+
+      - name: Build JAR
+        run: mvn clean package -DskipTests -B
+
+      - name: Setup Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Login no GitHub Container Registry
+        uses: docker/login-action@v3
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Extrair metadata Docker
+        id: meta
+        uses: docker/metadata-action@v5
+        with:
+          images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
+          tags: |
+            type=ref,event=branch
+            type=sha,prefix={{branch}}-
+            type=raw,value=latest,enable={{is_default_branch}}
+
+      - name: Build e Push imagem Docker
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          file: ./Dockerfile
+          push: true
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
+  # ============================================
+  # Job 4: Deploy (opcional - Render.com)
+  # ============================================
+  deploy:
+    name: Deploy to Render
+    runs-on: ubuntu-latest
+    needs: docker
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+
+    steps:
+      - name: Trigger Render Deploy
+        run: |
+          if [ -n "${{ secrets.RENDER_DEPLOY_HOOK_URL }}" ]; then
+            curl -X POST "${{ secrets.RENDER_DEPLOY_HOOK_URL }}"
+            echo "✅ Deploy triggered on Render"
+          else
+            echo "⚠️ RENDER_DEPLOY_HOOK_URL não configurado - pulando deploy"
+          fi
