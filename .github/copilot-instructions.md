@@ -65,6 +65,19 @@ com.example.geolocation.infrastructure.validation   → Validators
 - `@NotBlank` para parâmetros obrigatórios
 - `@Schema` em DTOs para documentação Swagger
 
+### Princípio: Corrigir na Origem
+
+**NUNCA use `@SuppressWarnings` para mascarar problemas.** Sempre corrija a causa raiz:
+
+| Warning              | ❌ Errado                         | ✅ Correto                       |
+| -------------------- | --------------------------------- | -------------------------------- |
+| Null type safety     | `@SuppressWarnings("null")`       | `Objects.requireNonNull()`       |
+| Hamcrest null safety | Manter Hamcrest                   | `jsonPath().exists()` ou AssertJ |
+| Regex complexity     | `@SuppressWarnings("java:S5843")` | Usar `InetAddress`               |
+| Thread.sleep         | Manter sleep                      | Awaitility `await().until()`     |
+
+**Único @SuppressWarnings aceitável:** `java:S2187` (falso positivo com `@Nested`)
+
 ## Arquivos Importantes
 
 - `docs/ARCHITECTURE.md` - Decisões arquiteturais

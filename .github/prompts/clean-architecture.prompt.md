@@ -1,5 +1,5 @@
 ---
-mode: agent
+agent: agent
 description: "Use when: organizing code structure, creating new classes, defining layers, implementing use cases. Follows Clean Architecture principles for the ip-geolocation-service"
 ---
 

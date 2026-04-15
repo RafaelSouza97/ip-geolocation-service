@@ -1,5 +1,5 @@
 ---
-mode: agent
+agent: agent
 description: "Use when: designing REST endpoints, creating controllers, defining request/response DTOs, handling HTTP errors"
 ---
 
@@ -8,12 +8,14 @@ description: "Use when: designing REST endpoints, creating controllers, defining
 ## Endpoint Design
 
 ### URL Patterns
+
 ```
 GET  /api/geolocation/v1/locate?ip={ip}     # Query com parâmetros
 GET  /api/geolocation/v1/ips/{ip}           # Path parameter (alternativa)
 ```
 
 ### Versioning
+
 - Use versão na URL: `/api/v1/...`
 - Mantenha backward compatibility
 - Documente breaking changes
@@ -36,6 +38,7 @@ public class GeolocationController {
 ```
 
 ### Custom Validators
+
 ```java
 @Target({PARAMETER, FIELD})
 @Retention(RUNTIME)
@@ -50,6 +53,7 @@ public @interface ValidIp {
 ## Response DTOs
 
 ### Success Response (200)
+
 ```java
 public record GeolocationResponse(
     String ip,
@@ -69,6 +73,7 @@ public record CoordinatesDto(double latitude, double longitude) {}
 ```
 
 ### Error Response (4xx/5xx)
+
 ```java
 public record ErrorResponse(
     String error,          // Código: INVALID_IP_FORMAT, MISSING_HEADER
@@ -81,13 +86,13 @@ public record ErrorResponse(
 
 ## HTTP Status Codes
 
-| Cenário | Status | Response |
-|---------|--------|----------|
-| Sucesso | 200 | GeolocationResponse |
-| IP inválido | 400 | ErrorResponse |
-| Header ausente | 400 | ErrorResponse |
-| API externa falhou | 200 | GeolocationResponse (fallback) |
-| Erro interno | 500 | ErrorResponse |
+| Cenário            | Status | Response                       |
+| ------------------ | ------ | ------------------------------ |
+| Sucesso            | 200    | GeolocationResponse            |
+| IP inválido        | 400    | ErrorResponse                  |
+| Header ausente     | 400    | ErrorResponse                  |
+| API externa falhou | 200    | GeolocationResponse (fallback) |
+| Erro interno       | 500    | ErrorResponse                  |
 
 ## Exception Handling
 
@@ -128,11 +133,13 @@ public class GlobalExceptionHandler {
 ## Headers
 
 ### Request Headers Obrigatórios
-| Header | Valores Válidos | Descrição |
-|--------|-----------------|-----------|
+
+| Header            | Valores Válidos   | Descrição             |
+| ----------------- | ----------------- | --------------------- |
 | x-device-platform | iOS, Android, Web | Plataforma do cliente |
 
 ### Response Headers
+
 ```java
 @GetMapping("/locate")
 public ResponseEntity<GeolocationResponse> locate(...) {

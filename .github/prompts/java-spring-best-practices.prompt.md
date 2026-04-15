@@ -1,5 +1,5 @@
 ---
-mode: agent
+agent: agent
 description: "Use when: writing Java code, Spring Boot configuration, creating services, controllers or any Java class. Applies best practices for Java 21 and Spring Boot 3.x"
 ---
 
@@ -73,3 +73,41 @@ com.example.geolocation.application.service
 - Use cache para dados que mudam raramente
 - Configure pool de conexões adequadamente
 - Use `@Async` para operações que podem ser paralelas
+
+## Princípio: Corrigir na Origem
+
+**NUNCA use `@SuppressWarnings` para mascarar problemas.** Corrija a causa raiz.
+
+### Soluções para Warnings Comuns
+
+```java
+// ❌ ERRADO: Suprimir null safety
+@SuppressWarnings("null")
+void test() {
+    mockMvc.perform(post(URL).contentType(MediaType.APPLICATION_JSON));
+}
+
+// ✅ CORRETO: Objects.requireNonNull()
+void test() {
+    mockMvc.perform(post(URL)
+        .contentType(Objects.requireNonNull(MediaType.APPLICATION_JSON)));
+}
+
+// ❌ ERRADO: Thread.sleep em testes
+Thread.sleep(100);
+
+// ✅ CORRETO: Awaitility
+await().atMost(Duration.ofMillis(200)).until(() -> condition);
+
+// ❌ ERRADO: Regex complexo com suppress
+@SuppressWarnings("java:S5843")
+Pattern IPV6_PATTERN = Pattern.compile("...");
+
+// ✅ CORRETO: Usar InetAddress
+InetAddress addr = InetAddress.getByName(ip);
+return addr instanceof Inet6Address;
+```
+
+### @SuppressWarnings Aceitável
+
+- `java:S2187` - Falso positivo do SonarQube com JUnit 5 `@Nested`

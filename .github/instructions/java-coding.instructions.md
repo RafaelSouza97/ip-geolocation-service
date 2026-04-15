@@ -5,6 +5,23 @@ description: "Java coding standards and conventions for ip-geolocation-service"
 
 # Java Coding Instructions
 
+## Princípio: Corrigir na Origem, Não Suprimir
+
+**NUNCA use `@SuppressWarnings` para mascarar problemas.** Corrija a causa raiz.
+
+### Exceções Aceitáveis
+
+- `@SuppressWarnings("java:S2187")` - Falso positivo do SonarQube com JUnit 5 `@Nested`
+
+### Como Corrigir Warnings Comuns
+
+| Warning                              | Solução                                          |
+| ------------------------------------ | ------------------------------------------------ |
+| Null type safety (MediaType, String) | `Objects.requireNonNull(value)`                  |
+| Hamcrest Matcher null safety         | Usar `jsonPath().exists()` ou AssertJ            |
+| Regex complexity (S5843)             | Usar `java.net.InetAddress` para validação de IP |
+| Thread.sleep in tests (S2925)        | Usar Awaitility `await().until()`                |
+
 ## Code Style
 
 ### Imports

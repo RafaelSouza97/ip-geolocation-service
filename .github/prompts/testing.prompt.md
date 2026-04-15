@@ -189,6 +189,73 @@ class IpApiClientIT {
 - 100% de cobertura em validações de IP
 - Testar todos os cenários de erro e fallback
 
+## Princípio: Corrigir na Origem, Não Suprimir
+
+**NUNCA use `@SuppressWarnings` para mascarar problemas reais.** Sempre corrija a causa raiz.
+
+### Null Type Safety
+
+```java
+// ❌ ERRADO: Suprimir warning
+@SuppressWarnings("null")
+void shouldReturn200() {
+    mockMvc.perform(post(URL).contentType(MediaType.APPLICATION_JSON));
+}
+
+// ✅ CORRETO: Usar Objects.requireNonNull()
+import java.util.Objects;
+
+void shouldReturn200() {
+    mockMvc.perform(post(URL)
+            .contentType(Objects.requireNonNull(MediaType.APPLICATION_JSON))
+            .content(Objects.requireNonNull(objectMapper.writeValueAsString(request))));
+}
+```
+
+### Hamcrest Matchers (Null Safety Issues)
+
+```java
+// ❌ ERRADO: Hamcrest inline com warnings de null safety
+.andExpect(jsonPath("$.token").value(notNullValue()));
+.andExpect(jsonPath("$.message").value(Matchers.not(containsString("Sensitive"))));
+
+// ✅ CORRETO: Usar métodos nativos do MockMvc ou AssertJ
+.andExpect(jsonPath("$.token").exists());  // Verifica que existe
+
+// ✅ CORRETO: Capturar resultado e usar AssertJ
+var result = mockMvc.perform(...).andReturn();
+String responseBody = result.getResponse().getContentAsString();
+assertThat(responseBody).doesNotContain("Sensitive");
+```
+
+### Thread.sleep() em Testes
+
+```java
+// ❌ ERRADO: Thread.sleep() (SonarQube S2925)
+Thread.sleep(150);  // Flaky, pode falhar em máquinas lentas
+
+// ✅ CORRETO: Usar Awaitility
+import static org.awaitility.Awaitility.await;
+
+await().pollInterval(Duration.ofMillis(20))
+       .atMost(Duration.ofMillis(300))
+       .until(() -> !selector.isInFailover());
+```
+
+### @SuppressWarnings Aceitáveis
+
+O único `@SuppressWarnings` aceitável em testes é:
+
+```java
+// ✅ OK: Falso positivo do SonarQube com @Nested (S2187)
+@DisplayName("GeolocationService")
+@SuppressWarnings("java:S2187")  // Classes @Nested contêm os testes
+class GeolocationServiceTest {
+    @Nested
+    class WhenCacheHit { /* testes aqui */ }
+}
+```
+
 ## Assertion Best Practices
 
 ```java
