@@ -14,7 +14,7 @@ import org.junit.jupiter.params.provider.EnumSource;
 import org.junit.jupiter.params.provider.ValueSource;
 
 @DisplayName("Platform")
-@SuppressWarnings("java:S2187") // False positive: @Nested classes contain the tests
+@SuppressWarnings("java:S2187")
 class PlatformTest {
 
     @Nested

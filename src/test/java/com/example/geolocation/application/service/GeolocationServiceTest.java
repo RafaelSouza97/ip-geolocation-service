@@ -75,14 +75,9 @@ class GeolocationServiceTest {
         @Test
         @DisplayName("should return cached result when cache hit")
         void shouldReturnCachedResultWhenCacheHit() {
-            // Arrange
             var cachedInfo = createApiResponse(PUBLIC_IP);
             when(cache.get(PUBLIC_IP)).thenReturn(Optional.of(cachedInfo));
-
-            // Act
             var result = service.locate(PUBLIC_IP);
-
-            // Assert
             assertEquals(DataSource.CACHE, result.source());
             assertEquals(PUBLIC_IP, result.ip());
             verify(cache).get(PUBLIC_IP);
@@ -92,15 +87,10 @@ class GeolocationServiceTest {
         @Test
         @DisplayName("should call provider when cache miss")
         void shouldCallProviderWhenCacheMiss() {
-            // Arrange
             var apiResponse = createApiResponse(PUBLIC_IP);
             when(cache.get(PUBLIC_IP)).thenReturn(Optional.empty());
             when(provider.lookup(PUBLIC_IP)).thenReturn(apiResponse);
-
-            // Act
             var result = service.locate(PUBLIC_IP);
-
-            // Assert
             assertEquals(DataSource.API, result.source());
             assertEquals(PUBLIC_IP, result.ip());
             assertEquals("United States", result.country().name());
@@ -112,15 +102,10 @@ class GeolocationServiceTest {
         @Test
         @DisplayName("should store result in cache after API call")
         void shouldStoreResultInCacheAfterApiCall() {
-            // Arrange
             var apiResponse = createApiResponse(PUBLIC_IP);
             when(cache.get(PUBLIC_IP)).thenReturn(Optional.empty());
             when(provider.lookup(PUBLIC_IP)).thenReturn(apiResponse);
-
-            // Act
             service.locate(PUBLIC_IP);
-
-            // Assert
             verify(cache).put(PUBLIC_IP, apiResponse);
         }
     }
@@ -133,10 +118,7 @@ class GeolocationServiceTest {
         @ValueSource(strings = {"192.168.1.1", "10.0.0.1", "172.16.0.1", "127.0.0.1"})
         @DisplayName("should return fallback for private IPs without calling provider")
         void shouldReturnFallbackForPrivateIps(String ip) {
-            // Act
             var result = service.locate(ip);
-
-            // Assert
             assertEquals(DataSource.FALLBACK, result.source());
             assertEquals("BR", result.country().code());
             assertEquals("Brazil", result.country().name());
@@ -147,10 +129,7 @@ class GeolocationServiceTest {
         @Test
         @DisplayName("should return fallback for localhost IPv6")
         void shouldReturnFallbackForLocalhostIpv6() {
-            // Act
             var result = service.locate("::1");
-
-            // Assert
             assertEquals(DataSource.FALLBACK, result.source());
             assertEquals("BR", result.country().code());
             verify(provider, never()).lookup(any());
@@ -165,7 +144,6 @@ class GeolocationServiceTest {
         @ValueSource(strings = {"invalid", "999.999.999.999", "abc.def.ghi.jkl", ""})
         @DisplayName("should throw InvalidIpAddressException for invalid IPs")
         void shouldThrowExceptionForInvalidIps(String ip) {
-            // Act & Assert
             var exception = assertThrows(InvalidIpAddressException.class, () -> service.locate(ip));
             assertEquals(ip, exception.getIp());
         }
@@ -173,7 +151,6 @@ class GeolocationServiceTest {
         @Test
         @DisplayName("should throw InvalidIpAddressException for null IP")
         void shouldThrowExceptionForNullIp() {
-            // Act & Assert
             assertThrows(InvalidIpAddressException.class, () -> service.locate(null));
         }
     }
@@ -185,15 +162,10 @@ class GeolocationServiceTest {
         @Test
         @DisplayName("should return fallback when API throws ExternalApiException")
         void shouldReturnFallbackWhenApiThrowsException() {
-            // Arrange
             when(cache.get(PUBLIC_IP)).thenReturn(Optional.empty());
             when(provider.lookup(PUBLIC_IP))
                     .thenThrow(new ExternalApiException("ip-api.com", "Connection timeout"));
-
-            // Act
             var result = service.locate(PUBLIC_IP);
-
-            // Assert
             assertEquals(DataSource.FALLBACK, result.source());
             assertEquals("BR", result.country().code());
         }
@@ -201,14 +173,9 @@ class GeolocationServiceTest {
         @Test
         @DisplayName("should return fallback when API throws unexpected exception")
         void shouldReturnFallbackWhenApiThrowsUnexpectedException() {
-            // Arrange
             when(cache.get(PUBLIC_IP)).thenReturn(Optional.empty());
             when(provider.lookup(PUBLIC_IP)).thenThrow(new RuntimeException("Unexpected"));
-
-            // Act
             var result = service.locate(PUBLIC_IP);
-
-            // Assert
             assertEquals(DataSource.FALLBACK, result.source());
             assertEquals("BR", result.country().code());
         }
@@ -216,15 +183,10 @@ class GeolocationServiceTest {
         @Test
         @DisplayName("should not cache fallback responses")
         void shouldNotCacheFallbackResponses() {
-            // Arrange
             when(cache.get(PUBLIC_IP)).thenReturn(Optional.empty());
             when(provider.lookup(PUBLIC_IP))
                     .thenThrow(new ExternalApiException("ip-api.com", "Error"));
-
-            // Act
             service.locate(PUBLIC_IP);
-
-            // Assert
             verify(cache, never()).put(any(), any());
         }
     }

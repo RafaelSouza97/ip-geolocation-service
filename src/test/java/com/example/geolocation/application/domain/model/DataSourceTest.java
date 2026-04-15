@@ -9,7 +9,7 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.EnumSource;
 
 @DisplayName("DataSource")
-@SuppressWarnings("java:S2187") // False positive: @Nested classes contain the tests
+@SuppressWarnings("java:S2187")
 class DataSourceTest {
 
     @Nested
