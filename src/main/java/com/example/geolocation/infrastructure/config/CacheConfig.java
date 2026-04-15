@@ -14,9 +14,9 @@ public class CacheConfig {
     @Bean
     public Cache<String, GeolocationInfo> geolocationCache(GeolocationProperties properties) {
         var cacheProps = properties.cache();
-        log.info("Configuring Caffeine cache: TTL={}, maxSize={}", 
+        log.info("Configuring Caffeine cache: TTL={}, maxSize={}",
             cacheProps.ttl(), cacheProps.maxSize());
-        
+
         return Caffeine.newBuilder()
             .expireAfterWrite(cacheProps.ttl())
             .maximumSize(cacheProps.maxSize())

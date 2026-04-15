@@ -12,7 +12,6 @@ public class HttpClientConfig {
 
     private static final Duration DEFAULT_CONNECT_TIMEOUT = Duration.ofSeconds(5);
 
-    
     @Bean
     public HttpClient sharedHttpClient(GeolocationProperties properties) {
         Duration timeout = properties.api() != null && properties.api().timeout() != null

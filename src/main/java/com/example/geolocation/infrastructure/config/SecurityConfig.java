@@ -28,7 +28,9 @@ public class SecurityConfig {
     private final SecurityProperties securityProperties;
     private final JwtAuthenticationFilter jwtAuthenticationFilter;
 
-    public SecurityConfig(SecurityProperties securityProperties, @Lazy JwtAuthenticationFilter jwtAuthenticationFilter) {
+    public SecurityConfig(
+            SecurityProperties securityProperties,
+            @Lazy JwtAuthenticationFilter jwtAuthenticationFilter) {
         this.securityProperties = securityProperties;
         this.jwtAuthenticationFilter = jwtAuthenticationFilter;
     }

@@ -26,16 +26,16 @@ public class OpenApiConfig {
                         .title("IP Geolocation Service API")
                         .version("1.0.0")
                         .description("""
-                                Microserviço REST para identificação de informações geográficas a partir de endereços IP.
-                                
-                                ## Autenticação
-                                
-                                1. Faça login em `POST /auth/login` com username e password
-                                2. Copie o token JWT retornado
-                                3. Clique no botão **Authorize** 🔒 e cole o token
-                                
-                                **Credenciais de teste:** `admin` / `Admin123@`
-                                """)
+                            Microserviço para identificação geográfica a partir de endereços IP.
+
+                            ## Autenticação
+
+                            1. Faça login em `POST /auth/login` com username e password
+                            2. Copie o token JWT retornado
+                            3. Clique no botão **Authorize** 🔒 e cole o token
+
+                            **Credenciais de teste:** `admin` / `Admin123@`
+                            """)
                         .contact(new Contact()
                                 .name("Rafael Souza")
                                 .email("rafael@example.com"))
