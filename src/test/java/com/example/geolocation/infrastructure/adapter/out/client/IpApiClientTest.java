@@ -80,7 +80,6 @@ class IpApiClientTest {
         @Test
         @DisplayName("should parse and return geolocation info")
         void shouldParseAndReturnGeolocationInfo() {
-            // Arrange
             var ip = "8.8.8.8";
             stubFor(get(urlEqualTo("/" + ip)).willReturn(okJson("""
                     {
@@ -97,11 +96,7 @@ class IpApiClientTest {
                         "query": "8.8.8.8"
                     }
                     """)));
-
-            // Act
             var result = client.lookup(ip);
-
-            // Assert
             assertEquals(ip, result.ip());
             assertEquals("US", result.country().code());
             assertEquals("United States", result.country().name());
@@ -118,7 +113,6 @@ class IpApiClientTest {
         @Test
         @DisplayName("should handle minimal response")
         void shouldHandleMinimalResponse() {
-            // Arrange
             var ip = "1.1.1.1";
             stubFor(get(urlEqualTo("/" + ip)).willReturn(okJson("""
                     {
@@ -135,11 +129,7 @@ class IpApiClientTest {
                         "query": "1.1.1.1"
                     }
                     """)));
-
-            // Act
             var result = client.lookup(ip);
-
-            // Assert
             assertEquals("AU", result.country().code());
             assertEquals("Australia", result.country().name());
         }
@@ -152,7 +142,6 @@ class IpApiClientTest {
         @Test
         @DisplayName("should throw exception when status is fail")
         void shouldThrowExceptionWhenStatusIsFail() {
-            // Arrange
             var ip = "invalid";
             stubFor(get(urlEqualTo("/" + ip)).willReturn(okJson("""
                     {
@@ -161,8 +150,6 @@ class IpApiClientTest {
                         "query": "invalid"
                     }
                     """)));
-
-            // Act & Assert
             var exception = assertThrows(ExternalApiException.class, () -> client.lookup(ip));
             assertTrue(exception.getMessage().contains("invalid query"));
         }
@@ -170,12 +157,9 @@ class IpApiClientTest {
         @Test
         @DisplayName("should throw exception when HTTP status is not 200")
         void shouldThrowExceptionWhenHttpStatusIsNot200() {
-            // Arrange
             var ip = "8.8.8.8";
             stubFor(get(urlEqualTo("/" + ip))
                     .willReturn(serverError().withBody("Internal Server Error")));
-
-            // Act & Assert
             var exception = assertThrows(ExternalApiException.class, () -> client.lookup(ip));
             assertTrue(exception.getMessage().contains("HTTP 500"));
         }
@@ -183,11 +167,8 @@ class IpApiClientTest {
         @Test
         @DisplayName("should throw exception on HTTP 400")
         void shouldThrowExceptionOnHttp400() {
-            // Arrange
             var ip = "bad-request";
             stubFor(get(urlEqualTo("/" + ip)).willReturn(badRequest().withBody("Bad Request")));
-
-            // Act & Assert
             var exception = assertThrows(ExternalApiException.class, () -> client.lookup(ip));
             assertTrue(exception.getMessage().contains("HTTP 400"));
         }
@@ -195,24 +176,18 @@ class IpApiClientTest {
         @Test
         @DisplayName("should throw exception on connection error")
         void shouldThrowExceptionOnConnectionError() {
-            // Arrange - usar porta diferente para simular erro de conexão
             var badProperties = createProperties("http://localhost:1", Duration.ofSeconds(1));
             var badHttpClient =
                     HttpClient.newBuilder().connectTimeout(Duration.ofSeconds(1)).build();
             var badClient = new IpApiClient(badProperties, objectMapper, badHttpClient);
-
-            // Act & Assert
             assertThrows(ExternalApiException.class, () -> badClient.lookup("8.8.8.8"));
         }
 
         @Test
         @DisplayName("should throw exception on invalid JSON")
         void shouldThrowExceptionOnInvalidJson() {
-            // Arrange
             var ip = "8.8.8.8";
             stubFor(get(urlEqualTo("/" + ip)).willReturn(ok("not valid json {")));
-
-            // Act & Assert
             assertThrows(ExternalApiException.class, () -> client.lookup(ip));
         }
     }
@@ -224,7 +199,6 @@ class IpApiClientTest {
         @Test
         @DisplayName("should make GET request to correct URL")
         void shouldMakeGetRequestToCorrectUrl() {
-            // Arrange
             var ip = "8.8.8.8";
             stubFor(get(urlEqualTo("/" + ip)).willReturn(okJson("""
                     {
@@ -241,11 +215,7 @@ class IpApiClientTest {
                         "query": "8.8.8.8"
                     }
                     """)));
-
-            // Act
             client.lookup(ip);
-
-            // Assert
             verify(getRequestedFor(urlEqualTo("/" + ip)));
         }
     }

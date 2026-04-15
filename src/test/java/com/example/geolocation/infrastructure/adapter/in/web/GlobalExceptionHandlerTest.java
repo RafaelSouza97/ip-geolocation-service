@@ -46,11 +46,8 @@ class GlobalExceptionHandlerTest {
         @Test
         @DisplayName("should return 400 with INVALID_IP_FORMAT code")
         void shouldReturn400WithInvalidIpFormatCode() throws Exception {
-            // Arrange
             when(geolocationUseCase.locate(anyString()))
                     .thenThrow(new InvalidIpAddressException("invalid-ip"));
-
-            // Act & Assert
             mockMvc.perform(
                     get(LOCATE_URL).param("ip", "invalid-ip").header(PLATFORM_HEADER, "Web"))
                     .andExpect(status().isBadRequest())
@@ -66,11 +63,8 @@ class GlobalExceptionHandlerTest {
         @Test
         @DisplayName("should return 400 with PRIVATE_IP_ADDRESS code")
         void shouldReturn400WithPrivateIpAddressCode() throws Exception {
-            // Arrange
             when(geolocationUseCase.locate(anyString()))
                     .thenThrow(new PrivateIpAddressException("192.168.1.1"));
-
-            // Act & Assert
             mockMvc.perform(
                     get(LOCATE_URL).param("ip", "192.168.1.1").header(PLATFORM_HEADER, "Web"))
                     .andExpect(status().isBadRequest())
@@ -87,11 +81,8 @@ class GlobalExceptionHandlerTest {
         @Test
         @DisplayName("should return 500 for unexpected exceptions")
         void shouldReturn500ForUnexpectedExceptions() throws Exception {
-            // Arrange
             when(geolocationUseCase.locate(anyString()))
                     .thenThrow(new RuntimeException("Unexpected error"));
-
-            // Act & Assert
             mockMvc.perform(get(LOCATE_URL).param("ip", "8.8.8.8").header(PLATFORM_HEADER, "Web"))
                     .andExpect(status().isInternalServerError())
                     .andExpect(jsonPath("$.code").value("INTERNAL_ERROR"))
@@ -101,18 +92,13 @@ class GlobalExceptionHandlerTest {
         @Test
         @DisplayName("should not expose internal error details")
         void shouldNotExposeInternalErrorDetails() throws Exception {
-            // Arrange
             when(geolocationUseCase.locate(anyString()))
                     .thenThrow(new NullPointerException("Sensitive internal info"));
-
-            // Act
             var result = mockMvc
                     .perform(get(LOCATE_URL).param("ip", "8.8.8.8").header(PLATFORM_HEADER, "Web"))
                     .andExpect(status().isInternalServerError())
                     .andExpect(jsonPath("$.message").value("An unexpected error occurred"))
                     .andReturn();
-
-            // Assert - verificação sem Hamcrest para evitar null safety warnings
             String responseBody = result.getResponse().getContentAsString();
             org.assertj.core.api.Assertions.assertThat(responseBody).doesNotContain("Sensitive");
         }

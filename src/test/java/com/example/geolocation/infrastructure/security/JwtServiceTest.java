@@ -17,7 +17,7 @@ class JwtServiceTest {
     private JwtService jwtService;
     private static final String SECRET_KEY =
             "404E635266556A586E3272357538782F413F4428472B4B6250645367566B5970";
-    private static final long EXPIRATION = 86400000L; // 24 hours
+    private static final long EXPIRATION = 86400000L;
 
     @BeforeEach
     void setUp() {
@@ -34,22 +34,16 @@ class JwtServiceTest {
         @Test
         @DisplayName("should generate a valid JWT token")
         void shouldGenerateValidJwtToken() {
-            // Act
             String token = jwtService.generateToken("testuser");
-
-            // Assert
             assertThat(token).isNotBlank();
-            assertThat(token.split("\\.")).hasSize(3); // Header.Payload.Signature
+            assertThat(token.split("\\.")).hasSize(3);
         }
 
         @Test
         @DisplayName("should generate different tokens for different users")
         void shouldGenerateDifferentTokensForDifferentUsers() {
-            // Act
             String token1 = jwtService.generateToken("user1");
             String token2 = jwtService.generateToken("user2");
-
-            // Assert
             assertThat(token1).isNotEqualTo(token2);
         }
     }
@@ -61,13 +55,8 @@ class JwtServiceTest {
         @Test
         @DisplayName("should extract username from token")
         void shouldExtractUsernameFromToken() {
-            // Arrange
             String token = jwtService.generateToken("testuser");
-
-            // Act
             String username = jwtService.extractUsername(token);
-
-            // Assert
             assertThat(username).isEqualTo("testuser");
         }
     }
@@ -79,26 +68,16 @@ class JwtServiceTest {
         @Test
         @DisplayName("should return true for valid token and matching username")
         void shouldReturnTrueForValidTokenAndMatchingUsername() {
-            // Arrange
             String token = jwtService.generateToken("testuser");
-
-            // Act
             boolean isValid = jwtService.isTokenValid(token, "testuser");
-
-            // Assert
             assertThat(isValid).isTrue();
         }
 
         @Test
         @DisplayName("should return false for valid token but non-matching username")
         void shouldReturnFalseForValidTokenButNonMatchingUsername() {
-            // Arrange
             String token = jwtService.generateToken("testuser");
-
-            // Act
             boolean isValid = jwtService.isTokenValid(token, "otheruser");
-
-            // Assert
             assertThat(isValid).isFalse();
         }
     }
@@ -110,29 +89,21 @@ class JwtServiceTest {
         @Test
         @DisplayName("should create non-expired token with default expiration")
         void shouldCreateNonExpiredTokenWithDefaultExpiration() {
-            // Arrange
             String token = jwtService.generateToken("testuser");
-
-            // Act & Assert
             assertThat(jwtService.isTokenValid(token, "testuser")).isTrue();
         }
 
         @Test
         @DisplayName("expired token should be invalid")
         void expiredTokenShouldBeInvalid() {
-            // Arrange - create service with very short expiration
-            var jwtProperties = new JwtProperties(SECRET_KEY, 1L); // 1ms expiration
+            var jwtProperties = new JwtProperties(SECRET_KEY, 1L);
             var userProperties = new UserProperties("admin", "Admin123@");
             var securityProperties = new SecurityProperties(jwtProperties, userProperties);
             var shortExpirationService = new JwtService(securityProperties);
 
             String token = shortExpirationService.generateToken("testuser");
-
-            // Wait for token to expire
             await().pollInterval(Duration.ofMillis(5)).atMost(Duration.ofMillis(100))
                     .until(() -> !shortExpirationService.isTokenValid(token, "testuser"));
-
-            // Act & Assert
             assertThat(shortExpirationService.isTokenValid(token, "testuser")).isFalse();
         }
     }

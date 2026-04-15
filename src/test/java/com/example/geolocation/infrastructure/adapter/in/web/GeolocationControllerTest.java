@@ -59,11 +59,8 @@ class GeolocationControllerTest {
         @Test
         @DisplayName("should return 200 with geolocation for valid IP")
         void shouldReturn200ForValidIp() throws Exception {
-            // Arrange
             var ip = "8.8.8.8";
             when(geolocationUseCase.locate(ip)).thenReturn(createMockResponse(ip, DataSource.API));
-
-            // Act & Assert
             mockMvc.perform(get(LOCATE_URL).param("ip", ip).header(PLATFORM_HEADER, "Web"))
                     .andExpect(status().isOk()).andExpect(jsonPath("$.ip").value(ip))
                     .andExpect(jsonPath("$.country.code").value("US"))
@@ -74,12 +71,9 @@ class GeolocationControllerTest {
         @Test
         @DisplayName("should return 200 with cache source")
         void shouldReturn200WithCacheSource() throws Exception {
-            // Arrange
             var ip = "8.8.8.8";
             when(geolocationUseCase.locate(ip))
                     .thenReturn(createMockResponse(ip, DataSource.CACHE));
-
-            // Act & Assert
             mockMvc.perform(get(LOCATE_URL).param("ip", ip).header(PLATFORM_HEADER, "iOS"))
                     .andExpect(status().isOk()).andExpect(jsonPath("$.source").value("cache"));
         }
@@ -87,14 +81,11 @@ class GeolocationControllerTest {
         @Test
         @DisplayName("should return 200 with fallback source")
         void shouldReturn200WithFallbackSource() throws Exception {
-            // Arrange
             var ip = "192.168.1.1";
             var fallbackResponse =
                     new GeolocationInfo(ip, new Country("BR", "Brazil"), new Region("", ""), "",
                             Coordinates.zero(), "", "", DataSource.FALLBACK, Instant.now());
             when(geolocationUseCase.locate(ip)).thenReturn(fallbackResponse);
-
-            // Act & Assert
             mockMvc.perform(get(LOCATE_URL).param("ip", ip).header(PLATFORM_HEADER, "Android"))
                     .andExpect(status().isOk()).andExpect(jsonPath("$.source").value("fallback"))
                     .andExpect(jsonPath("$.country.code").value("BR"));

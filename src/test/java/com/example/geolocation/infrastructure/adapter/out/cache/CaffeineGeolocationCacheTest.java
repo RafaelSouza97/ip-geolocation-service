@@ -55,15 +55,10 @@ class CaffeineGeolocationCacheTest {
     @Test
     @DisplayName("should return value when key exists")
     void shouldReturnValueWhenKeyExists() {
-        // Arrange
         var ip = "8.8.8.8";
         var info = createGeolocationInfo(ip);
         cache.put(ip, info);
-
-        // Act
         var result = cache.get(ip);
-
-        // Assert
         assertTrue(result.isPresent());
         assertEquals(ip, result.get().ip());
     }
@@ -71,43 +66,28 @@ class CaffeineGeolocationCacheTest {
     @Test
     @DisplayName("should store value correctly")
     void shouldStoreValueCorrectly() {
-        // Arrange
         var ip = "8.8.8.8";
         var info = createGeolocationInfo(ip);
-
-        // Act
         cache.put(ip, info);
-
-        // Assert
         assertNotNull(caffeineCache.getIfPresent(ip));
     }
 
     @Test
     @DisplayName("should evict value")
     void shouldEvictValue() {
-        // Arrange
         var ip = "8.8.8.8";
         var info = createGeolocationInfo(ip);
         cache.put(ip, info);
-
-        // Act
         cache.evict(ip);
-
-        // Assert
         assertTrue(cache.get(ip).isEmpty());
     }
 
     @Test
     @DisplayName("should clear all values")
     void shouldClearAllValues() {
-        // Arrange
         cache.put("8.8.8.8", createGeolocationInfo("8.8.8.8"));
         cache.put("1.1.1.1", createGeolocationInfo("1.1.1.1"));
-
-        // Act
         cache.clear();
-
-        // Assert
         assertTrue(cache.get("8.8.8.8").isEmpty());
         assertTrue(cache.get("1.1.1.1").isEmpty());
     }

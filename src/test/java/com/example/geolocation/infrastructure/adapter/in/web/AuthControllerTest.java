@@ -35,10 +35,7 @@ class AuthControllerTest {
         @Test
         @DisplayName("should return 200 with token for valid credentials")
         void shouldReturn200WithTokenForValidCredentials() throws Exception {
-            // Arrange
             var request = Map.of("username", "admin", "password", "Admin123@");
-
-            // Act & Assert
             mockMvc.perform(
                     post(LOGIN_URL).contentType(Objects.requireNonNull(MediaType.APPLICATION_JSON))
                             .content(Objects
@@ -49,10 +46,7 @@ class AuthControllerTest {
         @Test
         @DisplayName("should return 401 for invalid username")
         void shouldReturn401ForInvalidUsername() throws Exception {
-            // Arrange
             var request = Map.of("username", "wronguser", "password", "Admin123@");
-
-            // Act & Assert
             mockMvc.perform(
                     post(LOGIN_URL).contentType(Objects.requireNonNull(MediaType.APPLICATION_JSON))
                             .content(Objects
@@ -63,10 +57,7 @@ class AuthControllerTest {
         @Test
         @DisplayName("should return 401 for invalid password")
         void shouldReturn401ForInvalidPassword() throws Exception {
-            // Arrange
             var request = Map.of("username", "admin", "password", "wrongpassword");
-
-            // Act & Assert
             mockMvc.perform(
                     post(LOGIN_URL).contentType(Objects.requireNonNull(MediaType.APPLICATION_JSON))
                             .content(Objects
@@ -77,10 +68,7 @@ class AuthControllerTest {
         @Test
         @DisplayName("should return 400 when username is missing")
         void shouldReturn400WhenUsernameMissing() throws Exception {
-            // Arrange
             var request = Map.of("password", "Admin123@");
-
-            // Act & Assert
             mockMvc.perform(
                     post(LOGIN_URL).contentType(Objects.requireNonNull(MediaType.APPLICATION_JSON))
                             .content(Objects
@@ -91,10 +79,7 @@ class AuthControllerTest {
         @Test
         @DisplayName("should return 400 when password is missing")
         void shouldReturn400WhenPasswordMissing() throws Exception {
-            // Arrange
             var request = Map.of("username", "admin");
-
-            // Act & Assert
             mockMvc.perform(
                     post(LOGIN_URL).contentType(Objects.requireNonNull(MediaType.APPLICATION_JSON))
                             .content(Objects
@@ -105,7 +90,6 @@ class AuthControllerTest {
         @Test
         @DisplayName("should return 400 when body is empty")
         void shouldReturn400WhenBodyEmpty() throws Exception {
-            // Act & Assert
             mockMvc.perform(post(LOGIN_URL)
                     .contentType(Objects.requireNonNull(MediaType.APPLICATION_JSON)).content("{}"))
                     .andExpect(status().isBadRequest());
