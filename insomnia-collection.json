@@ -15,17 +15,31 @@
       "_type": "workspace"
     },
     {
-      "_id": "env_local",
+      "_id": "env_base",
       "parentId": "wrk_ip_geolocation",
+      "modified": 1712800000000,
+      "created": 1712800000000,
+      "name": "Base Environment",
+      "data": {
+        "api_version": "v1"
+      },
+      "dataPropertyOrder": { "&": ["api_version"] },
+      "color": null,
+      "isPrivate": false,
+      "metaSortKey": 0,
+      "_type": "environment"
+    },
+    {
+      "_id": "env_local",
+      "parentId": "env_base",
       "modified": 1712800000000,
       "created": 1712800000000,
       "name": "Local",
       "data": {
         "base_url": "http://localhost:8080",
-        "api_version": "v1",
         "jwt_token": ""
       },
-      "dataPropertyOrder": { "&": ["base_url", "api_version", "jwt_token"] },
+      "dataPropertyOrder": { "&": ["base_url", "jwt_token"] },
       "color": "#7ED321",
       "isPrivate": false,
       "metaSortKey": 1,
@@ -33,16 +47,15 @@
     },
     {
       "_id": "env_prod",
-      "parentId": "wrk_ip_geolocation",
+      "parentId": "env_base",
       "modified": 1712800000000,
       "created": 1712800000000,
       "name": "Production (Render)",
       "data": {
         "base_url": "https://ip-geolocation-service-cn07.onrender.com",
-        "api_version": "v1",
         "jwt_token": ""
       },
-      "dataPropertyOrder": { "&": ["base_url", "api_version", "jwt_token"] },
+      "dataPropertyOrder": { "&": ["base_url", "jwt_token"] },
       "color": "#FA5A5A",
       "isPrivate": false,
       "metaSortKey": 2,
