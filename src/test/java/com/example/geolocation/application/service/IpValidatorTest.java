@@ -63,6 +63,21 @@ class IpValidatorTest {
         void shouldRejectInvalidIpv6Addresses(String ip) {
             assertFalse(IpValidator.isValidIpv6(ip));
         }
+
+        @ParameterizedTest
+        @NullAndEmptySource
+        @ValueSource(strings = {"   ", "\t", "\n"})
+        @DisplayName("should reject null, empty and blank IPv6 inputs")
+        void shouldRejectNullEmptyBlankIpv6(String ip) {
+            assertFalse(IpValidator.isValidIpv6(ip));
+        }
+
+        @ParameterizedTest
+        @ValueSource(strings = {"8.8.8.8", "192.168.1.1", "10.0.0.1"})
+        @DisplayName("should reject IPv4 addresses when checking for IPv6")
+        void shouldRejectIpv4WhenCheckingIpv6(String ip) {
+            assertFalse(IpValidator.isValidIpv6(ip));
+        }
     }
 
     @Nested
@@ -97,6 +112,15 @@ class IpValidatorTest {
             assertFalse(IpValidator.isPrivateOrReserved(ip),
                     ip + " should not be private/reserved");
         }
+
+        @ParameterizedTest
+        @NullAndEmptySource
+        @ValueSource(strings = {"   ", "invalid", "not-an-ip"})
+        @DisplayName("should return false for null, empty, blank and invalid IPs")
+        void shouldReturnFalseForInvalidInputs(String ip) {
+            assertFalse(IpValidator.isPrivateOrReserved(ip));
+            assertFalse(IpValidator.isPublic(ip));
+        }
     }
 
     @Nested
@@ -115,6 +139,20 @@ class IpValidatorTest {
         @DisplayName("should not detect non-localhost addresses")
         void shouldNotDetectNonLocalhostAddresses(String ip) {
             assertFalse(IpValidator.isLocalhost(ip));
+        }
+
+        @ParameterizedTest
+        @NullAndEmptySource
+        @ValueSource(strings = {"   ", "\t"})
+        @DisplayName("should return false for null, empty and blank inputs")
+        void shouldReturnFalseForNullEmptyBlank(String ip) {
+            assertFalse(IpValidator.isLocalhost(ip));
+        }
+
+        @Test
+        @DisplayName("should detect 0:0:0:0:0:0:0:1 as localhost")
+        void shouldDetectFullFormIpv6Localhost() {
+            assertTrue(IpValidator.isLocalhost("0:0:0:0:0:0:0:1"));
         }
     }
 
@@ -135,6 +173,12 @@ class IpValidatorTest {
         }
 
         @Test
+        @DisplayName("should not modify IPv4 addresses")
+        void shouldNotModifyIpv4Addresses() {
+            assertEquals("192.168.1.1", IpValidator.normalize("192.168.1.1"));
+        }
+
+        @Test
         @DisplayName("should throw exception for null input")
         void shouldThrowExceptionForNullInput() {
             assertThrows(IllegalArgumentException.class, () -> IpValidator.normalize(null));
@@ -144,6 +188,12 @@ class IpValidatorTest {
         @DisplayName("should throw exception for blank input")
         void shouldThrowExceptionForBlankInput() {
             assertThrows(IllegalArgumentException.class, () -> IpValidator.normalize("  "));
+        }
+
+        @Test
+        @DisplayName("should throw exception for empty input")
+        void shouldThrowExceptionForEmptyInput() {
+            assertThrows(IllegalArgumentException.class, () -> IpValidator.normalize(""));
         }
     }
 

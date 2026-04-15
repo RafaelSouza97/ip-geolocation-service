@@ -51,6 +51,7 @@ com.example.geolocation.infrastructure.validation   → Validators
 - Use AAA pattern (Arrange, Act, Assert)
 - Mock apenas ports.out nos serviços
 - Use WireMock para testar HTTP clients
+- Mutation testing: `mvn test pitest:mutationCoverage` (threshold 70%)
 
 ### Lombok Annotations
 

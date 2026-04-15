@@ -21,6 +21,8 @@
         <java.version>21</java.version>
         <springdoc.version>2.3.0</springdoc.version>
         <wiremock.version>3.3.1</wiremock.version>
+        <pitest.version>1.15.8</pitest.version>
+        <pitest-junit5.version>1.2.1</pitest-junit5.version>
     </properties>
     
     <dependencies>
@@ -139,6 +141,44 @@
                         </goals>
                     </execution>
                 </executions>
+            </plugin>
+            
+            <!-- PITest for mutation testing -->
+            <plugin>
+                <groupId>org.pitest</groupId>
+                <artifactId>pitest-maven</artifactId>
+                <version>${pitest.version}</version>
+                <dependencies>
+                    <dependency>
+                        <groupId>org.pitest</groupId>
+                        <artifactId>pitest-junit5-plugin</artifactId>
+                        <version>${pitest-junit5.version}</version>
+                    </dependency>
+                </dependencies>
+                <configuration>
+                    <targetClasses>
+                        <param>com.example.geolocation.application.*</param>
+                        <param>com.example.geolocation.infrastructure.validation.*</param>
+                    </targetClasses>
+                    <targetTests>
+                        <param>com.example.geolocation.*Test</param>
+                    </targetTests>
+                    <excludedClasses>
+                        <param>com.example.geolocation.infrastructure.config.*</param>
+                        <param>com.example.geolocation.infrastructure.adapter.in.web.dto.*</param>
+                        <param>com.example.geolocation.Application</param>
+                    </excludedClasses>
+                    <mutators>
+                        <mutator>STRONGER</mutator>
+                    </mutators>
+                    <mutationThreshold>70</mutationThreshold>
+                    <coverageThreshold>80</coverageThreshold>
+                    <outputFormats>
+                        <outputFormat>HTML</outputFormat>
+                        <outputFormat>XML</outputFormat>
+                    </outputFormats>
+                    <timestampedReports>false</timestampedReports>
+                </configuration>
             </plugin>
         </plugins>
     </build>

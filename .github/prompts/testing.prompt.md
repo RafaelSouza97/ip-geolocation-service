@@ -189,6 +189,55 @@ class IpApiClientIT {
 - 100% de cobertura em validações de IP
 - Testar todos os cenários de erro e fallback
 
+## Mutation Testing (PITest)
+
+### Conceito
+
+Mutation testing avalia a **qualidade** dos testes, não apenas a cobertura.
+
+- PIT modifica o código (mutantes): `>=` → `>`, `true` → `false`
+- Se teste falha → mutante morto ✅ (teste eficaz)
+- Se teste passa → mutante sobreviveu ❌ (teste fraco)
+
+### Execução
+
+```bash
+# Executar mutation testing
+mvn test pitest:mutationCoverage
+
+# Relatório
+target/pit-reports/index.html
+```
+
+### Thresholds
+
+| Métrica | Mínimo | Descrição |
+|---------|--------|-----------|
+| Mutation | 70% | % de mutantes mortos |
+| Coverage | 80% | Cobertura de linhas |
+
+### Boas Práticas
+
+```java
+// ❌ Teste que não mata mutantes de boundary
+@Test void testPositive() {
+    assertTrue(isAdult(25));  // Mutante >= → > sobrevive
+}
+
+// ✅ Teste que mata mutantes de boundary
+@Test void testBoundary() {
+    assertTrue(isAdult(18));   // Mata mutante >= → >
+    assertFalse(isAdult(17));  // Mata mutante >= → <=
+}
+```
+
+### Classes Excluídas
+
+Não rodar mutation testing em:
+- Classes `@Configuration` (wiring, sem lógica)
+- DTOs (Records sem comportamento)
+- Main class (`Application.java`)
+
 ## Princípio: Corrigir na Origem, Não Suprimir
 
 **NUNCA use `@SuppressWarnings` para mascarar problemas reais.** Sempre corrija a causa raiz.
