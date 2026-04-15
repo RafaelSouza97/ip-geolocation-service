@@ -17,13 +17,6 @@ import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
-/**
- * Serviço de geolocalização que implementa a lógica de negócio.
- * 
- * Fluxo: 1. Valida o IP 2. Se IP privado/localhost -> retorna fallback 3. Verifica cache -> se hit,
- * retorna do cache 4. Consulta API externa -> armazena no cache e retorna 5. Em caso de erro na API
- * -> retorna fallback
- */
 @Slf4j
 @Service
 @RequiredArgsConstructor
@@ -40,7 +33,6 @@ public class GeolocationService implements GeolocationUseCase {
     public GeolocationInfo locate(String ip) {
         log.debug("Looking up geolocation for IP: {}", ip);
 
-        // 1. Validar IP
         if (!IpValidator.isValid(ip)) {
             log.warn("Invalid IP address: {}", ip);
             throw new InvalidIpAddressException(ip);
@@ -48,25 +40,21 @@ public class GeolocationService implements GeolocationUseCase {
 
         String normalizedIp = IpValidator.normalize(ip);
 
-        // 2. Se IP privado/localhost, retornar fallback
         if (IpValidator.isPrivateOrReserved(normalizedIp)) {
             log.info("Private/reserved IP detected, returning fallback: {}", normalizedIp);
             return createFallback(normalizedIp);
         }
 
-        // 3. Verificar cache
         var cached = cache.get(normalizedIp);
         if (cached.isPresent()) {
             log.debug("Cache hit for IP: {}", normalizedIp);
             return cached.get().withCacheSource();
         }
 
-        // 4. Consultar API externa
         try {
             log.debug("Cache miss, calling external API for IP: {}", normalizedIp);
             var result = provider.lookup(normalizedIp);
 
-            // 5. Armazenar no cache (apenas resultados da API, não fallback)
             cache.put(normalizedIp, result);
             log.info("Geolocation found for IP {} from {}", normalizedIp, result.source());
 
@@ -80,9 +68,7 @@ public class GeolocationService implements GeolocationUseCase {
         }
     }
 
-    /**
-     * Cria resposta de fallback com país padrão (configurável).
-     */
+    
     private GeolocationInfo createFallback(String ip) {
         var fallbackProps = properties.fallback();
         return new GeolocationInfo(ip,
@@ -91,3 +77,4 @@ public class GeolocationService implements GeolocationUseCase {
                 Instant.now());
     }
 }
+
