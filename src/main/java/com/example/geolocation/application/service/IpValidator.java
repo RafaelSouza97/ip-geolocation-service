@@ -1,5 +1,8 @@
 package com.example.geolocation.application.service;
 
+import java.net.Inet6Address;
+import java.net.InetAddress;
+import java.net.UnknownHostException;
 import java.util.regex.Pattern;
 import lombok.experimental.UtilityClass;
 
@@ -7,29 +10,11 @@ import lombok.experimental.UtilityClass;
  * Validador de endereços IP (IPv4 e IPv6). Detecta IPs inválidos, privados e localhost.
  */
 @UtilityClass
-@SuppressWarnings("java:S5843") // Regex complexity is necessary for IPv6 validation
 public class IpValidator {
 
     // IPv4: Cada octeto de 0-255
     private final Pattern IPV4_PATTERN = Pattern.compile(
             "^((25[0-5]|(2[0-4]|1\\d|[1-9]|)\\d)\\.){3}(25[0-5]|(2[0-4]|1\\d|[1-9]|)\\d)$");
-
-    // IPv6: Formato completo e comprimido
-    private final Pattern IPV6_PATTERN =
-            Pattern.compile("^(([0-9a-fA-F]{1,4}:){7}[0-9a-fA-F]{1,4}|" + // Full
-                    "([0-9a-fA-F]{1,4}:){1,7}:|" + // Ends with ::
-                    "([0-9a-fA-F]{1,4}:){1,6}:[0-9a-fA-F]{1,4}|" + // :: in middle
-                    "([0-9a-fA-F]{1,4}:){1,5}(:[0-9a-fA-F]{1,4}){1,2}|"
-                    + "([0-9a-fA-F]{1,4}:){1,4}(:[0-9a-fA-F]{1,4}){1,3}|"
-                    + "([0-9a-fA-F]{1,4}:){1,3}(:[0-9a-fA-F]{1,4}){1,4}|"
-                    + "([0-9a-fA-F]{1,4}:){1,2}(:[0-9a-fA-F]{1,4}){1,5}|"
-                    + "[0-9a-fA-F]{1,4}:((:[0-9a-fA-F]{1,4}){1,6})|"
-                    + ":((:[0-9a-fA-F]{1,4}){1,7}|:)|" + // Starts with ::
-                    "fe80:(:[0-9a-fA-F]{0,4}){0,4}%[0-9a-zA-Z]+|" + // Link-local
-                    "::(ffff(:0{1,4})?:)?((25[0-5]|(2[0-4]|1?\\d)?\\d)\\.){3}" + // IPv4-mapped
-                    "(25[0-5]|(2[0-4]|1?\\d)?\\d)|"
-                    + "([0-9a-fA-F]{1,4}:){1,4}:((25[0-5]|(2[0-4]|1?\\d)?\\d)\\.){3}"
-                    + "(25[0-5]|(2[0-4]|1?\\d)?\\d))$");
 
     // IPs Privados IPv4
     private final Pattern PRIVATE_IPV4_PATTERN = Pattern.compile("^(10\\." + // 10.0.0.0/8
@@ -44,7 +29,7 @@ public class IpValidator {
     // Localhost IPv6
     private final Pattern LOCALHOST_IPV6_PATTERN = Pattern.compile("^(::1|0:0:0:0:0:0:0:1)$");
 
-    // Link-local IPv6
+    // Link-local / Private IPv6 (fc00::/7, fe80::/10)
     private final Pattern PRIVATE_IPV6_PATTERN =
             Pattern.compile("^(fe80:|fc00:|fd00:)", Pattern.CASE_INSENSITIVE);
 
@@ -73,13 +58,25 @@ public class IpValidator {
     }
 
     /**
-     * Verifica se é um IPv6 válido.
+     * Verifica se é um IPv6 válido usando InetAddress do Java.
      */
     public boolean isValidIpv6(String ip) {
         if (ip == null || ip.isBlank()) {
             return false;
         }
-        return IPV6_PATTERN.matcher(ip.trim()).matches();
+        String trimmed = ip.trim();
+
+        // Já é IPv4, não é IPv6
+        if (isValidIpv4(trimmed)) {
+            return false;
+        }
+
+        try {
+            InetAddress addr = InetAddress.getByName(trimmed);
+            return addr instanceof Inet6Address;
+        } catch (UnknownHostException e) {
+            return false;
+        }
     }
 
     /**

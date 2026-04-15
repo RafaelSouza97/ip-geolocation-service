@@ -1,20 +1,22 @@
 package com.example.geolocation.infrastructure.security;
 
-import com.example.geolocation.infrastructure.config.SecurityProperties;
-import com.example.geolocation.infrastructure.config.SecurityProperties.JwtProperties;
-import com.example.geolocation.infrastructure.config.SecurityProperties.UserProperties;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.awaitility.Awaitility.await;
+import java.time.Duration;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
-
-import static org.assertj.core.api.Assertions.assertThat;
+import com.example.geolocation.infrastructure.config.SecurityProperties;
+import com.example.geolocation.infrastructure.config.SecurityProperties.JwtProperties;
+import com.example.geolocation.infrastructure.config.SecurityProperties.UserProperties;
 
 @DisplayName("JwtService")
 class JwtServiceTest {
 
     private JwtService jwtService;
-    private static final String SECRET_KEY = "404E635266556A586E3272357538782F413F4428472B4B6250645367566B5970";
+    private static final String SECRET_KEY =
+            "404E635266556A586E3272357538782F413F4428472B4B6250645367566B5970";
     private static final long EXPIRATION = 86400000L; // 24 hours
 
     @BeforeEach
@@ -127,11 +129,8 @@ class JwtServiceTest {
             String token = shortExpirationService.generateToken("testuser");
 
             // Wait for token to expire
-            try {
-                Thread.sleep(10);
-            } catch (InterruptedException e) {
-                Thread.currentThread().interrupt();
-            }
+            await().pollInterval(Duration.ofMillis(5)).atMost(Duration.ofMillis(100))
+                    .until(() -> !shortExpirationService.isTokenValid(token, "testuser"));
 
             // Act & Assert
             assertThat(shortExpirationService.isTokenValid(token, "testuser")).isFalse();

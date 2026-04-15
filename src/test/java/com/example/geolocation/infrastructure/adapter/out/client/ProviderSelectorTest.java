@@ -1,5 +1,6 @@
 package com.example.geolocation.infrastructure.adapter.out.client;
 
+import static org.awaitility.Awaitility.await;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -196,7 +197,7 @@ class ProviderSelectorTest {
 
         @Test
         @DisplayName("should reset to primary after failover period expires")
-        void shouldResetToPrimaryAfterFailoverExpires() throws InterruptedException {
+        void shouldResetToPrimaryAfterFailoverExpires() {
             // Arrange - trigger failover first
             when(primaryProvider.lookup(TEST_IP))
                     .thenThrow(new ExternalApiException("ip-api.com", "Timeout"));
@@ -207,7 +208,8 @@ class ProviderSelectorTest {
             assertTrue(selector.isInFailover());
 
             // Wait for failover to expire (100ms configured in setUp)
-            Thread.sleep(150);
+            await().pollInterval(Duration.ofMillis(20)).atMost(Duration.ofMillis(300))
+                    .until(() -> !selector.isInFailover());
 
             // Reset mocks
             reset(primaryProvider, secondaryProvider);
