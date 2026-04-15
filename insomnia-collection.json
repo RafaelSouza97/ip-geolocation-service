@@ -15,7 +15,7 @@
       "_type": "workspace"
     },
     {
-      "_id": "env_base",
+      "_id": "env_local",
       "parentId": "wrk_ip_geolocation",
       "modified": 1712800000000,
       "created": 1712800000000,
@@ -29,6 +29,23 @@
       "color": "#7ED321",
       "isPrivate": false,
       "metaSortKey": 1,
+      "_type": "environment"
+    },
+    {
+      "_id": "env_prod",
+      "parentId": "wrk_ip_geolocation",
+      "modified": 1712800000000,
+      "created": 1712800000000,
+      "name": "Production (Render)",
+      "data": {
+        "base_url": "https://ip-geolocation-service-cn07.onrender.com",
+        "api_version": "v1",
+        "jwt_token": ""
+      },
+      "dataPropertyOrder": { "&": ["base_url", "api_version", "jwt_token"] },
+      "color": "#FA5A5A",
+      "isPrivate": false,
+      "metaSortKey": 2,
       "_type": "environment"
     },
     {
