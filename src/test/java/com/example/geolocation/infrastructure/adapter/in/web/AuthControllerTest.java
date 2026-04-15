@@ -1,10 +1,10 @@
 package com.example.geolocation.infrastructure.adapter.in.web;
 
-import static org.hamcrest.Matchers.notNullValue;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import java.util.Map;
+import java.util.Objects;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -18,7 +18,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 @SpringBootTest
 @AutoConfigureMockMvc
 @DisplayName("AuthController")
-@SuppressWarnings("java:S2187")
 class AuthControllerTest {
 
     @Autowired
@@ -40,9 +39,11 @@ class AuthControllerTest {
             var request = Map.of("username", "admin", "password", "Admin123@");
 
             // Act & Assert
-            mockMvc.perform(post(LOGIN_URL).contentType(MediaType.APPLICATION_JSON)
-                    .content(objectMapper.writeValueAsString(request))).andExpect(status().isOk())
-                    .andExpect(jsonPath("$.token").value(notNullValue()));
+            mockMvc.perform(
+                    post(LOGIN_URL).contentType(Objects.requireNonNull(MediaType.APPLICATION_JSON))
+                            .content(Objects
+                                    .requireNonNull(objectMapper.writeValueAsString(request))))
+                    .andExpect(status().isOk()).andExpect(jsonPath("$.token").exists());
         }
 
         @Test
@@ -52,8 +53,10 @@ class AuthControllerTest {
             var request = Map.of("username", "wronguser", "password", "Admin123@");
 
             // Act & Assert
-            mockMvc.perform(post(LOGIN_URL).contentType(MediaType.APPLICATION_JSON)
-                    .content(objectMapper.writeValueAsString(request)))
+            mockMvc.perform(
+                    post(LOGIN_URL).contentType(Objects.requireNonNull(MediaType.APPLICATION_JSON))
+                            .content(Objects
+                                    .requireNonNull(objectMapper.writeValueAsString(request))))
                     .andExpect(status().isUnauthorized());
         }
 
@@ -64,8 +67,10 @@ class AuthControllerTest {
             var request = Map.of("username", "admin", "password", "wrongpassword");
 
             // Act & Assert
-            mockMvc.perform(post(LOGIN_URL).contentType(MediaType.APPLICATION_JSON)
-                    .content(objectMapper.writeValueAsString(request)))
+            mockMvc.perform(
+                    post(LOGIN_URL).contentType(Objects.requireNonNull(MediaType.APPLICATION_JSON))
+                            .content(Objects
+                                    .requireNonNull(objectMapper.writeValueAsString(request))))
                     .andExpect(status().isUnauthorized());
         }
 
@@ -76,8 +81,10 @@ class AuthControllerTest {
             var request = Map.of("password", "Admin123@");
 
             // Act & Assert
-            mockMvc.perform(post(LOGIN_URL).contentType(MediaType.APPLICATION_JSON)
-                    .content(objectMapper.writeValueAsString(request)))
+            mockMvc.perform(
+                    post(LOGIN_URL).contentType(Objects.requireNonNull(MediaType.APPLICATION_JSON))
+                            .content(Objects
+                                    .requireNonNull(objectMapper.writeValueAsString(request))))
                     .andExpect(status().isBadRequest());
         }
 
@@ -88,8 +95,10 @@ class AuthControllerTest {
             var request = Map.of("username", "admin");
 
             // Act & Assert
-            mockMvc.perform(post(LOGIN_URL).contentType(MediaType.APPLICATION_JSON)
-                    .content(objectMapper.writeValueAsString(request)))
+            mockMvc.perform(
+                    post(LOGIN_URL).contentType(Objects.requireNonNull(MediaType.APPLICATION_JSON))
+                            .content(Objects
+                                    .requireNonNull(objectMapper.writeValueAsString(request))))
                     .andExpect(status().isBadRequest());
         }
 
@@ -97,7 +106,8 @@ class AuthControllerTest {
         @DisplayName("should return 400 when body is empty")
         void shouldReturn400WhenBodyEmpty() throws Exception {
             // Act & Assert
-            mockMvc.perform(post(LOGIN_URL).contentType(MediaType.APPLICATION_JSON).content("{}"))
+            mockMvc.perform(post(LOGIN_URL)
+                    .contentType(Objects.requireNonNull(MediaType.APPLICATION_JSON)).content("{}"))
                     .andExpect(status().isBadRequest());
         }
     }

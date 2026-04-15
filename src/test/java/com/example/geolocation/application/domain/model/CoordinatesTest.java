@@ -11,7 +11,6 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
 
 @DisplayName("Coordinates")
-@SuppressWarnings("java:S2187")
 class CoordinatesTest {
 
     @Nested

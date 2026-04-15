@@ -33,7 +33,6 @@ import com.github.tomakehurst.wiremock.client.WireMock;
 import com.github.tomakehurst.wiremock.core.WireMockConfiguration;
 
 @DisplayName("IpApiClient")
-@SuppressWarnings("java:S2187")
 class IpApiClientTest {
 
     private static WireMockServer wireMockServer;

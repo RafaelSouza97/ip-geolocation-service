@@ -11,7 +11,6 @@ import org.junit.jupiter.params.provider.CsvSource;
 import org.junit.jupiter.params.provider.NullAndEmptySource;
 
 @DisplayName("Country")
-@SuppressWarnings("java:S2187")
 class CountryTest {
 
     @Nested

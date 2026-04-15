@@ -37,7 +37,6 @@ import com.example.geolocation.infrastructure.config.GeolocationProperties.Provi
 
 @DisplayName("GeolocationService")
 @ExtendWith(MockitoExtension.class)
-@SuppressWarnings("java:S2187")
 class GeolocationServiceTest {
 
     @Mock

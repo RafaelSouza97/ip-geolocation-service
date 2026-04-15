@@ -22,7 +22,6 @@ import com.example.geolocation.infrastructure.security.JwtService;
 @WebMvcTest(GeolocationController.class)
 @AutoConfigureMockMvc(addFilters = false)
 @DisplayName("GlobalExceptionHandler")
-@SuppressWarnings("java:S2187")
 class GlobalExceptionHandlerTest {
 
     @Autowired
@@ -106,12 +105,16 @@ class GlobalExceptionHandlerTest {
             when(geolocationUseCase.locate(anyString()))
                     .thenThrow(new NullPointerException("Sensitive internal info"));
 
-            // Act & Assert
-            mockMvc.perform(get(LOCATE_URL).param("ip", "8.8.8.8").header(PLATFORM_HEADER, "Web"))
+            // Act
+            var result = mockMvc
+                    .perform(get(LOCATE_URL).param("ip", "8.8.8.8").header(PLATFORM_HEADER, "Web"))
                     .andExpect(status().isInternalServerError())
                     .andExpect(jsonPath("$.message").value("An unexpected error occurred"))
-                    .andExpect(jsonPath("$.message").value(org.hamcrest.Matchers
-                            .not(org.hamcrest.Matchers.containsString("Sensitive"))));
+                    .andReturn();
+
+            // Assert - verificação sem Hamcrest para evitar null safety warnings
+            String responseBody = result.getResponse().getContentAsString();
+            org.assertj.core.api.Assertions.assertThat(responseBody).doesNotContain("Sensitive");
         }
     }
 }
