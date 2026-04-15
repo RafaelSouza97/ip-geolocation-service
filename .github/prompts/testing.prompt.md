@@ -1,5 +1,5 @@
 ---
-mode: agent
+agent: agent
 description: "Use when: writing tests, creating test classes, implementing unit tests, integration tests, or any test-related code"
 ---
 

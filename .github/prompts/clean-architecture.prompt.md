@@ -32,12 +32,14 @@ src/main/java/com/example/geolocation/
 ## Dependency Rules
 
 ### ✅ PERMITIDO
+
 - `infrastructure` → `application` (depende de)
 - `adapter.in` → `port.in` (implementa/usa)
 - `adapter.out` → `port.out` (implementa)
 - `service` → `port.out` (usa interfaces)
 
 ### ❌ PROIBIDO
+
 - `application` → `infrastructure` (NUNCA!)
 - `domain` → qualquer coisa externa
 - Annotations do Spring em `domain/model`
@@ -45,6 +47,7 @@ src/main/java/com/example/geolocation/
 ## Naming Conventions por Camada
 
 ### Application Layer
+
 ```java
 // Ports (interfaces)
 public interface GeolocationUseCase {}        // Input port
@@ -63,6 +66,7 @@ public class GeolocationService implements GeolocationUseCase {}
 ```
 
 ### Infrastructure Layer
+
 ```java
 // Controllers
 @RestController
@@ -91,12 +95,12 @@ public class CacheConfig {}
 
 ## Testing by Layer
 
-| Layer | Test Type | Dependencies |
-|-------|-----------|--------------|
-| domain | Unit | Nenhuma |
-| service | Unit | Mocks de ports |
+| Layer       | Test Type   | Dependencies             |
+| ----------- | ----------- | ------------------------ |
+| domain      | Unit        | Nenhuma                  |
+| service     | Unit        | Mocks de ports           |
 | adapter.out | Integration | WireMock, TestContainers |
-| adapter.in | Integration | MockMvc, WebTestClient |
+| adapter.in  | Integration | MockMvc, WebTestClient   |
 
 ## Package Visibility
 
