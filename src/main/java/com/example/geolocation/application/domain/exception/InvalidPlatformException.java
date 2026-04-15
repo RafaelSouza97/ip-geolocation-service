@@ -3,10 +3,6 @@ package com.example.geolocation.application.domain.exception;
 import com.example.geolocation.application.domain.model.Platform;
 import lombok.Getter;
 
-/**
- * Exceção lançada quando a plataforma informada não é válida. Plataformas válidas: iOS, Android,
- * Web
- */
 @Getter
 public class InvalidPlatformException extends GeolocationException {
 
@@ -22,3 +18,4 @@ public class InvalidPlatformException extends GeolocationException {
         return ErrorCode.INVALID_PLATFORM.getCode();
     }
 }
+
