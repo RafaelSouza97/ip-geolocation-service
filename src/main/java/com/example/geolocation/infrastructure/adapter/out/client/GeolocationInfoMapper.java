@@ -8,39 +8,16 @@ import com.example.geolocation.application.domain.model.GeolocationInfo;
 import com.example.geolocation.application.domain.model.Region;
 import lombok.experimental.UtilityClass;
 
-/**
- * Utilitário para criar GeolocationInfo a partir de respostas de APIs externas. Centraliza o
- * tratamento de valores nulos e a criação do objeto de domínio.
- */
 @UtilityClass
 public class GeolocationInfoMapper {
 
-    /**
-     * Dados de resposta de API de geolocalização.
-     *
-     * @param ip endereço IP consultado
-     * @param countryCode código ISO do país
-     * @param countryName nome do país
-     * @param regionCode código da região (pode ser null)
-     * @param regionName nome da região (pode ser null)
-     * @param city cidade (pode ser null)
-     * @param latitude latitude (pode ser null)
-     * @param longitude longitude (pode ser null)
-     * @param timezone fuso horário (pode ser null)
-     * @param isp provedor de internet (pode ser null)
-     */
+    
     public record ApiResponseData(String ip, String countryCode, String countryName,
             String regionCode, String regionName, String city, Double latitude, Double longitude,
             String timezone, String isp) {
     }
 
-    /**
-     * Cria um GeolocationInfo a partir de dados de resposta da API externa. Trata valores nulos de
-     * forma segura.
-     *
-     * @param data dados da resposta da API
-     * @return GeolocationInfo preenchido
-     */
+    
     public GeolocationInfo fromApiResponse(ApiResponseData data) {
         return new GeolocationInfo(data.ip(), new Country(data.countryCode(), data.countryName()),
                 new Region(data.regionCode() != null ? data.regionCode() : "",
@@ -52,3 +29,4 @@ public class GeolocationInfoMapper {
                 data.isp() != null ? data.isp() : "", DataSource.API, Instant.now());
     }
 }
+

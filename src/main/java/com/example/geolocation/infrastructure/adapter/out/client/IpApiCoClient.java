@@ -18,9 +18,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
-/**
- * Cliente HTTP para a API ipapi.co. API secundária de fallback para geolocalização.
- */
 @Slf4j
 @Component("ipApiCoClient")
 @RequiredArgsConstructor
@@ -53,8 +50,6 @@ public class IpApiCoClient implements GeolocationProvider {
             }
 
             var apiResponse = objectMapper.readValue(response.body(), IpApiCoResponse.class);
-
-            // ipapi.co retorna error=true quando há falha
             if (apiResponse.error() != null && apiResponse.error()) {
                 log.warn("API {} returned error for IP {}: {}", API_NAME, ip, apiResponse.reason());
                 throw new ExternalApiException(API_NAME, apiResponse.reason());
@@ -84,9 +79,7 @@ public class IpApiCoClient implements GeolocationProvider {
                 response.longitude(), response.timezone(), response.org()));
     }
 
-    /**
-     * DTO para resposta da API ipapi.co.
-     */
+    
     @JsonIgnoreProperties(ignoreUnknown = true)
     record IpApiCoResponse(String ip, String city, String region,
             @JsonProperty("region_code") String regionCode,
@@ -95,3 +88,4 @@ public class IpApiCoClient implements GeolocationProvider {
             String timezone, String org, Boolean error, String reason) {
     }
 }
+

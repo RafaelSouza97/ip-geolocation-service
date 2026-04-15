@@ -12,3 +12,4 @@ public record LoginRequest(
                 @Schema(description = "Senha do usuário", example = "Admin123@") @NotBlank(
                                 message = ErrorCode.Validation.PASSWORD_REQUIRED) String password) {
 }
+

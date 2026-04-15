@@ -19,9 +19,6 @@ import com.example.geolocation.infrastructure.adapter.in.web.dto.ErrorResponse;
 import jakarta.validation.ConstraintViolationException;
 import lombok.extern.slf4j.Slf4j;
 
-/**
- * Handler global de exceções para a API REST.
- */
 @Slf4j
 @RestControllerAdvice
 public class GlobalExceptionHandler {
@@ -103,3 +100,4 @@ public class GlobalExceptionHandler {
                 ErrorCode.INTERNAL_ERROR.getCode(), ErrorCode.INTERNAL_ERROR.getMessage()));
     }
 }
+

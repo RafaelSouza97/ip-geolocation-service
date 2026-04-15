@@ -5,9 +5,6 @@ import io.swagger.v3.oas.annotations.media.Schema;
 
 import java.time.Instant;
 
-/**
- * DTO de resposta para informações de geolocalização.
- */
 @Schema(description = "Informações de geolocalização de um IP")
 public record GeolocationResponse(
     @Schema(description = "Endereço IP consultado", example = "8.8.8.8")
@@ -64,9 +61,7 @@ public record GeolocationResponse(
         double longitude
     ) {}
 
-    /**
-     * Converte um modelo de domínio para DTO de resposta.
-     */
+    
     public static GeolocationResponse fromDomain(GeolocationInfo info) {
         return new GeolocationResponse(
             info.ip(),
@@ -81,3 +76,4 @@ public record GeolocationResponse(
         );
     }
 }
+

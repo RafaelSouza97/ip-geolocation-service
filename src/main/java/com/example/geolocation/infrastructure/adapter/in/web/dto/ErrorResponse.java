@@ -4,9 +4,6 @@ import io.swagger.v3.oas.annotations.media.Schema;
 
 import java.time.Instant;
 
-/**
- * DTO de resposta para erros.
- */
 @Schema(description = "Resposta de erro da API")
 public record ErrorResponse(
     @Schema(description = "Código do erro", example = "INVALID_IP_FORMAT")
@@ -22,3 +19,4 @@ public record ErrorResponse(
         this(code, message, Instant.now());
     }
 }
+

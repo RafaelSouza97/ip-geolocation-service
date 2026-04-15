@@ -8,9 +8,6 @@ import com.github.benmanes.caffeine.cache.Cache;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
-/**
- * Implementação de cache usando Caffeine.
- */
 @Slf4j
 @Component
 @RequiredArgsConstructor
@@ -47,3 +44,4 @@ public class CaffeineGeolocationCache implements GeolocationCache {
         cache.invalidateAll();
     }
 }
+

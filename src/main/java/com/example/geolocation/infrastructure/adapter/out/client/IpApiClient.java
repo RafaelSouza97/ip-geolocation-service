@@ -20,9 +20,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
-/**
- * Cliente HTTP para a API ip-api.com. Provedor primário de geolocalização.
- */
 @Slf4j
 @Component("ipApiClient")
 @RequiredArgsConstructor
@@ -82,12 +79,11 @@ public class IpApiClient implements GeolocationProvider {
                 response.timezone(), response.isp()));
     }
 
-    /**
-     * DTO para resposta da API ip-api.com.
-     */
+    
     @JsonIgnoreProperties(ignoreUnknown = true)
     record IpApiResponse(String status, String message, String country, String countryCode,
             String region, String regionName, String city, double lat, double lon, String timezone,
             String isp, @JsonProperty("query") String query) {
     }
 }
+

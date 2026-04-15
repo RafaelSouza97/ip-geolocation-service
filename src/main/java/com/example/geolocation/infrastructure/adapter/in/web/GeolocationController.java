@@ -25,9 +25,6 @@ import jakarta.validation.constraints.NotBlank;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
-/**
- * Controller REST para geolocalização de IPs.
- */
 @Slf4j
 @RestController
 @RequestMapping("/api/geolocation/v1")
@@ -59,10 +56,8 @@ public class GeolocationController {
                             required = false) String platform) {
         log.debug("Received locate request for IP: {} from platform: {}", ip, platform);
 
-        // Validar header de plataforma
         validatePlatform(platform);
 
-        // Executar caso de uso
         var result = geolocationUseCase.locate(ip);
 
         log.info("Geolocation for IP {} returned from {}", ip, result.sourceValue());
@@ -80,3 +75,4 @@ public class GeolocationController {
         }
     }
 }
+
