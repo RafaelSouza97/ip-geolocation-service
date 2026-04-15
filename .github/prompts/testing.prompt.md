@@ -211,10 +211,12 @@ target/pit-reports/index.html
 
 ### Thresholds
 
-| Métrica | Mínimo | Descrição |
-|---------|--------|-----------|
-| Mutation | 70% | % de mutantes mortos |
-| Coverage | 80% | Cobertura de linhas |
+| Métrica  | Mínimo | Excelente | Descrição            |
+| -------- | ------ | --------- | -------------------- |
+| Mutation | 70%    | **>80%**  | % de mutantes mortos |
+| Coverage | 80%    | **>90%**  | Cobertura de linhas  |
+
+> **Objetivo:** Sempre buscar o nível **Excelente** (>80% mutation, >90% coverage)
 
 ### Boas Práticas
 
@@ -234,6 +236,7 @@ target/pit-reports/index.html
 ### Classes Excluídas
 
 Não rodar mutation testing em:
+
 - Classes `@Configuration` (wiring, sem lógica)
 - DTOs (Records sem comportamento)
 - Main class (`Application.java`)
