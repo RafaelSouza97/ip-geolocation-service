@@ -12,32 +12,35 @@ public record GeolocationInfo(String ip, Country country, Region region, String 
         Objects.requireNonNull(country, ErrorCode.COUNTRY_NULL.getMessage());
         Objects.requireNonNull(source, ErrorCode.SOURCE_NULL.getMessage());
 
-        if (region == null)
+        if (region == null) {
             region = new Region("", "");
-        if (city == null)
+        }
+        if (city == null) {
             city = "";
-        if (coordinates == null)
+        }
+        if (coordinates == null) {
             coordinates = Coordinates.zero();
-        if (timezone == null)
+        }
+        if (timezone == null) {
             timezone = "";
-        if (isp == null)
+        }
+        if (isp == null) {
             isp = "";
-        if (timestamp == null)
+        }
+        if (timestamp == null) {
             timestamp = Instant.now();
+        }
     }
 
-    
     public GeolocationInfo withCacheSource() {
         return new GeolocationInfo(ip, country, region, city, coordinates, timezone, isp,
                 DataSource.CACHE, timestamp);
     }
 
-    
     public boolean isFallback() {
         return DataSource.FALLBACK.equals(source);
     }
 
-    
     public String sourceValue() {
         return source.getValue();
     }

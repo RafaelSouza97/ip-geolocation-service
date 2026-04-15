@@ -7,13 +7,10 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public enum DataSource {
 
-    
     CACHE("cache"),
 
-    
     API("api"),
 
-    
     FALLBACK("fallback");
 
     private final String value;

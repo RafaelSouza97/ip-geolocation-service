@@ -25,22 +25,18 @@ public enum Platform {
         return value;
     }
 
-    
     public static Set<String> validValues() {
         return VALID_VALUES_SET;
     }
 
-    
     public static String validValuesAsString() {
         return VALID_VALUES_STRING;
     }
 
-    
     public static boolean isValid(String value) {
         return VALID_VALUES_SET.contains(value);
     }
 
-    
     public static Platform fromValue(String value) {
         return Arrays.stream(values()).filter(p -> p.getValue().equals(value)).findFirst()
                 .orElseThrow(() -> new IllegalArgumentException(
@@ -48,5 +44,4 @@ public enum Platform {
                                 .format(value)));
     }
 }
-
 

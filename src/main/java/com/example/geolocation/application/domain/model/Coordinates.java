@@ -12,7 +12,6 @@ public record Coordinates(double latitude, double longitude) {
         }
     }
 
-    
     public static Coordinates zero() {
         return new Coordinates(0, 0);
     }
